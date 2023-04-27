@@ -9,4 +9,5 @@ interface OrderContract
 {
     public function user(): BelongsTo;
     public function items(): HasMany;
+    public function getThankYouUrl(): string;
 }

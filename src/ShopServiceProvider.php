@@ -33,6 +33,8 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
+
         app()->runningUnitTests()
             ? $this->bootTesting()
             : $this->bootDefault();
@@ -45,14 +47,11 @@ class ShopServiceProvider extends ServiceProvider
             $this->getPath('database/migrations') => database_path('migrations'),
             $this->getPath('resources/views') => resource_path('views/vendor/shop'),
         ], 'shop');
-
-        $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
     }
 
     protected function bootTesting(): void
     {
         $this->loadMigrationsFrom($this->getPath('database/migrations'));
-        $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
     }
 
     protected function registerCartService(): void

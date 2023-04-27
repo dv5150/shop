@@ -239,22 +239,20 @@ class CheckoutTest extends TestCase
     public function thank_you_page_redirects_when_no_order_was_found(): void
     {
         $this->get(route('shop.order.thankYou', [
-            'order' => 'a-b-c-d-e-f-not-found'
+            'uuid' => 'a-b-c-d-e-f-not-found'
         ]))->assertStatus(302);
     }
 
     public function checkThankYouPageAccessWithOrderAvailable(TestResponse $response): void
     {
+        $order = config('shop.models.order')::first();
+
         $response->assertStatus(201)
             ->assertJson([
-                'redirectUrl' => route('shop.order.thankYou', [
-                    'order' => config('shop.models.order')::first()
-                ])
+                'redirectUrl' => $order->getThankYouUrl()
             ]);
 
-        $this->get(route('shop.order.thankYou', [
-            'order' => config('shop.models.order')::first()
-        ]))
+        $this->get($order->getThankYouUrl())
             ->assertStatus(200)
             ->assertViewIs('shop::thankYou.order');
     }

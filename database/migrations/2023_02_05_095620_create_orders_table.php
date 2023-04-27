@@ -14,20 +14,22 @@ class CreateOrdersTable extends Migration
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->uuid('id')
-                ->primary();
+            $table->id();
+            $table->uuid('uuid');
 
             $table->unsignedBigInteger('user_id')
                 ->nullable();
 
             $table->string('email');
             $table->string('phone');
+            $table->text('comment')
+                ->nullable();
 
             $table->string('shipping_name');
             $table->string('shipping_zip_code');
             $table->string('shipping_city');
             $table->string('shipping_address');
-            $table->string('shipping_comment')
+            $table->text('shipping_comment')
                 ->nullable();
 
             $table->string('billing_name');

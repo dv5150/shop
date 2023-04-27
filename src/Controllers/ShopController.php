@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Redirect;
 
 class ShopController
 {
-    public function showThankYouPage(string $order)
+    public function showThankYouPage(string $uuid)
     {
-        $order = config('shop.models.order')::find($order);
+        $order = config('shop.models.order')::firstWhere('uuid', $uuid);
 
         if (!$order) {
             return Redirect::route(config('shop.onSuccessfulOrder.redirectRoute'));

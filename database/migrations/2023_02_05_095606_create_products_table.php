@@ -16,10 +16,10 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
-            $table->json('name');
-            $table->json('slug');
+            $table->string('name');
+            $table->string('slug');
+            $table->text('description');
 
-            $table->json('description');
             $table->float('price_gross')
                 ->default(0.0);
             $table->boolean('is_digital_product')

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class CheckoutAPIController
 {
@@ -38,7 +39,7 @@ class CheckoutAPIController
         $this->saveItems($order, $orderData['cartData']);
 
         return new JsonResponse(data: [
-            'redirectUrl' => route('shop.order.thankYou', ['order' => $order])
+            'redirectUrl' => $order->getThankYouUrl()
         ], status: 201);
     }
 
@@ -59,6 +60,11 @@ class CheckoutAPIController
             $order->user()->associate($user);
         }
 
+        do {
+            $uuid = Str::uuid();
+        } while (config('shop.models.order')::whereUuid($uuid)->exists());
+
+        $order->setAttribute('uuid', $uuid);
         $order->save();
 
         return $order;
