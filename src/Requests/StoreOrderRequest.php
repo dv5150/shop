@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Requests;
 
+use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOrderRequest extends FormRequest
@@ -23,25 +24,6 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'personalData.email' => 'required|email|max:255',
-            'personalData.phone' => 'required|string|max:255',
-
-            'shippingData.name' => 'required|string|max:255',
-            'shippingData.zipCode' => 'required|string|max:255',
-            'shippingData.city' => 'required|string|max:255',
-            'shippingData.street' => 'required|string|max:255',
-            'shippingData.comment' => 'required|string|max:255',
-
-            'billingData.name' => 'required|string|max:255',
-            'billingData.zipCode' => 'required|string|max:255',
-            'billingData.city' => 'required|string|max:255',
-            'billingData.street' => 'required|string|max:255',
-            'billingData.taxNumber' => 'required|string|max:255',
-
-            'cartData' => 'required|array|min:1',
-            'cartData.*.item.id' => 'required|exists:products,id',
-            'cartData.*.quantity' => 'required|integer|min:1',
-        ];
+        return app(OrderDataTransformerContract::class)->rules();
     }
 }

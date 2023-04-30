@@ -7,11 +7,37 @@ use Illuminate\Support\Arr;
 
 class OrderDataTransformer implements OrderDataTransformerContract
 {
+    public function rules(): array
+    {
+        return [
+            'personalData.email' => 'required|email|max:255',
+            'personalData.phone' => 'required|string|max:255',
+            'personalData.comment' => 'required|string',
+
+            'shippingData.name' => 'required|string|max:255',
+            'shippingData.zipCode' => 'required|string|max:255',
+            'shippingData.city' => 'required|string|max:255',
+            'shippingData.street' => 'required|string|max:255',
+            'shippingData.comment' => 'required|string',
+
+            'billingData.name' => 'required|string|max:255',
+            'billingData.zipCode' => 'required|string|max:255',
+            'billingData.city' => 'required|string|max:255',
+            'billingData.street' => 'required|string|max:255',
+            'billingData.taxNumber' => 'required|string|max:255',
+
+            'cartData' => 'required|array|min:1',
+            'cartData.*.item.id' => 'required|exists:products,id',
+            'cartData.*.quantity' => 'required|integer|min:1',
+        ];
+    }
+
     public function transform($orderData): array
     {
         return [
             'email' => Arr::get($orderData, 'personalData.email'),
             'phone' => Arr::get($orderData, 'personalData.phone'),
+            'comment' => Arr::get($orderData, 'personalData.comment'),
             'shipping_name' => Arr::get($orderData, 'shippingData.name'),
             'shipping_zip_code' => Arr::get($orderData, 'shippingData.zipCode'),
             'shipping_city' => Arr::get($orderData, 'shippingData.city'),
