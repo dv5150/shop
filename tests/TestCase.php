@@ -19,6 +19,8 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
+        $this->loadMigrationsFrom('database/migrations/');
+
         $this->withoutMix();
 
         Config::set('shop.models.product', Product::class);

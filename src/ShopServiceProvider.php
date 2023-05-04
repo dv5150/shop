@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop;
 
+use DV5150\Shop\Console\Commands\InstallCommand;
 use DV5150\Shop\Contracts\CartServiceContract;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
@@ -24,6 +25,10 @@ class ShopServiceProvider extends ServiceProvider
         $this->registerCartService();
         $this->registerTransformers();
         $this->registerApiRoutes();
+
+        $this->commands([
+            InstallCommand::class,
+        ]);
     }
 
     /**
@@ -34,24 +39,6 @@ class ShopServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
-
-        app()->runningUnitTests()
-            ? $this->bootTesting()
-            : $this->bootDefault();
-    }
-
-    protected function bootDefault(): void
-    {
-        $this->publishes([
-            $this->getPath('config/shop.php') => config_path('shop.php'),
-            $this->getPath('database/migrations') => database_path('migrations'),
-            $this->getPath('resources/views') => resource_path('views/vendor/shop'),
-        ], 'shop');
-    }
-
-    protected function bootTesting(): void
-    {
-        $this->loadMigrationsFrom($this->getPath('database/migrations'));
     }
 
     protected function registerCartService(): void

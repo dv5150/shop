@@ -8,5 +8,5 @@
         @openCartDrawer="openDrawer"
     ></cart-drawer>
 
-    @include('shop.partials.productList')
+    @include('shop::partials.productList')
 @endsection

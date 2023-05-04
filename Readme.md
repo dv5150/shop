@@ -1,17 +1,15 @@
 # <span style="color: #F05340;">Laravel Webshop built with Vue 3, Pinia and Filament</span>
 ## The goal of the project:
 To create a Laravel webshop which is easy to install, customizable as much as possible while also keeping it developer-friendly.
-
 ##### `Chaotic version, will be tested on Windows 11 using Laravel 8`
 ---
 ## Setup
-
 1. Install the migration files and frontend components to your project:
     - `$ php artisan shop:install`
-2. Run the migrations to prepare the database:
+2. Update your `shop.php` config file with your models.
+3. Run the migrations to prepare the database:
     - `$ php artisan migrate`
-3. Use the example app.js to get an idea:
-
+4. Use the example app.js to get an idea:
     ```js
     require('./bootstrap')
 
@@ -40,21 +38,15 @@ To create a Laravel webshop which is easy to install, customizable as much as po
     let checkout = useCheckoutStore()
     checkout.init()
     ```
-4. Run the compiler:
+5. Run the compiler:
     - `$ npm run dev`
-
 ---
+## Filament support (Optional)
 
-## Setup Filament support (Optional)
+Throughout the above installation process you will have the option to install the webshop Filament resources.
 
-Install the Filament support resources:
-
-`$ php artisan shop:filament`
-
-This does not include a User Filament resource. \
-However, if you would like to, you can display a user's previous orders on their admin page,
+This does not include a User Filament resource. However, if you would like to, you can display a user's previous orders on their admin page,
 just update your own User Filament resource with the following:
-
 ```php
 use App\Filament\Resources\UserResource\RelationManagers\OrdersRelationManager;
 
