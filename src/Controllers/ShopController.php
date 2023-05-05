@@ -10,7 +10,7 @@ class ShopController
 
         abort_if(!$order, 404, __('Order not found.'));
 
-        return view('shop::thankYou.order', [
+        return view('shop::thankYou', [
             'order' => $order
         ]);
     }

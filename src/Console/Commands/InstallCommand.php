@@ -107,7 +107,7 @@ class InstallCommand extends Command
 
         foreach ($this->migrations as $migration) {
             File::copy(
-                $this->getPath("database/migrations/$migration.php"),
+                $this->getPath("database/migrations/$migration.php.stub"),
                 database_path("migrations/{$date}_shop_{$migration}.php")
             );
         }

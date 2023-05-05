@@ -19,16 +19,14 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom('database/migrations/');
-
         $this->withoutMix();
+
+        $this->loadMigrationsFrom('database/migrations');
 
         Config::set('shop.models.product', Product::class);
         Config::set('shop.models.order', Order::class);
         Config::set('shop.models.orderItem', OrderItem::class);
         Config::set('shop.models.user', User::class);
-
-        Config::set('shop.onSuccessfulOrder.redirectRoute', 'home');
     }
 
     protected function getPackageProviders($app)

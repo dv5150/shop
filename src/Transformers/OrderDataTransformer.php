@@ -12,13 +12,13 @@ class OrderDataTransformer implements OrderDataTransformerContract
         return [
             'personalData.email' => 'required|email|max:255',
             'personalData.phone' => 'required|string|max:255',
-            'personalData.comment' => 'required|string',
+            'personalData.comment' => 'nullable|string',
 
             'shippingData.name' => 'required|string|max:255',
             'shippingData.zipCode' => 'required|string|max:255',
             'shippingData.city' => 'required|string|max:255',
             'shippingData.street' => 'required|string|max:255',
-            'shippingData.comment' => 'required|string',
+            'shippingData.comment' => 'nullable|string',
 
             'billingData.name' => 'required|string|max:255',
             'billingData.zipCode' => 'required|string|max:255',

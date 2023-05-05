@@ -6,13 +6,10 @@ use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Tests\Mock\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 
 class CheckoutTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected ProductContract $productA;
     protected ProductContract $productB;
 
@@ -27,8 +24,6 @@ class CheckoutTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->refreshDatabase();
 
         $this->productA = config('shop.models.product')::factory()
             ->create()
@@ -236,11 +231,11 @@ class CheckoutTest extends TestCase
     }
 
     /** @test */
-    public function thank_you_page_redirects_when_no_order_was_found(): void
+    public function thank_you_page_throws_404_when_no_order_was_found(): void
     {
         $this->get(route('shop.order.thankYou', [
             'uuid' => 'a-b-c-d-e-f-not-found'
-        ]))->assertStatus(302);
+        ]))->assertStatus(404);
     }
 
     public function checkThankYouPageAccessWithOrderAvailable(TestResponse $response): void
@@ -254,6 +249,6 @@ class CheckoutTest extends TestCase
 
         $this->get($order->getThankYouUrl())
             ->assertStatus(200)
-            ->assertViewIs('shop::thankYou.order');
+            ->assertViewIs('shop::thankYou');
     }
 }

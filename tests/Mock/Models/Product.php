@@ -8,21 +8,13 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Sluggable\HasTranslatableSlug;
 use Spatie\Sluggable\SlugOptions;
-use Spatie\Translatable\HasTranslations;
 
 class Product extends Model implements ProductContract
 {
-    use HasFactory, HasTranslations, HasTranslatableSlug;
+    use HasFactory;
 
     protected $guarded = [];
-
-    public $translatable = [
-        'name',
-        'slug',
-        'description',
-    ];
 
     public $casts = [
         'is_digital_product' => 'boolean',

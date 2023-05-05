@@ -18,27 +18,14 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
-        $suffixes = [
-            'en' => ['Sweater', 'Pants', 'Shirt', 'Glasses', 'Hat', 'Socks'],
-            'hu' => ['Pulóver', 'Nadrág', 'Ing', 'Szemüveg', 'Sapka', 'Zokni'],
-        ];
+        $suffixes = ['Sweater', 'Pants', 'Shirt', 'Glasses', 'Hat', 'Socks'];
 
-        $nameEn = $this->faker->company() . ' ' . Arr::random($suffixes['en']);
-        $nameHu = $this->faker->company() . ' ' . Arr::random($suffixes['hu']);
+        $name = $this->faker->company() . ' ' . Arr::random($suffixes);
 
         return [
-            'name' => [
-                'en' => $nameEn,
-                'hu' => $nameHu,
-            ],
-            'slug' => [
-                'en' => Str::slug($nameEn),
-                'hu' => Str::slug($nameHu),
-            ],
-            'description' => [
-                'en' => $this->faker->realText(320),
-                'hu' => $this->faker->realText(320),
-            ],
+            'name' => $name,
+            'slug' => Str::slug($name),
+            'description' => $this->faker->realText(320),
             'price_gross' => $this->faker->numberBetween(1, 70) * 1000 - 10,
         ];
     }
