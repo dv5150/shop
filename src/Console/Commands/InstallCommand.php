@@ -128,7 +128,7 @@ class InstallCommand extends Command
 
         foreach ($this->models as $model) {
             File::copy(
-                $this->getPath("src/Models/Shop/$model.php.stub"),
+                $this->getPath("src/Models/Default/$model.php.stub"),
                 app_path("Models/Shop/$model.php")
             );
         }
