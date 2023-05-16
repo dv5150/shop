@@ -11,8 +11,9 @@ class CartService
 {
     public function all(): CartCollection
     {
-        if ($cart = Session::get($this->getCartSessionKey())) {
-            return unserialize($cart);
+        if ($cart = Session::get($this->getSessionKey())) {
+            return unserialize($cart)
+                ->map(fn (CartItemCapsule $capsule) => $capsule->refreshDiscount());
         }
 
         return $this->reset();
@@ -20,7 +21,11 @@ class CartService
 
     public function reset(): CartCollection
     {
-        return $this->saveCart(new CartCollection());
+        $cart = new CartCollection();
+
+        $this->saveCart($cart);
+
+        return $cart;
     }
 
     public function addItem(ProductContract $item, int $quantity = 1): CartCollection
@@ -32,7 +37,9 @@ class CartService
             ? $cart->incrementQuantityBy($item, $quantity)
             : $cart->push(new CartItemCapsule($item, $quantity));
 
-        return $this->saveCart($cart);
+        $this->saveCart($cart);
+
+        return $this->all();
     }
 
     public function removeItem(ProductContract $item, int $quantity = 1): CartCollection
@@ -44,7 +51,9 @@ class CartService
             $cart = $cart->decrementQuantityBy($item, $quantity);
         }
 
-        return $this->saveCart($cart);
+        $this->saveCart($cart);
+
+        return $this->all();
     }
 
     public function eraseItem(ProductContract $item): CartCollection
@@ -56,7 +65,9 @@ class CartService
             $cart = $cart->eraseItem($item);
         }
 
-        return $this->saveCart($cart);
+        $this->saveCart($cart);
+
+        return $this->all();
     }
 
     public function hasDigitalItemsOnly(): bool
@@ -79,12 +90,12 @@ class CartService
 
     public function saveCart(CartCollection $cart): CartCollection
     {
-        Session::put($this->getCartSessionKey(), serialize($cart));
+        Session::put($this->getSessionKey(), serialize($cart));
 
         return $cart;
     }
 
-    public function getCartSessionKey(): string
+    public function getSessionKey(): string
     {
         return 'cart';
     }

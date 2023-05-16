@@ -5,6 +5,7 @@ namespace DV5150\Shop\Controllers\API;
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Contracts\ProductContract;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Model;
 
 class CartAPIController
 {
@@ -41,7 +42,9 @@ class CartAPIController
 
     protected function resolveProduct($productID): ProductContract
     {
-        $product = config('shop.models.product')::findOrFail($productID);
+        /** @var Model $product */
+        $product = config('shop.models.product')::with('discounts.discount')
+            ->findOrFail($productID);
 
         if (!$product instanceof ProductContract) {
             abort(422, __('The selected item is not a valid product.'));

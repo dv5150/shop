@@ -3,11 +3,13 @@
 namespace DV5150\Shop\Tests\Mock\Models;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\Discount;
 use DV5150\Shop\Tests\Mock\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Sluggable\SlugOptions;
 
 class Product extends Model implements ProductContract
@@ -28,6 +30,11 @@ class Product extends Model implements ProductContract
     public function orders(): BelongsToMany
     {
         return $this->belongsToMany(config('shop.models.order'));
+    }
+
+    public function discounts(): MorphMany
+    {
+        return $this->morphMany(Discount::class, 'discountable');
     }
 
     public function getSlugOptions(): SlugOptions
