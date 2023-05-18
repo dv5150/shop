@@ -20,6 +20,11 @@ class ProductValueDiscount extends Discount
         ]);
     }
 
+    public function getFullName(): ?string
+    {
+        return "{$this->getValue()} OFF ({$this->getName()})";
+    }
+
     public function getName(): ?string
     {
         return $this->name;

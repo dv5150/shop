@@ -17,6 +17,7 @@ class InstallCommand extends Command
         '07_create_category_product_table',
         '08_create_shipping_modes_table',
         '09_create_payment_modes_table',
+        '10_create_discounts_table',
     ];
 
     protected array $models = [
@@ -38,6 +39,13 @@ class InstallCommand extends Command
         'ProductResource/Pages/CreateProduct',
         'ProductResource/Pages/EditProduct',
         'ProductResource/Pages/ListProducts',
+        'ProductResource/RelationManagers/DiscountsRelationManager',
+        'ProductPercentDiscountResource/Pages/CreateProductPercentDiscount',
+        'ProductPercentDiscountResource/Pages/EditProductPercentDiscount',
+        'ProductPercentDiscountResource/Pages/ListProductPercentDiscounts',
+        'ProductValueDiscountResource/Pages/CreateProductValueDiscount',
+        'ProductValueDiscountResource/Pages/EditProductValueDiscount',
+        'ProductValueDiscountResource/Pages/ListProductValueDiscounts',
         'UserResource/RelationManagers/OrdersRelationManager',
         'OrderResource',
         'ProductResource',
@@ -160,7 +168,10 @@ class InstallCommand extends Command
             'Filament/Resources/OrderResource/Pages',
             'Filament/Resources/OrderResource/RelationManagers',
             'Filament/Resources/ProductResource/Pages',
+            'Filament/Resources/ProductResource/RelationManagers',
             'Filament/Resources/UserResource/RelationManagers',
+            'Filament/Resources/ProductPercentDiscountResource/Pages',
+            'Filament/Resources/ProductValueDiscountResource/Pages',
         ];
 
         foreach ($directories as $directory) {

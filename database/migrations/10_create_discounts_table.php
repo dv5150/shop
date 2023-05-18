@@ -19,6 +19,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('discounts', function (Blueprint $table) {
+            $table->id();
             $table->morphs('discountable');
             $table->morphs('discount');
         });

@@ -9,6 +9,8 @@ class Discount extends Model
 {
     public $timestamps = false;
 
+    protected $guarded = [];
+
     public function discountable(): MorphTo
     {
         return $this->morphTo();
@@ -22,6 +24,7 @@ class Discount extends Model
     public function toArray(): array
     {
         return [
+            'fullName' => static::getFullName(),
             'name' => static::getName(),
             'value' => static::getValue(),
             'unit' => static::getUnit(),

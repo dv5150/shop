@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\ProductPercentDiscountResource\Pages;
+
+use App\Filament\Resources\ProductPercentDiscountResource;
+use Filament\Pages\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+
+class ListProductPercentDiscounts extends ListRecords
+{
+    protected static string $resource = ProductPercentDiscountResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            CreateAction::make(),
+        ];
+    }
+}

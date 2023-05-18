@@ -22,6 +22,11 @@ class ProductPercentDiscount extends Discount
         return max([$originalPrice - $discount, 0.0]);
     }
 
+    public function getFullName(): ?string
+    {
+        return "{$this->getValue()}% ({$this->getName()})";
+    }
+
     public function getName(): ?string
     {
         return $this->name;

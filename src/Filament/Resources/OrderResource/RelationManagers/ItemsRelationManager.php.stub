@@ -28,8 +28,7 @@ class ItemsRelationManager extends RelationManager
         return $this->getOwnerRecord()
             ->{static::getRelationshipName()}()
             ->with('product')
-            ->select()
-            ->addSelect(DB::raw('(quantity * price_gross) as subtotal'));
+            ->select(['*', DB::raw('(quantity * price_gross) as subtotal')]);
     }
 
     public static function form(Form $form): Form
