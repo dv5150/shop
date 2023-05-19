@@ -8,6 +8,7 @@ use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Models\Discount;
 use DV5150\Shop\Models\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Discounts\ProductValueDiscount;
+use DV5150\Shop\Tests\Mock\Models\Product;
 
 class DiscountTest extends TestCase
 {
@@ -39,29 +40,17 @@ class DiscountTest extends TestCase
         Cart::addItem($this->productB);
         Cart::addItem($this->productC);
 
-        $discountA = tap(new Discount(), function (Discount $discount) {
-            $percentDiscountA = ProductPercentDiscount::create([
-                'name' => '60% OFF discount',
-                'value' => 60.0,
-            ]);
+        $discountA = $this->createPercentDiscountForProduct(
+            $this->productA,
+            '60% OFF discount',
+            60.0
+        );
 
-            $discount->discountable()->associate($this->productA);
-            $discount->discount()->associate($percentDiscountA);
-        });
-
-        $discountA->save();
-
-        $discountB = tap(new Discount(), function (Discount $discount) {
-            $percentDiscountB = ProductPercentDiscount::create([
-                'name' => '13% OFF discount',
-                'value' => 13.0,
-            ]);
-
-            $discount->discountable()->associate($this->productB);
-            $discount->discount()->associate($percentDiscountB);
-        });
-
-        $discountB->save();
+        $discountB = $this->createPercentDiscountForProduct(
+            $this->productB,
+            '13% OFF discount',
+            13.0
+        );
 
         $expected = [
             [
@@ -107,29 +96,17 @@ class DiscountTest extends TestCase
         Cart::addItem($this->productB);
         Cart::addItem($this->productC);
 
-        $discountA = tap(new Discount(), function (Discount $discount) {
-            $valueDiscountA = ProductValueDiscount::create([
-                'name' => '1000 OFF discount',
-                'value' => 1000.0,
-            ]);
+        $discountA = $this->createValueDiscountForProduct(
+            $this->productA,
+            '1000 OFF discount',
+            1000.0
+        );
 
-            $discount->discountable()->associate($this->productA);
-            $discount->discount()->associate($valueDiscountA);
-        });
-
-        $discountA->save();
-
-        $discountB = tap(new Discount(), function (Discount $discount) {
-            $valueDiscountB = ProductValueDiscount::create([
-                'name' => '4400 OFF discount',
-                'value' => 4400.0,
-            ]);
-
-            $discount->discountable()->associate($this->productB);
-            $discount->discount()->associate($valueDiscountB);
-        });
-
-        $discountB->save();
+        $discountB = $this->createValueDiscountForProduct(
+            $this->productB,
+            '4400 OFF discount',
+            4400.0
+        );
 
         $expected = [
             [
@@ -169,83 +146,47 @@ class DiscountTest extends TestCase
     }
 
     /** @test */
-    public function product_best_available_discount_is_applied()
+    public function best_available_discount_is_applied()
     {
         Cart::addItem($this->productA);
         Cart::addItem($this->productB);
         Cart::addItem($this->productC);
 
-        $discountAA = tap(new Discount(), function (Discount $discount) {
-            $valueDiscountAA = ProductValueDiscount::create([
-                'name' => '1000 OFF discount',
-                'value' => 1000.0,
-            ]);
+        $this->createValueDiscountForProduct(
+            $this->productA,
+            '1000 OFF discount',
+            1000.0
+        );
 
-            $discount->discountable()->associate($this->productA);
-            $discount->discount()->associate($valueDiscountAA);
-        });
+        $discountAB = $this->createValueDiscountForProduct(
+            $this->productA,
+            '3000 OFF discount',
+            3000.0
+        );
 
-        $discountAA->save();
+        $this->createPercentDiscountForProduct(
+            $this->productB,
+            '20% OFF discount',
+            20.0
+        );
 
-        $discountAB = tap(new Discount(), function (Discount $discount) {
-            $valueDiscountAB = ProductValueDiscount::create([
-                'name' => '3000 OFF discount',
-                'value' => 3000.0,
-            ]);
+        $discountBB = $this->createPercentDiscountForProduct(
+            $this->productB,
+            '70% OFF discount',
+            70.0
+        );
 
-            $discount->discountable()->associate($this->productA);
-            $discount->discount()->associate($valueDiscountAB);
-        });
+        $this->createPercentDiscountForProduct(
+            $this->productC,
+            '3% OFF discount',
+            3.0
+        );
 
-        $discountAB->save();
-
-        $discountBA = tap(new Discount(), function (Discount $discount) {
-            $percentDiscountBA = ProductPercentDiscount::create([
-                'name' => '20% OFF discount',
-                'value' => 20.0,
-            ]);
-
-            $discount->discountable()->associate($this->productB);
-            $discount->discount()->associate($percentDiscountBA);
-        });
-
-        $discountBA->save();
-
-        $discountBB = tap(new Discount(), function (Discount $discount) {
-            $percentDiscountBB = ProductPercentDiscount::create([
-                'name' => '70% OFF discount',
-                'value' => 70.0,
-            ]);
-
-            $discount->discountable()->associate($this->productB);
-            $discount->discount()->associate($percentDiscountBB);
-        });
-
-        $discountBB->save();
-
-        $discountCA = tap(new Discount(), function (Discount $discount) {
-            $percentDiscountCA = ProductPercentDiscount::create([
-                'name' => '3% OFF discount',
-                'value' => 3.0,
-            ]);
-
-            $discount->discountable()->associate($this->productC);
-            $discount->discount()->associate($percentDiscountCA);
-        });
-
-        $discountCA->save();
-
-        $discountCB = tap(new Discount(), function (Discount $discount) {
-            $valueDiscountCB = ProductValueDiscount::create([
-                'name' => '1000 OFF discount',
-                'value' => 1000.0,
-            ]);
-
-            $discount->discountable()->associate($this->productC);
-            $discount->discount()->associate($valueDiscountCB);
-        });
-
-        $discountCB->save();
+        $discountCB = $this->createValueDiscountForProduct(
+            $this->productC,
+            '1000 OFF discount',
+            1000.0
+        );
 
         $expected = [
             [
@@ -282,5 +223,136 @@ class DiscountTest extends TestCase
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson(['cartItems' => $expected]);
+    }
+
+    /** @test */
+    public function best_available_price_is_applied_when_removing_a_discount()
+    {
+        Cart::addItem($this->productA);
+        Cart::addItem($this->productB);
+
+        $discountAA = $this->createPercentDiscountForProduct($this->productA, '55% OFF discount', 55.0);
+        $discountAB = $this->createPercentDiscountForProduct($this->productA, '88% OFF discount', 88.0);
+
+        $discountBA = $this->createValueDiscountForProduct($this->productB, '510 OFF discount', 510.0);
+        $discountBB = $this->createValueDiscountForProduct($this->productB, '1510 OFF discount', 1510.0);
+
+        $expected = [
+            [
+                'item' => [
+                    'id' => $this->productA->getID(),
+                    'name' => $this->productA->getName(),
+                    'price_gross' => 600,
+                    'price_gross_original' => $this->productA->getPriceGross(),
+                    'discount' => $discountAB->toArray(),
+                ],
+                'quantity' => 1,
+            ],
+            [
+                'item' => [
+                    'id' => $this->productB->getID(),
+                    'name' => $this->productB->getName(),
+                    'price_gross' => 5990,
+                    'price_gross_original' => $this->productB->getPriceGross(),
+                    'discount' => $discountBB->toArray(),
+                ],
+                'quantity' => 1,
+            ],
+        ];
+
+        $this->get(route('api.shop.cart.index'))
+            ->assertJson(['cartItems' => $expected]);
+
+        $discountAB->delete();
+        $discountBB->delete();
+
+        $expected = [
+            [
+                'item' => [
+                    'id' => $this->productA->getID(),
+                    'name' => $this->productA->getName(),
+                    'price_gross' => 2250,
+                    'price_gross_original' => $this->productA->getPriceGross(),
+                    'discount' => $discountAA->toArray(),
+                ],
+                'quantity' => 1,
+            ],
+            [
+                'item' => [
+                    'id' => $this->productB->getID(),
+                    'name' => $this->productB->getName(),
+                    'price_gross' => 6990,
+                    'price_gross_original' => $this->productB->getPriceGross(),
+                    'discount' => $discountBA->toArray(),
+                ],
+                'quantity' => 1,
+            ],
+        ];
+
+        $this->get(route('api.shop.cart.index'))
+            ->assertJson(['cartItems' => $expected]);
+
+        $discountAA->delete();
+        $discountBA->delete();
+
+        $expected = [
+            [
+                'item' => [
+                    'id' => $this->productA->getID(),
+                    'name' => $this->productA->getName(),
+                    'price_gross' => $this->productA->getPriceGross(),
+                    'price_gross_original' => $this->productA->getPriceGross(),
+                    'discount' => null,
+                ],
+                'quantity' => 1,
+            ],
+            [
+                'item' => [
+                    'id' => $this->productB->getID(),
+                    'name' => $this->productB->getName(),
+                    'price_gross' => $this->productB->getPriceGross(),
+                    'price_gross_original' => $this->productB->getPriceGross(),
+                    'discount' => null,
+                ],
+                'quantity' => 1,
+            ],
+        ];
+
+        $this->get(route('api.shop.cart.index'))
+            ->assertJson(['cartItems' => $expected]);
+    }
+
+    protected function createPercentDiscountForProduct(Product $product, string $name, float $value): Discount
+    {
+        $discount = tap(new Discount(), function (Discount $discount) use ($name, $value, $product) {
+            $percentDiscount = ProductPercentDiscount::create([
+                'name' => $name,
+                'value' => $value,
+            ]);
+
+            $discount->discountable()->associate($product);
+            $discount->discount()->associate($percentDiscount);
+        });
+
+        $discount->save();
+
+        return $discount;
+    }
+
+    protected function createValueDiscountForProduct(Product $product, string $name, float $value): Discount
+    {
+        $discount = tap(new Discount(), function (Discount $discount) use ($name, $value, $product) {
+            $percentDiscount = ProductValueDiscount::create([
+                'name' => $name,
+                'value' => $value,
+            ]);
+
+            $discount->discountable()->associate($product);
+            $discount->discount()->associate($percentDiscount);
+        });
+
+        $discount->save();
+
+        return $discount;
     }
 }

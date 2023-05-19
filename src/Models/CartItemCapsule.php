@@ -65,8 +65,6 @@ class CartItemCapsule implements Arrayable
     {
         $this->removeDiscount();
 
-        $this->getItem()->load('discounts.discount');
-
         $this->applyDiscount();
 
         return $this;
@@ -74,9 +72,12 @@ class CartItemCapsule implements Arrayable
 
     protected function applyDiscount(): self
     {
-        $this->getItem()->discounts->each(
-            fn (Discount $discount) => $this->tryDiscount($discount->discount)
-        );
+        $this->getItem()
+            ->load('discounts.discount')
+            ->discounts
+            ->each(
+                fn (Discount $discount) => $this->tryDiscount($discount->discount)
+            );
 
         return $this;
     }
@@ -85,7 +86,7 @@ class CartItemCapsule implements Arrayable
     {
         $newDiscountedPriceGross = $discount->getDiscountedPriceGross($this);
 
-        if ($newDiscountedPriceGross <= $this->getBestAvailableTemporaryPrice()) {
+        if ($newDiscountedPriceGross <= $this->getPriceGross()) {
             $this->discountedPriceGross = $newDiscountedPriceGross;
             $this->discount = $discount;
         }
@@ -111,13 +112,7 @@ class CartItemCapsule implements Arrayable
         return $this->discountedPriceGross;
     }
 
-    protected function getPriceGross(): float
-    {
-        return $this->getDiscountedPriceGross()
-            ?? $this->getOriginalProductPriceGross();
-    }
-
-    protected function getBestAvailableTemporaryPrice(): ?float
+    protected function getPriceGross(): ?float
     {
         return $this->getDiscountedPriceGross()
             ?? $this->getOriginalProductPriceGross();
