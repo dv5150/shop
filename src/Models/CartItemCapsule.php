@@ -44,7 +44,7 @@ class CartItemCapsule implements Arrayable
 
     public function getOriginalProductPriceGross(): float
     {
-        return $this->item->getPriceGross();
+        return $this->getItem()->getPriceGross();
     }
 
     public function toArray()
