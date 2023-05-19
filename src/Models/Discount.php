@@ -21,13 +21,38 @@ class Discount extends Model
         return $this->morphTo();
     }
 
+    public function getDiscountedPriceGross(CartItemCapsule $capsule): float
+    {
+        return $this->discount->getDiscountedPriceGross($capsule);
+    }
+
+    public function getFullName(): ?string
+    {
+        return $this->discount->getFullName();
+    }
+
+    public function getName(): ?string
+    {
+        return $this->discount->getName();
+    }
+
+    public function getValue(): float
+    {
+        return $this->discount->getValue();
+    }
+
+    public function getUnit(): string
+    {
+        return $this->discount->getUnit();
+    }
+
     public function toArray(): array
     {
         return [
-            'fullName' => static::getFullName(),
-            'name' => static::getName(),
-            'value' => static::getValue(),
-            'unit' => static::getUnit(),
+            'fullName' => $this->getFullName(),
+            'name' => $this->getName(),
+            'value' => $this->getValue(),
+            'unit' => $this->getUnit(),
         ];
     }
 }
