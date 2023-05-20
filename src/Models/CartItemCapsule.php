@@ -70,6 +70,17 @@ class CartItemCapsule implements Arrayable
         return $this;
     }
 
+    public function getDiscount(): ?Discount
+    {
+        return $this->discount;
+    }
+
+    public function getPriceGross(): ?float
+    {
+        return $this->getDiscountedPriceGross()
+            ?? $this->getOriginalProductPriceGross();
+    }
+
     protected function applyDiscount(): self
     {
         $this->getItem()
@@ -102,19 +113,8 @@ class CartItemCapsule implements Arrayable
         return $this;
     }
 
-    protected function getDiscount(): ?Discount
-    {
-        return $this->discount;
-    }
-
     protected function getDiscountedPriceGross(): ?float
     {
         return $this->discountedPriceGross;
-    }
-
-    protected function getPriceGross(): ?float
-    {
-        return $this->getDiscountedPriceGross()
-            ?? $this->getOriginalProductPriceGross();
     }
 }

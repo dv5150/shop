@@ -3,6 +3,7 @@
 namespace DV5150\Shop\Tests\Unit;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Tests\Mock\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -10,20 +11,18 @@ use Illuminate\Testing\TestResponse;
 
 class CheckoutTest extends TestCase
 {
+    use ProvidesSampleOrderData;
+
     protected ProductContract $productA;
     protected ProductContract $productB;
 
     protected User $testUser;
-    protected array $testOrderData;
-
-    protected array $expectedBaseOrderData;
-
-    protected array $expectedProductAData;
-    protected array $expectedProductBData;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->setUpSampleOrderData();
 
         $this->productA = config('shop.models.product')::factory()
             ->create()
@@ -38,42 +37,6 @@ class CheckoutTest extends TestCase
             'email' => 'johnny+12345@jackson.com',
             'password' => Hash::make('testing'),
         ]);
-
-        $this->testOrderData = [
-            'personalData' => [
-                'email' => 'tester+mailaddress+10000@my-webshop.com',
-                'phone' => '+36301001000',
-            ],
-            'shippingData' => [
-                'name' => 'Test Name 1000',
-                'zipCode' => '1000',
-                'city' => 'Budapest 1000',
-                'street' => 'One street 1000',
-                'comment' => 'There are no comments here 1000',
-            ],
-            'billingData' => [
-                'name' => 'Another Name 9000',
-                'zipCode' => '9000',
-                'city' => 'Győr 9000',
-                'street' => 'Street 9000',
-                'taxNumber' => '900000000',
-            ],
-        ];
-
-        $this->expectedBaseOrderData = [
-            'email' => $this->testOrderData['personalData']['email'],
-            'phone' => $this->testOrderData['personalData']['phone'],
-            'shipping_name' => $this->testOrderData['shippingData']['name'],
-            'shipping_zip_code' => $this->testOrderData['shippingData']['zipCode'],
-            'shipping_city' => $this->testOrderData['shippingData']['city'],
-            'shipping_address' => $this->testOrderData['shippingData']['street'],
-            'shipping_comment' => $this->testOrderData['shippingData']['comment'],
-            'billing_name' => $this->testOrderData['billingData']['name'],
-            'billing_zip_code' => $this->testOrderData['billingData']['zipCode'],
-            'billing_city' => $this->testOrderData['billingData']['city'],
-            'billing_address' => $this->testOrderData['billingData']['street'],
-            'billing_tax_number' => $this->testOrderData['billingData']['taxNumber'],
-        ];
 
         $this->expectedProductAData = [
             'product_id' => $this->productA->getID(),

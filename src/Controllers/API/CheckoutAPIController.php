@@ -7,6 +7,7 @@ use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Requests\StoreOrderRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
@@ -78,21 +79,21 @@ class CheckoutAPIController
 
         $orderItems = config('shop.models.product')::find($IDs)
             ->map(fn (ProductContract $product) => $this->makeOrderItem(
-                $product,
-                $quantities[$product->getID()]
+                (new CartItemCapsule($product, $quantities[$product->getID()]))
+                    ->refreshDiscount()
             ));
 
         $order->items()->saveMany($orderItems);
     }
 
-    protected function makeOrderItem(ProductContract $product, int $quantity): OrderItemContract
+    protected function makeOrderItem(CartItemCapsule $capsule): OrderItemContract
     {
         $orderItem = new (config('shop.models.orderItem'))(
             app(OrderItemDataTransformerContract::class)
-                ->transform($product, $quantity)
+                ->transform($capsule)
         );
 
-        $orderItem->product()->associate($product);
+        $orderItem->product()->associate($capsule->getItem());
 
         return $orderItem;
     }

@@ -25,6 +25,8 @@ return new class extends Migration
                 ->default(1);
             $table->float('price_gross')
                 ->default(0.0);
+            $table->text('info')
+                ->nullable();
 
             $table->timestamps();
 
