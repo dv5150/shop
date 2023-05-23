@@ -3,6 +3,8 @@
     <div>
         <cart-item-list :products="cart.products"></cart-item-list>
         <hr>
+        <coupon></coupon>
+        <hr>
         <personal-data></personal-data>
         <hr>
         <shipping-mode></shipping-mode>

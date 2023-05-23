@@ -5,15 +5,13 @@ namespace DV5150\Shop\Tests\Unit;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Models\Discount;
-use DV5150\Shop\Models\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Discounts\ProductValueDiscount;
+use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Mock\Models\Product;
 
 class DiscountTest extends TestCase
 {
-    use ProvidesSampleOrderData;
+    use ProvidesSampleOrderData,
+        CreatesDiscountsForProducts;
 
     protected ProductContract $productA;
     protected ProductContract $productB;
@@ -69,7 +67,7 @@ class DiscountTest extends TestCase
             13.0
         );
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -103,7 +101,11 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
     }
 
     /** @test */
@@ -125,7 +127,7 @@ class DiscountTest extends TestCase
             4400.0
         );
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -159,7 +161,11 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems
+                ]
+            ]);
     }
 
     /** @test */
@@ -205,7 +211,7 @@ class DiscountTest extends TestCase
             1000.0
         );
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -239,7 +245,11 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
     }
 
     /** @test */
@@ -254,7 +264,7 @@ class DiscountTest extends TestCase
         $discountBA = $this->createValueDiscountForProduct($this->productB, '510 OFF discount', 510.0);
         $discountBB = $this->createValueDiscountForProduct($this->productB, '1510 OFF discount', 1510.0);
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -278,12 +288,16 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
 
         $discountAB->delete();
         $discountBB->delete();
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -307,12 +321,16 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
 
         $discountAA->delete();
         $discountBA->delete();
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -336,7 +354,11 @@ class DiscountTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
     }
 
     /** @test */
@@ -391,39 +413,5 @@ class DiscountTest extends TestCase
             'price_gross' => 6675.0,
             'info' => $discountB->getFullname(),
         ]));
-    }
-
-    protected function createPercentDiscountForProduct(Product $product, string $name, float $value): Discount
-    {
-        $discount = tap(new Discount(), function (Discount $discount) use ($name, $value, $product) {
-            $percentDiscount = ProductPercentDiscount::create([
-                'name' => $name,
-                'value' => $value,
-            ]);
-
-            $discount->discountable()->associate($product);
-            $discount->discount()->associate($percentDiscount);
-        });
-
-        $discount->save();
-
-        return $discount;
-    }
-
-    protected function createValueDiscountForProduct(Product $product, string $name, float $value): Discount
-    {
-        $discount = tap(new Discount(), function (Discount $discount) use ($name, $value, $product) {
-            $percentDiscount = ProductValueDiscount::create([
-                'name' => $name,
-                'value' => $value,
-            ]);
-
-            $discount->discountable()->associate($product);
-            $discount->discount()->associate($percentDiscount);
-        });
-
-        $discount->save();
-
-        return $discount;
     }
 }

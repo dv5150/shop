@@ -3,10 +3,12 @@
 namespace DV5150\Shop;
 
 use DV5150\Shop\Console\Commands\InstallCommand;
-use DV5150\Shop\Contracts\CartServiceContract;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
+use DV5150\Shop\Contracts\Services\CartServiceContract;
+use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Services\CartService;
+use DV5150\Shop\Services\CouponService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
 use Illuminate\Support\Facades\App;
@@ -45,7 +47,7 @@ class ShopServiceProvider extends ServiceProvider
     {
         App::bind(
             CartServiceContract::class,
-            fn () => new CartService()
+            fn () => new CartService(new CouponService())
         );
     }
 

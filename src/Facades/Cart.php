@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Facades;
 
-use DV5150\Shop\Contracts\CartServiceContract;
+use DV5150\Shop\Contracts\Services\CartServiceContract;
 use Illuminate\Support\Facades\Facade;
 
 class Cart extends Facade
@@ -13,6 +13,9 @@ class Cart extends Facade
      * @method static addItem()
      * @method static removeItem()
      * @method static eraseItem()
+     * @method static setCoupon()
+     * @method static getCoupon()
+     * @method static getTotal()
      * @method static toArray()
      * @method static toJson()
      *

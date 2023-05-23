@@ -17,7 +17,8 @@ class InstallCommand extends Command
         '07_create_category_product_table',
         '08_create_shipping_modes_table',
         '09_create_payment_modes_table',
-        '10_create_discounts_table',
+        '10_create_discount_tables',
+        '11_create_coupon_tables',
     ];
 
     protected array $models = [
@@ -32,23 +33,64 @@ class InstallCommand extends Command
     ];
 
     protected array $filamentResources = [
+        'CartPercentCouponResource',
+        'CartPercentCouponResource/Pages/CreateCartPercentCoupon',
+        'CartPercentCouponResource/Pages/EditCartPercentCoupon',
+        'CartPercentCouponResource/Pages/ListCartPercentCoupons',
+
+        'CartValueCouponResource',
+        'CartValueCouponResource/Pages/CreateCartValueCoupon',
+        'CartValueCouponResource/Pages/EditCartValueCoupon',
+        'CartValueCouponResource/Pages/ListCartValueCoupons',
+
+        'CouponResource',
+        'CouponResource/Pages/CreateCoupon',
+        'CouponResource/Pages/EditCoupon',
+        'CouponResource/Pages/ListCoupons',
+
+        'OrderResource',
         'OrderResource/Pages/CreateOrder',
         'OrderResource/Pages/EditOrder',
         'OrderResource/Pages/ListOrders',
         'OrderResource/RelationManagers/ItemsRelationManager',
+
+        'ProductPercentDiscountResource',
+        'ProductPercentDiscountResource/Pages/CreateProductPercentDiscount',
+        'ProductPercentDiscountResource/Pages/EditProductPercentDiscount',
+        'ProductPercentDiscountResource/Pages/ListProductPercentDiscounts',
+
+        'ProductResource',
         'ProductResource/Pages/CreateProduct',
         'ProductResource/Pages/EditProduct',
         'ProductResource/Pages/ListProducts',
         'ProductResource/RelationManagers/DiscountsRelationManager',
-        'ProductPercentDiscountResource/Pages/CreateProductPercentDiscount',
-        'ProductPercentDiscountResource/Pages/EditProductPercentDiscount',
-        'ProductPercentDiscountResource/Pages/ListProductPercentDiscounts',
+
+        'ProductValueDiscountResource',
         'ProductValueDiscountResource/Pages/CreateProductValueDiscount',
         'ProductValueDiscountResource/Pages/EditProductValueDiscount',
         'ProductValueDiscountResource/Pages/ListProductValueDiscounts',
+
         'UserResource/RelationManagers/OrdersRelationManager',
-        'OrderResource',
-        'ProductResource',
+    ];
+
+    protected array $requiredFilamentDirectories = [
+        'CartPercentCouponResource/Pages',
+
+        'CartValueCouponResource/Pages',
+
+        'CouponResource/Pages',
+
+        'OrderResource/Pages',
+        'OrderResource/RelationManagers',
+
+        'ProductResource/Pages',
+        'ProductResource/RelationManagers',
+
+        'ProductPercentDiscountResource/Pages',
+
+        'ProductValueDiscountResource/Pages',
+
+        'UserResource/RelationManagers',
     ];
 
     /**
@@ -164,18 +206,8 @@ class InstallCommand extends Command
     {
         $this->info('Copying Filament resources...');
 
-        $directories = [
-            'Filament/Resources/OrderResource/Pages',
-            'Filament/Resources/OrderResource/RelationManagers',
-            'Filament/Resources/ProductResource/Pages',
-            'Filament/Resources/ProductResource/RelationManagers',
-            'Filament/Resources/UserResource/RelationManagers',
-            'Filament/Resources/ProductPercentDiscountResource/Pages',
-            'Filament/Resources/ProductValueDiscountResource/Pages',
-        ];
-
-        foreach ($directories as $directory) {
-            File::ensureDirectoryExists(app_path($directory));
+        foreach ($this->requiredFilamentDirectories as $directory) {
+            File::ensureDirectoryExists(app_path("Filament/Resources/$directory"));
         }
 
         foreach ($this->filamentResources as $resource) {

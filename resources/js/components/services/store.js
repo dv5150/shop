@@ -1,35 +1,53 @@
+import axios from 'axios'
 import { defineStore } from 'pinia'
 
 export const useCartStore = defineStore('cart', {
     state: () => {
         return {
             isOpen: false,
-            products: []
+            products: [],
+            coupon: null,
+            total: 0
         }
     },
     getters: {
-        totalPrice: (state) => _.reduce(state.products, (sum, product) => {
-            return sum + (product.item.price_gross * product.quantity)
-        }, 0),
         cartItemLength: (state) => _.sumBy(state.products, (product) => product.quantity)
     },
     actions: {
         init() {
             axios.get('/api/shop/cart')
-                .then(response => this.products = response.data.cartItems)
+                .then(response => {
+                    this.products = response.data.cart.items
+                    this.coupon = response.data.cart.coupon
+                    this.total = response.data.cart.total
+                })
         },
         increaseQuantity(id, quantity = 1) {
             axios.post(`/api/shop/cart/${id}/add/${quantity}`)
-                .then(response => this.products = response.data.cartItems)
+                .then(response => this.products = response.data.cart.items)
         },
         decreaseQuantity(id, quantity = 1) {
             axios.post(`/api/shop/cart/${id}/remove/${quantity}`)
-                .then(response => this.products = response.data.cartItems)
+                .then(response => this.products = response.data.cart.items)
         },
         eraseProduct(id) {
             axios.delete(`/api/shop/cart/${id}`)
-                .then(response => this.products = response.data.cartItems)
-        }
+                .then(response => this.products = response.data.cart.items)
+        },
+        applyCoupon(code) {
+            axios.post(`/api/shop/cart/coupon/${code}`)
+                .then(response => {
+                    this.coupon = response.data.cart.coupon
+                    this.total = response.data.cart.total
+                })
+        },
+        eraseCoupon() {
+            axios.delete(`/api/shop/cart/coupon`)
+                .then(response => {
+                    this.coupon = response.data.cart.coupon
+                    this.total = response.data.cart.total
+                })
+        },
     }
 })
 

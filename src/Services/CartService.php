@@ -4,11 +4,21 @@ namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Support\CartCollection;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Services\CartServiceContract;
+use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Models\Coupon;
 use Illuminate\Support\Facades\Session;
 
-class CartService
+class CartService implements CartServiceContract
 {
+    protected CouponServiceContract $couponService;
+
+    public function __construct(CouponServiceContract $couponService)
+    {
+        $this->couponService = $couponService;
+    }
+
     public function all(): CartCollection
     {
         if ($cart = Session::get($this->getSessionKey())) {
@@ -30,7 +40,6 @@ class CartService
 
     public function addItem(ProductContract $item, int $quantity = 1): CartCollection
     {
-        /** @var CartCollection $cart */
         $cart = $this->all();
 
         $cart = $cart->hasItem($item)
@@ -44,7 +53,6 @@ class CartService
 
     public function removeItem(ProductContract $item, int $quantity = 1): CartCollection
     {
-        /** @var CartCollection $cart */
         $cart = $this->all();
 
         if ($cart->hasItem($item)) {
@@ -58,7 +66,6 @@ class CartService
 
     public function eraseItem(ProductContract $item): CartCollection
     {
-        /** @var CartCollection $cart */
         $cart = $this->all();
 
         if ($cart->hasItem($item)) {
@@ -70,22 +77,33 @@ class CartService
         return $this->all();
     }
 
-    public function hasDigitalItemsOnly(): bool
+    public function setCoupon(?Coupon $coupon): CartCollection
     {
-        /** @var CartCollection $cart */
+        $this->couponService->setCoupon($coupon);
+
+        return $this->all();
+    }
+
+    public function getCoupon(): ?Coupon
+    {
+        return $this->couponService->getCoupon();
+    }
+
+    public function getTotal(): float
+    {
         $cart = $this->all();
 
-        return $cart->hasDigitalItemsOnly();
+        if ($coupon = $this->getCoupon()) {
+            return $coupon->getDiscountedPriceGross($cart);
+        }
+
+        return $cart->getTotalGrossPrice();
     }
 
-    public function toArray(): array
+    public function hasDigitalItemsOnly(): bool
     {
-        return $this->all()->toArray();
-    }
-
-    public function toJson($options = 0): string
-    {
-        return $this->all()->toJson($options);
+        return $this->all()
+            ->hasDigitalItemsOnly();
     }
 
     public function saveCart(CartCollection $cart): CartCollection
@@ -95,7 +113,19 @@ class CartService
         return $cart;
     }
 
-    public function getSessionKey(): string
+    public function toArray(): array
+    {
+        return $this->all()
+            ->toArray();
+    }
+
+    public function toJson($options = 0): string
+    {
+        return $this->all()
+            ->toJson($options);
+    }
+
+    protected function getSessionKey(): string
     {
         return 'cart';
     }

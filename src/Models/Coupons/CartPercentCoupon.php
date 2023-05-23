@@ -1,13 +1,13 @@
 <?php
 
-namespace DV5150\Shop\Models\Discounts;
+namespace DV5150\Shop\Models\Coupons;
 
 use DV5150\Shop\Concerns\ProvidesPercentDealData;
-use DV5150\Shop\Contracts\Deals\DiscountContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Deals\CouponContract;
+use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPercentDiscount extends Model implements DiscountContract
+class CartPercentCoupon extends Model implements CouponContract
 {
     use ProvidesPercentDealData;
 
@@ -17,9 +17,9 @@ class ProductPercentDiscount extends Model implements DiscountContract
         'value' => 'float'
     ];
 
-    public function getDiscountedPriceGross(CartItemCapsule $cartItem): float
+    public function getDiscountedPriceGross(CartCollection $cart): float
     {
-        $originalPrice = $cartItem->getOriginalProductPriceGross();
+        $originalPrice = $cart->getTotalGrossPrice();
 
         $discount = $originalPrice * ($this->getValue() / 100);
 

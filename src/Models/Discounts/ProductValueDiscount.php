@@ -2,11 +2,15 @@
 
 namespace DV5150\Shop\Models\Discounts;
 
+use DV5150\Shop\Concerns\ProvidesValueDealData;
+use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Models\CartItemCapsule;
-use DV5150\Shop\Models\Discount;
+use Illuminate\Database\Eloquent\Model;
 
-class ProductValueDiscount extends Discount
+class ProductValueDiscount extends Model implements DiscountContract
 {
+    use ProvidesValueDealData;
+
     protected $guarded = [];
 
     protected $casts = [
@@ -16,27 +20,7 @@ class ProductValueDiscount extends Discount
     public function getDiscountedPriceGross(CartItemCapsule $cartItem): float
     {
         return max([
-            $cartItem->getOriginalProductPriceGross() - $this->value, 0.0
+            $cartItem->getOriginalProductPriceGross() - $this->getValue(), 0.0
         ]);
-    }
-
-    public function getFullName(): ?string
-    {
-        return "{$this->getValue()} OFF ({$this->getName()})";
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function getValue(): float
-    {
-        return $this->value;
-    }
-
-    public function getUnit(): string
-    {
-        return ':currency';
     }
 }

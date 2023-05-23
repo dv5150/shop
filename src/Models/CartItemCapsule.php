@@ -58,6 +58,7 @@ class CartItemCapsule implements Arrayable
                 'discount' => $this->getDiscount()?->toArray(),
             ],
             'quantity' => $this->getQuantity(),
+            'subtotal' => $this->getSubtotalGrossPrice(),
         ];
     }
 
@@ -81,14 +82,17 @@ class CartItemCapsule implements Arrayable
             ?? $this->getOriginalProductPriceGross();
     }
 
+    public function getSubtotalGrossPrice(): float
+    {
+        return $this->getPriceGross() * $this->getQuantity();
+    }
+
     protected function applyDiscount(): self
     {
         $this->getItem()
             ->load('discounts.discount')
             ->discounts
-            ->each(
-                fn (Discount $discount) => $this->tryDiscount($discount->discount)
-            );
+            ->each(fn (Discount $discount) => $this->tryDiscount($discount));
 
         return $this;
     }

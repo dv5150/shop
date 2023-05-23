@@ -51,4 +51,9 @@ class CartCollection extends Collection
             fn (CartItemCapsule $capsule) => !$capsule->getItem()->isDigitalProduct()
         );
     }
+
+    public function getTotalGrossPrice(): float
+    {
+        return $this->sum(fn (CartItemCapsule $capsule) => $capsule->getSubtotalGrossPrice());
+    }
 }

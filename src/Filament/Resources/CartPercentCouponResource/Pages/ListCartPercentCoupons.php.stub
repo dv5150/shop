@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\CartPercentCouponResource\Pages;
+
+use App\Filament\Resources\CartPercentCouponResource;
+use Filament\Pages\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+
+class ListCartPercentCoupons extends ListRecords
+{
+    protected static string $resource = CartPercentCouponResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            CreateAction::make(),
+        ];
+    }
+}

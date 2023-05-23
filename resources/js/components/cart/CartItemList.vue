@@ -11,7 +11,12 @@
             <tr v-for="product in cart.products">
                 <th>
                     {{ product.item.name }} <br>
-                    <span>{{ product.item.price_gross }}</span>
+                    <span v-if="product.item.price_gross < product.item.price_gross_original">
+                        <s>{{ product.item.price_gross_original }}</s>
+                    </span>
+                    <span style="color: blue; margin-left: 10px;">
+                        {{ product.item.price_gross }}
+                    </span>
                 </th>
                 <td>
                     <button @click="cart.decreaseQuantity(product.item.id)">
@@ -25,14 +30,14 @@
                         [ REMOVE ]
                     </button>
                 </td>
-                <td>{{ product.item.price_gross * product.quantity }}</td>
+                <td>{{ product.subtotal }}</td>
             </tr>
             <tr>
                 <th>
                     TOTAL
                 </th>
                 <td></td>
-                <td>{{ cart.totalPrice }}</td>
+                <td>{{ cart.total }}</td>
             </tr>
         </tbody>
     </table>

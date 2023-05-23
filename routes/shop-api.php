@@ -5,6 +5,13 @@ use DV5150\Shop\Controllers\API\CheckoutAPIController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
+    Route::group(['prefix' => 'coupon', 'as' => 'coupon.'], function () {
+        Route::post('{code}', [CartAPIController::class, 'setCoupon'])
+            ->name('store');
+        Route::delete('/', [CartAPIController::class, 'removeCoupon'])
+            ->name('erase');
+    });
+
     Route::get('/', [CartAPIController::class, 'index'])
         ->name('index');
     Route::post('{product}/add/{quantity?}', [CartAPIController::class, 'store'])

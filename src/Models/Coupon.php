@@ -3,59 +3,54 @@
 namespace DV5150\Shop\Models;
 
 use DV5150\Shop\Contracts\Deals\BaseDealContract;
-use DV5150\Shop\Contracts\Deals\DiscountContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Deals\CouponContract;
+use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Discount extends Model implements BaseDealContract
+class Coupon extends Model implements BaseDealContract
 {
     public $timestamps = false;
 
     protected $guarded = [];
 
-    public function discountable(): MorphTo
+    public function coupon(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function discount(): MorphTo
+    public function getCoupon(): CouponContract
     {
-        return $this->morphTo();
+        return $this->coupon;
     }
 
-    public function getDiscount(): DiscountContract
+    public function getDiscountedPriceGross(CartCollection $cart): float
     {
-        return $this->discount;
-    }
-
-    public function getDiscountedPriceGross(CartItemCapsule $capsule): float
-    {
-        return $this->getDiscount()
-            ->getDiscountedPriceGross($capsule);
+        return $this->getCoupon()
+            ->getDiscountedPriceGross($cart);
     }
 
     public function getFullName(): ?string
     {
-        return $this->getDiscount()
+        return $this->getCoupon()
             ->getFullName();
     }
 
     public function getName(): ?string
     {
-        return $this->getDiscount()
+        return $this->getCoupon()
             ->getName();
     }
 
     public function getValue(): float
     {
-        return $this->getDiscount()
+        return $this->getCoupon()
             ->getValue();
     }
 
     public function getUnit(): string
     {
-        return $this->getDiscount()
+        return $this->getCoupon()
             ->getUnit();
     }
 

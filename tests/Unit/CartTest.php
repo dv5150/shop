@@ -35,7 +35,7 @@ class CartTest extends TestCase
         Cart::addItem($this->productA);
         Cart::addItem($this->productB);
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -55,12 +55,16 @@ class CartTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
 
         Cart::addItem($this->productA, 5);
         Cart::addItem($this->productB, 9);
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -80,7 +84,11 @@ class CartTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems,
+                ]
+            ]);
     }
 
     /** @test */
@@ -94,7 +102,7 @@ class CartTest extends TestCase
         Cart::removeItem($this->productB);
         Cart::removeItem($this->productC);
 
-        $expected = [
+        $expectedItems = [
             [
                 'item' => [
                     'id' => $this->productA->getID(),
@@ -122,14 +130,22 @@ class CartTest extends TestCase
         ];
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => $expected]);
+            ->assertJson([
+                'cart' => [
+                    'items' => $expectedItems
+                ]
+            ]);
 
         Cart::removeItem($this->productA, 14);
         Cart::removeItem($this->productB, 11);
         Cart::removeItem($this->productC, 999);
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => []]);
+            ->assertJson([
+                'cart' => [
+                    'items' => [],
+                ]
+            ]);
     }
 
     /** @test */
@@ -139,7 +155,11 @@ class CartTest extends TestCase
         Cart::eraseItem($this->productA);
 
         $this->get(route('api.shop.cart.index'))
-            ->assertJson(['cartItems' => []]);
+            ->assertJson([
+                'cart' => [
+                    'items' => [],
+                ]
+            ]);
     }
 
     /** @test */

@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Filament\Resources\CartPercentCouponResource\Pages;
+
+use App\Filament\Resources\CartPercentCouponResource;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateCartPercentCoupon extends CreateRecord
+{
+    protected static string $resource = CartPercentCouponResource::class;
+}
