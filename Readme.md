@@ -28,6 +28,7 @@ To create a Laravel webshop which is easy to install, customizable as much as po
     app.component('cart-drawer', CartDrawer)
     app.component('cart-widget', CartWidget)
     app.component('checkout', Checkout)
+    app.component('coupon', Coupon)
     app.component('product-list', ProductList)
 
     app.mount('#app')
