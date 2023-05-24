@@ -2,50 +2,28 @@
 
 namespace DV5150\Shop\Tests\Unit;
 
-use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 
 class DiscountTest extends TestCase
 {
     use ProvidesSampleOrderData,
+        ProvidesSampleProductData,
         CreatesDiscountsForProducts;
-
-    protected ProductContract $productA;
-    protected ProductContract $productB;
-    protected ProductContract $productC;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->setUpSampleOrderData();
+        $this->setUpSampleProductData();
 
-        $this->productA = config('shop.models.product')::factory()
-            ->create(['price_gross' => 5000.0])
-            ->refresh();
-
-        $this->productB = config('shop.models.product')::factory()
-            ->create(['price_gross' => 7500.0])
-            ->refresh();
-
-        $this->productC = config('shop.models.product')::factory()
-            ->create(['price_gross' => 12300.0])
-            ->refresh();
-
-        $this->expectedProductAData = [
-            'product_id' => $this->productA->getID(),
-            'name' => $this->productA->getName(),
-            'price_gross' => $this->productA->getPriceGross(),
-        ];
-
-        $this->expectedProductBData = [
-            'product_id' => $this->productB->getID(),
-            'name' => $this->productB->getName(),
-            'price_gross' => $this->productB->getPriceGross(),
-        ];
+        $this->productA->update(['price_gross' => 5000.0]);
+        $this->productB->update(['price_gross' => 7500.0]);
+        $this->productC->update(['price_gross' => 12300.0]);
     }
 
     /** @test */
@@ -384,34 +362,49 @@ class DiscountTest extends TestCase
                         'item' => [
                             'id' => $this->productA->getID(),
                         ],
-                        'quantity' => 1,
+                        'quantity' => 2,
                     ],
                     [
                         'item' => [
                             'id' => $this->productB->getID(),
                         ],
-                        'quantity' => 1,
+                        'quantity' => 2,
+                    ],
+                    [
+                        'item' => [
+                            'id' => $this->productC->getID(),
+                        ],
+                        'quantity' => 2,
                     ],
                 ],
             ])
         );
+
+        $orderKey = config('shop.models.order')::first()->getKey();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => null,
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductAData, [
-            'order_id' => config('shop.models.order')::first()->getKey(),
-            'quantity' => 1,
+            'order_id' => $orderKey,
+            'quantity' => 2,
             'price_gross' => 3300.0,
             'info' => $discountA->getFullname(),
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
-            'order_id' => config('shop.models.order')::first()->getKey(),
-            'quantity' => 1,
+            'order_id' => $orderKey,
+            'quantity' => 2,
             'price_gross' => 6675.0,
             'info' => $discountB->getFullname(),
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductCData, [
+            'order_id' => $orderKey,
+            'quantity' => 2,
+            'price_gross' => 12300.0,
+            'info' => null,
         ]));
     }
 }

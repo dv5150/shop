@@ -7,9 +7,6 @@ trait ProvidesSampleOrderData
     public array $testOrderData;
     public array $expectedBaseOrderData;
 
-    public array $expectedProductAData;
-    public array $expectedProductBData;
-
     public function setUpSampleOrderData()
     {
         $this->testOrderData = [
