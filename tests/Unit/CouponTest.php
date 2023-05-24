@@ -306,4 +306,171 @@ class CouponTest extends TestCase
                 ]
             ]);
     }
+
+    /** @test */
+    public function cart_value_coupons_are_saved_properly_as_order_items_as_guest()
+    {
+        $discountA = $this->createPercentDiscountForProduct(
+            $this->productA,
+            '50% OFF discount',
+            50.0
+        );
+
+        $discountB = $this->createValueDiscountForProduct(
+            $this->productB,
+            '900 OFF discount',
+            900.0
+        );
+
+        $coupon = $this->createCartValueCoupon(
+            '1100 OFF discount',
+            1100.0,
+            'CART1100OFF'
+        );
+
+        $this->post(route('api.shop.cart.coupon.store', [
+            'code' => $coupon->code
+        ]));
+
+        $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    [
+                        'item' => [
+                            'id' => $this->productA->getID(),
+                        ],
+                        'quantity' => 7,
+                    ],
+                    [
+                        'item' => [
+                            'id' => $this->productB->getID(),
+                        ],
+                        'quantity' => 7,
+                    ],
+                ],
+            ])
+        );
+
+        $orderKey = config('shop.models.order')::first()->getKey();
+
+        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
+            'user_id' => null,
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge([
+            'product_id' => $this->productA->getID(),
+            'name' => $this->productA->getName(),
+        ], [
+            'order_id' => $orderKey,
+            'quantity' => 7,
+            'price_gross' => 1500.0,
+            'info' => $discountA->getFullname(),
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge([
+            'product_id' => $this->productB->getID(),
+            'name' => $this->productB->getName(),
+        ], [
+            'order_id' => $orderKey,
+            'quantity' => 7,
+            'price_gross' => 7100.0,
+            'info' => $discountB->getFullname(),
+        ]));
+
+        $this->assertDatabaseHas('order_items', [
+            'product_id' => null,
+            'name' => $coupon->getFullName(),
+            'order_id' => $orderKey,
+            'quantity' => 1,
+            'price_gross' => -1100.0,
+            'info' => null,
+        ]);
+    }
+
+    /** @test */
+    public function cart_percent_coupons_are_saved_properly_as_order_items_as_guest()
+    {
+        $discountA = $this->createPercentDiscountForProduct(
+            $this->productA,
+            '30% OFF discount',
+            30.0
+        );
+
+        $discountB = $this->createValueDiscountForProduct(
+            $this->productB,
+            '500 OFF discount',
+            500.0
+        );
+
+        $coupon = $this->createCartPercentCoupon(
+            '25% OFF discount',
+            25.0,
+            'CART25OFF'
+        );
+
+        $this->post(route('api.shop.cart.coupon.store', [
+            'code' => $coupon->code
+        ]));
+
+        $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    [
+                        'item' => [
+                            'id' => $this->productA->getID(),
+                        ],
+                        'quantity' => 8,
+                    ],
+                    [
+                        'item' => [
+                            'id' => $this->productB->getID(),
+                        ],
+                        'quantity' => 8,
+                    ],
+                ],
+            ])
+        );
+
+        $orderKey = config('shop.models.order')::first()->getKey();
+
+        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
+            'user_id' => null,
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge([
+            'product_id' => $this->productA->getID(),
+            'name' => $this->productA->getName(),
+        ], [
+            'order_id' => $orderKey,
+            'quantity' => 8,
+            'price_gross' => 2100.0,
+            'info' => $discountA->getFullname(),
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge([
+            'product_id' => $this->productB->getID(),
+            'name' => $this->productB->getName(),
+        ], [
+            'order_id' => $orderKey,
+            'quantity' => 8,
+            'price_gross' => 7500.0,
+            'info' => $discountB->getFullname(),
+        ]));
+
+        $itemsTotal = array_sum([
+            2100.0 * 8,
+            7500.0 * 8,
+        ]);
+
+        $this->assertDatabaseHas('order_items', [
+            'product_id' => null,
+            'name' => $coupon->getFullName(),
+            'order_id' => $orderKey,
+            'quantity' => 1,
+            'price_gross' => 0 - ($itemsTotal * 0.25),
+            'info' => null,
+        ]);
+    }
 }

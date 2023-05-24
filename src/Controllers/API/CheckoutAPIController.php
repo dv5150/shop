@@ -7,6 +7,7 @@ use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Requests\StoreOrderRequest;
 use Illuminate\Database\Eloquent\Model;
@@ -82,6 +83,13 @@ class CheckoutAPIController
                 (new CartItemCapsule($product, $quantities[$product->getID()]))
                     ->refreshDiscount()
             ));
+
+        if ($coupon = Cart::getCoupon()) {
+            $orderItems->push(
+                $coupon->getCoupon()
+                    ->toOrderItem($orderItems)
+            );
+        }
 
         $order->items()->saveMany($orderItems);
     }
