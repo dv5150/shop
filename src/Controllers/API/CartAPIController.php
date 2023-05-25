@@ -15,7 +15,7 @@ class CartAPIController
         return new JsonResponse(data: [
             'cart' => [
                 'items' => Cart::toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);
@@ -27,7 +27,7 @@ class CartAPIController
             'cart' => [
                 'items' => Cart::addItem($this->resolveProduct($productID), $quantity)
                     ->toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);
@@ -39,7 +39,7 @@ class CartAPIController
             'cart' => [
                 'items' => Cart::removeItem($this->resolveProduct($productID), $quantity)
                     ->toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);
@@ -51,7 +51,7 @@ class CartAPIController
             'cart' => [
                 'items' => Cart::eraseItem($this->resolveProduct($productID))
                     ->toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);
@@ -63,7 +63,7 @@ class CartAPIController
             'cart' => [
                 'items' => Cart::setCoupon($this->resolveCoupon($couponCode))
                     ->toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);
@@ -75,7 +75,7 @@ class CartAPIController
             'cart' => [
                 'items' => Cart::setCoupon(null)
                     ->toArray(),
-                'coupon' => Cart::getCoupon(),
+                'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
             ]
         ]);

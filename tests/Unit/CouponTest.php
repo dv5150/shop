@@ -100,7 +100,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
 
@@ -113,7 +116,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 25200.0,
-                    'coupon' => $couponA->toArray(),
+                    'coupon' => [
+                        'couponItem' => $couponA->toArray(),
+                        'couponDiscountAmount' => -2800.0,
+                    ],
                 ]
             ]);
 
@@ -126,7 +132,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
 
@@ -139,7 +148,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 21000.0,
-                    'coupon' => $couponB->toArray(),
+                    'coupon' => [
+                        'couponItem' => $couponB->toArray(),
+                        'couponDiscountAmount' => -7000.0,
+                    ],
                 ]
             ]);
 
@@ -150,7 +162,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
     }
@@ -179,7 +194,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
 
@@ -192,7 +210,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 27300.0,
-                    'coupon' => $couponA->toArray(),
+                    'coupon' => [
+                        'couponItem' => $couponA->toArray(),
+                        'couponDiscountAmount' => -700.0,
+                    ],
                 ]
             ]);
 
@@ -205,7 +226,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
 
@@ -218,7 +242,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 26100.0,
-                    'coupon' => $couponB->toArray(),
+                    'coupon' => [
+                        'couponItem' => $couponB->toArray(),
+                        'couponDiscountAmount' => -1900.0,
+                    ],
                 ]
             ]);
 
@@ -229,7 +256,10 @@ class CouponTest extends TestCase
                 'cart' => [
                     'items' => $this->expectedProductData,
                     'total' => 28000.0,
-                    'coupon' => null,
+                    'coupon' => [
+                        'couponItem' => null,
+                        'couponDiscountAmount' => null,
+                    ],
                 ]
             ]);
     }
@@ -302,7 +332,10 @@ class CouponTest extends TestCase
                         ],
                     ],
                     'total' => 4500.0 + 24000.0 + 34000.0 - 660.0,
-                    'coupon' => $coupon->toArray(),
+                    'coupon' => [
+                        'couponItem' => $coupon->toArray(),
+                        'couponDiscountAmount' => -660.0,
+                    ],
                 ]
             ]);
     }

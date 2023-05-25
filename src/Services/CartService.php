@@ -84,6 +84,22 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
+    public function getCouponSummary(): ?array
+    {
+        $cart = $this->all();
+
+        $coupon = $this->getCoupon();
+
+        $couponDiscountAmount = $coupon
+            ? $coupon->getDiscountedPriceGross($cart) - $cart->getTotalGrossPrice()
+            : null;
+
+        return [
+            'couponItem' => $coupon,
+            'couponDiscountAmount' => floor($couponDiscountAmount),
+        ];
+    }
+
     public function getCoupon(): ?Coupon
     {
         return $this->couponService->getCoupon();
@@ -94,7 +110,7 @@ class CartService implements CartServiceContract
         $cart = $this->all();
 
         if ($coupon = $this->getCoupon()) {
-            return $coupon->getDiscountedPriceGross($cart);
+            return floor($coupon->getDiscountedPriceGross($cart));
         }
 
         return $cart->getTotalGrossPrice();

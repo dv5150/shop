@@ -119,6 +119,8 @@ class CartItemCapsule implements Arrayable
 
     protected function getDiscountedPriceGross(): ?float
     {
-        return $this->discountedPriceGross;
+        return $this->discountedPriceGross
+            ? floor($this->discountedPriceGross)
+            : null;
     }
 }

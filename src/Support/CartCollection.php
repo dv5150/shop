@@ -54,6 +54,8 @@ class CartCollection extends Collection
 
     public function getTotalGrossPrice(): float
     {
-        return $this->sum(fn (CartItemCapsule $capsule) => $capsule->getSubtotalGrossPrice());
+        return $this->sum(
+            fn (CartItemCapsule $capsule) => $capsule->getSubtotalGrossPrice()
+        );
     }
 }

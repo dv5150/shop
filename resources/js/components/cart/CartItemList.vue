@@ -11,11 +11,15 @@
             <tr v-for="product in cart.products">
                 <th>
                     {{ product.item.name }} <br>
-                    <span v-if="product.item.price_gross < product.item.price_gross_original">
+                    <span v-if="product.item.discount">
                         <s>{{ product.item.price_gross_original }}</s>
                     </span>
                     <span style="color: blue; margin-left: 10px;">
                         {{ product.item.price_gross }}
+                    </span>
+                    <br>
+                    <span v-if="product.item.discount" style="color: blue;">
+                        Discount: {{ product.item.discount.name }}
                     </span>
                 </th>
                 <td>
@@ -32,12 +36,26 @@
                 </td>
                 <td>{{ product.subtotal }}</td>
             </tr>
+            <tr v-if="cart.coupon?.couponItem">
+                <th>
+                    CART SUBTOTAL
+                </th>
+                <td></td>
+                <td><strong>{{ cart.subtotal }}</strong></td>
+            </tr>
+            <tr v-if="cart.coupon?.couponItem">
+                <th>
+                    Coupon: {{ cart.coupon.couponItem.name }}
+                </th>
+                <td></td>
+                <td>{{ cart.coupon.couponDiscountAmount }}</td>
+            </tr>
             <tr>
                 <th>
                     TOTAL
                 </th>
                 <td></td>
-                <td>{{ cart.total }}</td>
+                <td><strong>{{ cart.total }}</strong></td>
             </tr>
         </tbody>
     </table>

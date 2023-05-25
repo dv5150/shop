@@ -5,7 +5,7 @@
                 <th colspan="2">Coupon</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody v-if="!cart.coupon?.couponItem">
             <tr>
                 <td>
                     Coupon code
@@ -14,14 +14,14 @@
                     <input type="text" id="couponCode" placeholder="ABCDEF123">
                 </td>
                 <td>
-                    <button @click="applyCoupon">Apply coupon</button>
+                    <button @click="applyCoupon">[APPLY COUPON]</button>
                 </td>
             </tr>
         </tbody>
-        <tfoot v-if="cart.coupon">
+        <tfoot v-if="cart.coupon?.couponItem">
             <tr>
                 <td class="bg-gray-400 p-5">
-                    {{ cart.coupon.fullName }}
+                    {{ cart.coupon.couponItem.name }}
                 </td>
                 <td class="bg-gray-400 p-5">
                     <a href="#" @click="cart.eraseCoupon()">[REMOVE COUPON]</a>
