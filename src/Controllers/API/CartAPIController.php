@@ -17,6 +17,7 @@ class CartAPIController
                 'items' => Cart::toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }
@@ -29,6 +30,7 @@ class CartAPIController
                     ->toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }
@@ -41,6 +43,7 @@ class CartAPIController
                     ->toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }
@@ -53,6 +56,7 @@ class CartAPIController
                     ->toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }
@@ -65,6 +69,7 @@ class CartAPIController
                     ->toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }
@@ -77,6 +82,7 @@ class CartAPIController
                     ->toArray(),
                 'coupon' => Cart::getCouponSummary(),
                 'total' => Cart::getTotal(),
+                'currency' => config('shop.currency'),
             ]
         ]);
     }

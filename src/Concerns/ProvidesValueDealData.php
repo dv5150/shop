@@ -6,7 +6,7 @@ trait ProvidesValueDealData
 {
     public function getFullName(): ?string
     {
-        return "{$this->getValue()} {$this->getUnit()} OFF ({$this->getName()})";
+        return "Discount: {$this->getValue()} {$this->getUnit()}";
     }
 
     public function getName(): ?string
@@ -21,6 +21,6 @@ trait ProvidesValueDealData
 
     public function getUnit(): string
     {
-        return ':currency';
+        return config('shop.currency.code');
     }
 }

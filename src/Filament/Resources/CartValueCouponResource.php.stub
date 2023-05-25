@@ -34,7 +34,8 @@ class CartValueCouponResource extends Resource
                     ->nullable(),
                 TextInput::make('value')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->label('Value (' . config('shop.currency.code') . ')'),
             ]);
     }
 
@@ -44,7 +45,7 @@ class CartValueCouponResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('value')
-                    ->label('Value'),
+                    ->label('Value (' . config('shop.currency.code') . ')'),
             ])
             ->filters([
                 //

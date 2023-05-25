@@ -39,7 +39,8 @@ class ItemsRelationManager extends RelationManager
                     ->required()
                     ->disabled(),
                 TextInput::make('price_gross')
-                    ->disabled(),
+                    ->disabled()
+                    ->label('Gross Price (' . config('shop.currency.code') . ')'),
                 TextInput::make('quantity')
                     ->required()
                     ->numeric()
@@ -53,7 +54,8 @@ class ItemsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('quantity'),
-                TextColumn::make('price_gross'),
+                TextColumn::make('price_gross')
+                    ->label('Gross Price (' . config('shop.currency.code') . ')'),
                 TextColumn::make('subtotal'),
             ])
             ->filters([

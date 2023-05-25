@@ -34,7 +34,8 @@ class ProductResource extends Resource
                     ->required(),
                 TextInput::make('price_gross')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->label('Gross Price (' . config('shop.currency.code') . ')'),
                 Select::make('categories')
                     ->multiple()
                     ->relationship('categories', 'name'),
@@ -51,7 +52,8 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('price_gross'),
+                TextColumn::make('price_gross')
+                    ->label('Gross Price (' . config('shop.currency.code') . ')'),
                 TextColumn::make('categories')
                     ->formatStateUsing(function ($record) {
                         $names = $record->categories->map->name;

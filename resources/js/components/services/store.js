@@ -7,7 +7,8 @@ export const useCartStore = defineStore('cart', {
             isOpen: false,
             products: [],
             coupon: null,
-            total: 0
+            total: 0,
+            currency: null,
         }
     },
     getters: {
@@ -45,6 +46,7 @@ export const useCartStore = defineStore('cart', {
             this.products = response.data.cart.items
             this.coupon = response.data.cart.coupon
             this.total = response.data.cart.total
+            this.currency = response.data.cart.currency
         }
     }
 })

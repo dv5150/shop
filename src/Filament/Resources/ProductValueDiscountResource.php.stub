@@ -34,7 +34,8 @@ class ProductValueDiscountResource extends Resource
                     ->nullable(),
                 TextInput::make('value')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->label('Value (' . config('shop.currency.code') . ')'),
             ]);
     }
 
@@ -43,7 +44,8 @@ class ProductValueDiscountResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('value'),
+                TextColumn::make('value')
+                    ->label('Value (' . config('shop.currency.code') . ')'),
             ])
             ->filters([
                 //

@@ -6,7 +6,7 @@ trait ProvidesPercentDealData
 {
     public function getFullName(): ?string
     {
-        return "{$this->getValue()}{$this->getUnit()} ({$this->getName()})";
+        return "Discount: {$this->getValue()}{$this->getUnit()}";
     }
 
     public function getName(): ?string

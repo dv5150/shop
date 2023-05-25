@@ -6,7 +6,7 @@ use App\Filament\Resources\OrderResource\Pages\CreateOrder;
 use App\Filament\Resources\OrderResource\Pages\EditOrder;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
-use App\Models\Order;
+use App\Models\Shop\Order;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -82,7 +82,7 @@ class OrderResource extends Resource
                 TextColumn::make('email')
                     ->label('E-Mail'),
                 TextColumn::make('price_gross')
-                    ->label('Total'),
+                    ->label('Total (' . config('shop.currency.code') . ')'),
                 TextColumn::make('created_at')
                     ->label('Date'),
             ])

@@ -12,14 +12,14 @@
                 <th>
                     {{ product.item.name }} <br>
                     <span v-if="product.item.discount">
-                        <s>{{ product.item.price_gross_original }}</s>
+                        <s>{{ product.item.price_gross_original }} {{ cart.currency?.code }}</s>
                     </span>
                     <span style="color: blue; margin-left: 10px;">
-                        {{ product.item.price_gross }}
+                        {{ product.item.price_gross }} {{ cart.currency?.code }}
                     </span>
                     <br>
                     <span v-if="product.item.discount" style="color: blue;">
-                        Discount: {{ product.item.discount.name }}
+                        {{ product.item.discount.fullName }}
                     </span>
                 </th>
                 <td>
@@ -34,28 +34,28 @@
                         [ REMOVE ]
                     </button>
                 </td>
-                <td>{{ product.subtotal }}</td>
+                <td>{{ product.subtotal }} {{ cart.currency?.code }}</td>
             </tr>
             <tr v-if="cart.coupon?.couponItem">
                 <th>
                     CART SUBTOTAL
                 </th>
                 <td></td>
-                <td><strong>{{ cart.subtotal }}</strong></td>
+                <td><strong>{{ cart.subtotal }} {{ cart.currency?.code }}</strong></td>
             </tr>
             <tr v-if="cart.coupon?.couponItem">
                 <th>
-                    Coupon: {{ cart.coupon.couponItem.name }}
+                    {{ cart.coupon.couponItem.fullName }}
                 </th>
                 <td></td>
-                <td>{{ cart.coupon.couponDiscountAmount }}</td>
+                <td>{{ cart.coupon.couponDiscountAmount }} {{ cart.currency?.code }}</td>
             </tr>
             <tr>
                 <th>
-                    TOTAL
+                    CART TOTAL
                 </th>
                 <td></td>
-                <td><strong>{{ cart.total }}</strong></td>
+                <td><strong>{{ cart.total }} {{ cart.currency?.code }}</strong></td>
             </tr>
         </tbody>
     </table>

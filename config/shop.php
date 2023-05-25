@@ -11,5 +11,8 @@ return [
         // 'shippingMode' => \App\Models\Shop\ShippingMode::class,
         // 'billingAddress' => \App\Models\Shop\BillingAddress::class,
         // 'shippingAddress' => \App\Models\Shop\ShippingAddress::class,
-    ]
+    ],
+    'currency' => [
+        'code' => 'EUR',
+    ],
 ];

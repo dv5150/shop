@@ -27,6 +27,8 @@ class TestCase extends Orchestra
         Config::set('shop.models.order', Order::class);
         Config::set('shop.models.orderItem', OrderItem::class);
         Config::set('shop.models.user', User::class);
+
+        Config::set('shop.currency.code', 'EUR');
     }
 
     protected function getPackageProviders($app)
