@@ -5,6 +5,8 @@ namespace DV5150\Shop\Tests\Unit;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
+use DV5150\Shop\Models\Coupons\CartPercentCoupon;
+use DV5150\Shop\Models\Coupons\CartValueCoupon;
 use DV5150\Shop\Tests\Concerns\CreatesCartCoupons;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
@@ -505,5 +507,49 @@ class CouponTest extends TestCase
             'price_gross' => 0 - ($itemsTotal * 0.25),
             'info' => null,
         ]);
+    }
+
+    /** @test */
+    public function base_coupons_get_deleted_when_cart_coupons_are_deleted()
+    {
+        $this->createCartValueCoupon(
+            '100 OFF discount',
+            100.0,
+            'CART100'
+        );
+
+        $this->createCartPercentCoupon(
+            '40% OFF discount',
+            40.0,
+            'CART40'
+        );
+
+        $this->assertDatabaseHas('coupons', [
+            'coupon_type' => CartValueCoupon::class,
+            'coupon_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('coupons', [
+            'coupon_type' => CartPercentCoupon::class,
+            'coupon_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('cart_value_coupons', [
+            'name' => '100 OFF discount',
+            'value' => 100.0,
+        ]);
+
+        $this->assertDatabaseHas('cart_percent_coupons', [
+            'name' => '40% OFF discount',
+            'value' => 40.0,
+        ]);
+
+        CartValueCoupon::first()->delete();
+        CartPercentCoupon::first()->delete();
+
+        $this->assertDatabaseCount('cart_value_coupons', 0);
+        $this->assertDatabaseCount('cart_percent_coupons', 0);
+
+        $this->assertDatabaseCount('coupons', 0);
     }
 }

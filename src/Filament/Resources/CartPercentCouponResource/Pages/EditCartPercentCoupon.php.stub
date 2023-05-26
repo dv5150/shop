@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\CartPercentCouponResource\Pages;
 
 use App\Filament\Resources\CartPercentCouponResource;
-use Filament\Pages\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditCartPercentCoupon extends EditRecord
@@ -13,7 +12,7 @@ class EditCartPercentCoupon extends EditRecord
     protected function getActions(): array
     {
         return [
-            DeleteAction::make(),
+            //
         ];
     }
 }

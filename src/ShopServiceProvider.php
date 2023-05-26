@@ -6,7 +6,12 @@ use DV5150\Shop\Console\Commands\InstallCommand;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
-use DV5150\Shop\Contracts\Services\CouponServiceContract;
+use DV5150\Shop\Models\Coupons\CartPercentCoupon;
+use DV5150\Shop\Models\Coupons\CartValueCoupon;
+use DV5150\Shop\Models\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Models\Discounts\ProductValueDiscount;
+use DV5150\Shop\Observers\DeleteCouponObserver;
+use DV5150\Shop\Observers\DeleteDiscountObserver;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CouponService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
@@ -40,6 +45,8 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerObservers();
+
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
     }
 
@@ -74,6 +81,15 @@ class ShopServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->as('shop.')
             ->group($this->getPath('routes/shop.php'));
+    }
+
+    protected function registerObservers(): void
+    {
+        ProductPercentDiscount::observe(DeleteDiscountObserver::class);
+        ProductValueDiscount::observe(DeleteDiscountObserver::class);
+
+        CartPercentCoupon::observe(DeleteCouponObserver::class);
+        CartValueCoupon::observe(DeleteCouponObserver::class);
     }
 
     protected function getPath(?string $target = null): string

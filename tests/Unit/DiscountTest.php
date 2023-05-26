@@ -4,6 +4,8 @@ namespace DV5150\Shop\Tests\Unit;
 
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
+use DV5150\Shop\Models\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Models\Discounts\ProductValueDiscount;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
@@ -406,5 +408,53 @@ class DiscountTest extends TestCase
             'price_gross' => 12300.0,
             'info' => null,
         ]));
+    }
+
+    /** @test */
+    public function base_discounts_get_deleted_when_product_discounts_are_deleted()
+    {
+        $this->createValueDiscountForProduct(
+            $this->productA,
+            '1700 OFF discount',
+            1700.0
+        );
+
+        $this->createPercentDiscountForProduct(
+            $this->productB,
+            '11% OFF discount',
+            11.0
+        );
+
+        $this->assertDatabaseHas('discounts', [
+            'discountable_type' => config('shop.models.product'),
+            'discountable_id' => $this->productA->getKey(),
+            'discount_type' => ProductValueDiscount::class,
+            'discount_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('discounts', [
+            'discountable_type' => config('shop.models.product'),
+            'discountable_id' => $this->productB->getKey(),
+            'discount_type' => ProductPercentDiscount::class,
+            'discount_id' => 1,
+        ]);
+
+        $this->assertDatabaseHas('product_value_discounts', [
+            'name' => '1700 OFF discount',
+            'value' => 1700.0,
+        ]);
+
+        $this->assertDatabaseHas('product_percent_discounts', [
+            'name' => '11% OFF discount',
+            'value' => 11.0,
+        ]);
+
+        ProductValueDiscount::first()->delete();
+        ProductPercentDiscount::first()->delete();
+
+        $this->assertDatabaseCount('product_value_discounts', 0);
+        $this->assertDatabaseCount('product_percent_discounts', 0);
+
+        $this->assertDatabaseCount('discounts', 0);
     }
 }

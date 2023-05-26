@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Models\Coupons;
 
+use DV5150\Shop\Concerns\HasBaseCoupons;
 use DV5150\Shop\Concerns\ProvidesValueDealData;
 use DV5150\Shop\Contracts\Deals\CouponContract;
 use DV5150\Shop\Contracts\OrderItemContract;
@@ -11,7 +12,8 @@ use Illuminate\Support\Collection;
 
 class CartValueCoupon extends Model implements CouponContract
 {
-    use ProvidesValueDealData;
+    use ProvidesValueDealData,
+        HasBaseCoupons;
 
     protected $guarded = [];
 
@@ -31,5 +33,10 @@ class CartValueCoupon extends Model implements CouponContract
             'quantity' => 1,
             'price_gross' => 0 - $this->getValue(),
         ]);
+    }
+
+    public function getTypeName(): string
+    {
+        return 'Coupon';
     }
 }

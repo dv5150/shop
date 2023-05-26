@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Models\Coupons;
 
+use DV5150\Shop\Concerns\HasBaseCoupons;
 use DV5150\Shop\Concerns\ProvidesPercentDealData;
 use DV5150\Shop\Contracts\Deals\CouponContract;
 use DV5150\Shop\Contracts\OrderItemContract;
@@ -11,7 +12,8 @@ use Illuminate\Support\Collection;
 
 class CartPercentCoupon extends Model implements CouponContract
 {
-    use ProvidesPercentDealData;
+    use ProvidesPercentDealData,
+        HasBaseCoupons;
 
     protected $guarded = [];
 
@@ -45,5 +47,10 @@ class CartPercentCoupon extends Model implements CouponContract
                     * $orderItem->getQuantity();
             }
         ) * ($this->getValue() / 100));
+    }
+
+    public function getTypeName(): string
+    {
+        return 'Coupon';
     }
 }
