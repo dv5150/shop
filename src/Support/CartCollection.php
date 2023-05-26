@@ -45,6 +45,24 @@ class CartCollection extends Collection
             ->values();
     }
 
+    public function refreshDiscounts(): self
+    {
+        $productKeys = collect($this->all())
+            ->mapWithKeys(fn (CartItemCapsule $capsule) => [
+                $capsule->getItem()->getID() => $capsule->getQuantity()
+            ])->all();
+
+        $products = config('shop.models.product')::with('discounts.discount')
+            ->find(array_keys($productKeys));
+
+        $capsules = $products->map(function (ProductContract $product) use ($productKeys) {
+            return (new CartItemCapsule($product, $productKeys[$product->getID()]))
+                ->applyDiscount();
+        });
+
+        return new static($capsules->all());
+    }
+
     public function hasDigitalItemsOnly(): bool
     {
         return $this->doesntContain(

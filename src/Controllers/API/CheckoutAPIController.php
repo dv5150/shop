@@ -78,10 +78,11 @@ class CheckoutAPIController
 
         $IDs = array_keys($quantities);
 
-        $orderItems = config('shop.models.product')::find($IDs)
+        $orderItems = config('shop.models.product')::with('discounts.discount')
+            ->find($IDs)
             ->map(fn (ProductContract $product) => $this->makeOrderItem(
                 (new CartItemCapsule($product, $quantities[$product->getID()]))
-                    ->refreshDiscount()
+                    ->applyDiscount()
             ));
 
         if ($coupon = Cart::getCoupon()) {

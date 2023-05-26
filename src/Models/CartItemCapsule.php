@@ -62,15 +62,6 @@ class CartItemCapsule implements Arrayable
         ];
     }
 
-    public function refreshDiscount(): self
-    {
-        $this->removeDiscount();
-
-        $this->applyDiscount();
-
-        return $this;
-    }
-
     public function getDiscount(): ?Discount
     {
         return $this->discount;
@@ -87,10 +78,17 @@ class CartItemCapsule implements Arrayable
         return $this->getPriceGross() * $this->getQuantity();
     }
 
-    protected function applyDiscount(): self
+    public function removeDiscount(): self
+    {
+        $this->discount = null;
+        $this->discountedPriceGross = null;
+
+        return $this;
+    }
+
+    public function applyDiscount(): self
     {
         $this->getItem()
-            ->load('discounts.discount')
             ->discounts
             ->each(fn (Discount $discount) => $this->tryDiscount($discount));
 
@@ -105,14 +103,6 @@ class CartItemCapsule implements Arrayable
             $this->discountedPriceGross = $newDiscountedPriceGross;
             $this->discount = $discount;
         }
-
-        return $this;
-    }
-
-    protected function removeDiscount(): self
-    {
-        $this->discount = null;
-        $this->discountedPriceGross = null;
 
         return $this;
     }

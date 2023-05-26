@@ -23,7 +23,8 @@ class CartService implements CartServiceContract
     {
         if ($cart = Session::get($this->getSessionKey())) {
             return unserialize($cart)
-                ->map(fn (CartItemCapsule $capsule) => $capsule->refreshDiscount());
+                ->map(fn (CartItemCapsule $capsule) => $capsule->removeDiscount())
+                ->refreshDiscounts();
         }
 
         return $this->reset();
