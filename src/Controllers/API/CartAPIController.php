@@ -110,8 +110,7 @@ class CartAPIController
     protected function resolveProduct($productID): ProductContract
     {
         /** @var Model $product */
-        $product = config('shop.models.product')::with('discounts.discount')
-            ->findOrFail($productID);
+        $product = config('shop.models.product')::findOrFail($productID);
 
         if (!$product instanceof ProductContract) {
             abort(422, __('The selected item is not a valid product.'));
