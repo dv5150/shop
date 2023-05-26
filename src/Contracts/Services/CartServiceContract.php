@@ -14,8 +14,9 @@ interface CartServiceContract
     public function removeItem(ProductContract $item, int $quantity = 1): CartCollection;
     public function eraseItem(ProductContract $item): CartCollection;
     public function setCoupon(?Coupon $coupon): CartCollection;
+    public function getCouponSummary(CartCollection $cartResults): ?array;
     public function getCoupon(): ?Coupon;
-    public function getTotal(): float;
+    public function getTotal(CartCollection $cartResults): float;
     public function hasDigitalItemsOnly(): bool;
     public function toArray(): array;
     public function toJson($options = 0): string;

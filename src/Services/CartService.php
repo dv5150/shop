@@ -85,7 +85,7 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
-    public function getCouponSummary(): ?array
+    public function getCouponSummary(CartCollection $cartResults): ?array
     {
         $cart = $this->all();
 
@@ -106,15 +106,13 @@ class CartService implements CartServiceContract
         return $this->couponService->getCoupon();
     }
 
-    public function getTotal(): float
+    public function getTotal(CartCollection $cartResults): float
     {
-        $cart = $this->all();
-
         if ($coupon = $this->getCoupon()) {
-            return floor($coupon->getDiscountedPriceGross($cart));
+            return floor($coupon->getDiscountedPriceGross($cartResults));
         }
 
-        return $cart->getTotalGrossPrice();
+        return $cartResults->getTotalGrossPrice();
     }
 
     public function hasDigitalItemsOnly(): bool
