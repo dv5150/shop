@@ -413,13 +413,13 @@ class DiscountTest extends TestCase
     /** @test */
     public function base_discounts_get_deleted_when_product_discounts_are_deleted()
     {
-        $this->createValueDiscountForProduct(
+        $baseDiscountA = $this->createValueDiscountForProduct(
             $this->productA,
             '1700 OFF discount',
             1700.0
         );
 
-        $this->createPercentDiscountForProduct(
+        $baseDiscountB = $this->createPercentDiscountForProduct(
             $this->productB,
             '11% OFF discount',
             11.0
@@ -449,8 +449,8 @@ class DiscountTest extends TestCase
             'value' => 11.0,
         ]);
 
-        ProductValueDiscount::first()->delete();
-        ProductPercentDiscount::first()->delete();
+        $baseDiscountA->delete();
+        $baseDiscountB->delete();
 
         $this->assertDatabaseCount('product_value_discounts', 0);
         $this->assertDatabaseCount('product_percent_discounts', 0);

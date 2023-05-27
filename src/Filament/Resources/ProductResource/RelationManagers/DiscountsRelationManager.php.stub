@@ -2,17 +2,23 @@
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Filament\Resources\DiscountResource;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
-use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
-use Filament\Forms\Components\MorphToSelect;
-use Filament\Forms\Components\MorphToSelect\Type;
+use DV5150\Shop\Models\Deals\Discount;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
-use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Contracts\HasRelationshipTable;
+use Illuminate\Database\Eloquent\Model;
+use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use Filament\Tables\Columns\TextColumn;
 
 class DiscountsRelationManager extends RelationManager
@@ -23,27 +29,7 @@ class DiscountsRelationManager extends RelationManager
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                MorphToSelect::make('discount')
-                    ->types([
-                        Type::make(ProductPercentDiscount::class)
-                            ->getOptionLabelFromRecordUsing(
-                                function (ProductPercentDiscount $discount): string {
-                                    return $discount->getFullName();
-                                }
-                            )->titleColumnName('name')
-                            ->label('Product Percent Discount'),
-                        Type::make(ProductValueDiscount::class)
-                            ->getOptionLabelFromRecordUsing(
-                                function (ProductValueDiscount $discount): string {
-                                    return $discount->getFullName();
-                                }
-                            )->titleColumnName('name')
-                            ->label('Product Value Discount')
-                    ])->required()
-                    ->label('Discount'),
-            ]);
+        return $form;
     }
 
     public static function table(Table $table): Table
@@ -51,28 +37,55 @@ class DiscountsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('discount')
-                    ->formatStateUsing(
-                        fn (DiscountContract $state) => $state->getFullName()
-                    ),
+                    ->formatStateUsing(fn (DiscountContract $state) => DiscountResource::getDiscountAdminName($state)),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Attach discount')
-                    ->modalHeading('Attach discount')
-                    ->modalButton('Attach')
-                    ->disableCreateAnother(),
+                    ->using(function (HasRelationshipTable $livewire, array $data): Model {
+                        $discountedItem = $livewire->ownerRecord;
+
+                        tap(new Discount(), function (Discount $baseDiscount) use ($discountedItem, $data) {
+                            $discount = $data['discount_type']::create([
+                                'name' => $data['name'],
+                                'value' => $data['value'],
+                            ]);
+
+                            $baseDiscount->discountable()->associate($discountedItem);
+                            $baseDiscount->discount()->associate($discount);
+                            $baseDiscount->save();
+                        });
+
+                        return $discountedItem;
+                    })
+                    ->form([
+                        Select::make('discount_type')
+                            ->options(self::getDiscountTypes())
+                            ->required(),
+                        Card::make([
+                            TextInput::make('value')
+                                ->numeric()
+                                ->required(),
+                            TextInput::make('name'),
+                        ]),
+                    ])
             ])
             ->actions([
-                DeleteAction::make()
-                    ->label('Detach')
-                    ->modalHeading('Detach discount')
-                    ->modalButton('Detach'),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
+    }
+
+    protected static function getDiscountTypes(): array
+    {
+        return [
+            ProductPercentDiscount::class => 'Percent Discount (%)',
+            ProductValueDiscount::class => 'Value Discount (' . config('shop.currency.code') . ')',
+        ];
     }
 }

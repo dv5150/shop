@@ -2,12 +2,12 @@
 
 namespace DV5150\Shop\Observers;
 
-use DV5150\Shop\Contracts\Deals\CouponContract;
+use DV5150\Shop\Models\Deals\Coupon;
 
 class DeleteCouponObserver
 {
-    public function deleted(CouponContract $cartCoupon)
+    public function deleting(Coupon $baseCoupon)
     {
-        $cartCoupon->coupons->each->delete();
+        $baseCoupon->coupon->delete();
     }
 }

@@ -510,15 +510,15 @@ class CouponTest extends TestCase
     }
 
     /** @test */
-    public function base_coupons_get_deleted_when_cart_coupons_are_deleted()
+    public function coupons_get_deleted_when_base_coupons_are_deleted()
     {
-        $this->createCartValueCoupon(
+        $baseCouponA = $this->createCartValueCoupon(
             '100 OFF discount',
             100.0,
             'CART100'
         );
 
-        $this->createCartPercentCoupon(
+        $baseCouponB = $this->createCartPercentCoupon(
             '40% OFF discount',
             40.0,
             'CART40'
@@ -544,8 +544,8 @@ class CouponTest extends TestCase
             'value' => 40.0,
         ]);
 
-        CartValueCoupon::first()->delete();
-        CartPercentCoupon::first()->delete();
+        $baseCouponA->delete();
+        $baseCouponB->delete();
 
         $this->assertDatabaseCount('cart_value_coupons', 0);
         $this->assertDatabaseCount('cart_percent_coupons', 0);

@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Deals\Coupons;
 
-use DV5150\Shop\Concerns\HasBaseCoupons;
+use DV5150\Shop\Concerns\HasBaseCoupon;
 use DV5150\Shop\Concerns\ProvidesPercentDealData;
 use DV5150\Shop\Contracts\Deals\CouponContract;
 use DV5150\Shop\Contracts\OrderItemContract;
@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 class CartPercentCoupon extends Model implements CouponContract
 {
     use ProvidesPercentDealData,
-        HasBaseCoupons;
+        HasBaseCoupon;
 
     protected $guarded = [];
 

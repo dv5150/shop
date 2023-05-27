@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Filament\Resources\DiscountResource\Pages;
+
+use App\Filament\Resources\DiscountResource;
+use DV5150\Shop\Models\Deals\Discount;
+use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
+
+class CreateDiscount extends CreateRecord
+{
+    protected static string $resource = DiscountResource::class;
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        $data = $this->data;
+
+        $discount = $data['discount_type']::create($data['discount']);
+
+        $baseDiscount = tap(new Discount([
+            'discountable_type' => $data['discountable_type'],
+            'discountable_id' => $data['discountable_id'],
+        ]), function (Discount $baseCoupon) use ($discount) {
+            $baseCoupon->discount()->associate($discount);
+        });
+
+        $baseDiscount->save();
+
+        return $baseDiscount;
+    }
+}

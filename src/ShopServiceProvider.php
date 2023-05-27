@@ -6,10 +6,8 @@ use DV5150\Shop\Console\Commands\InstallCommand;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
-use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
-use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
-use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
+use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Observers\DeleteCouponObserver;
 use DV5150\Shop\Observers\DeleteDiscountObserver;
 use DV5150\Shop\Services\CartService;
@@ -85,11 +83,8 @@ class ShopServiceProvider extends ServiceProvider
 
     protected function registerObservers(): void
     {
-        ProductPercentDiscount::observe(DeleteDiscountObserver::class);
-        ProductValueDiscount::observe(DeleteDiscountObserver::class);
-
-        CartPercentCoupon::observe(DeleteCouponObserver::class);
-        CartValueCoupon::observe(DeleteCouponObserver::class);
+        Discount::observe(DeleteDiscountObserver::class);
+        Coupon::observe(DeleteCouponObserver::class);
     }
 
     protected function getPath(?string $target = null): string

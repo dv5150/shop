@@ -2,12 +2,12 @@
 
 namespace DV5150\Shop\Observers;
 
-use DV5150\Shop\Contracts\Deals\DiscountContract;
+use DV5150\Shop\Models\Deals\Discount;
 
 class DeleteDiscountObserver
 {
-    public function deleted(DiscountContract $productDiscount)
+    public function deleting(Discount $baseDiscount)
     {
-        $productDiscount->discounts->each->delete();
+        $baseDiscount->discount->delete();
     }
 }

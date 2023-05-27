@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Filament\Resources\DiscountResource\Pages;
+
+use App\Filament\Resources\DiscountResource;
+use DV5150\Shop\Models\Deals\Discount;
+use Filament\Pages\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+
+class EditDiscount extends EditRecord
+{
+    protected static string $resource = DiscountResource::class;
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        $record->update([
+            'discountable_type' => $data['discountable_type'],
+            'discountable_id' => $data['discountable_id'],
+        ]);
+
+        $requiredDiscountType = $data['discount_type'];
+
+        $newDiscountData = Arr::except(
+            $this->data['discount'],
+            ['id', 'created_at', 'updated_at']
+        );
+
+        $existingProductDiscount = $record->discount;
+
+        if (!$existingProductDiscount instanceof $requiredDiscountType) {
+            $currentDiscountClass = get_class($existingProductDiscount);
+
+            $currentDiscountClass::withoutEvents(function () use ($existingProductDiscount) {
+                $existingProductDiscount->delete();
+            });
+
+            tap($record, function (Discount $baseDiscount) use ($requiredDiscountType, $newDiscountData) {
+                $discount = $requiredDiscountType::create($newDiscountData);
+
+                $baseDiscount->discount()->associate($discount);
+                $baseDiscount->save();
+            });
+        } else {
+            $existingProductDiscount->update($newDiscountData);
+        }
+
+        return $record;
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            DeleteAction::make(),
+        ];
+    }
+}

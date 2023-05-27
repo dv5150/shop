@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Deals\Discounts;
 
-use DV5150\Shop\Concerns\HasBaseDiscounts;
+use DV5150\Shop\Concerns\HasBaseDiscount;
 use DV5150\Shop\Concerns\ProvidesValueDealData;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Models\CartItemCapsule;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductValueDiscount extends Model implements DiscountContract
 {
     use ProvidesValueDealData,
-        HasBaseDiscounts;
+        HasBaseDiscount;
 
     protected $guarded = [];
 
