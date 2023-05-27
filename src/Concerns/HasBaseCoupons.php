@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Concerns;
 
-use DV5150\Shop\Models\Coupon;
+use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 trait HasBaseCoupons

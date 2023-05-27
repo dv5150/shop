@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Services;
 
-use DV5150\Shop\Models\Coupon;
+use DV5150\Shop\Models\Deals\Coupon;
 
 interface CouponServiceContract
 {

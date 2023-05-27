@@ -6,11 +6,11 @@ use App\Filament\Resources\CouponResource\Pages\ListCoupons;
 use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
 use App\Filament\Resources\CouponResource\Pages\EditCoupon;
 use DV5150\Shop\Contracts\Deals\CouponContract;
-use DV5150\Shop\Models\Coupon;
-use DV5150\Shop\Models\Coupons\CartPercentCoupon;
-use DV5150\Shop\Models\Coupons\CartValueCoupon;
-use Filament\Forms\Components\MorphToSelect;
-use Filament\Forms\Components\MorphToSelect\Type;
+use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
+use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -27,7 +27,7 @@ class CouponResource extends Resource
 
     protected static ?string $slug = 'shop/coupons';
 
-    protected static ?string $navigationGroup = 'Shop (Coupons)';
+    protected static ?string $navigationGroup = 'Shop';
 
     protected static ?string $navigationLabel = 'Coupon Codes';
 
@@ -35,26 +35,19 @@ class CouponResource extends Resource
     {
         return $form
             ->schema([
-                MorphToSelect::make('coupon')
-                    ->types([
-                        Type::make(CartPercentCoupon::class)
-                            ->getOptionLabelFromRecordUsing(
-                                function (CartPercentCoupon $coupon): string {
-                                    return $coupon->getFullName();
-                                }
-                            )->titleColumnName('name')
-                            ->label('Cart Percent Coupon'),
-                        Type::make(CartValueCoupon::class)
-                            ->getOptionLabelFromRecordUsing(
-                                function (CartValueCoupon $coupon): string {
-                                    return $coupon->getFullName();
-                                }
-                            )->titleColumnName('name')
-                            ->label('Cart Value Coupon')
-                    ])->required(),
-                TextInput::make('code')
+                Select::make('coupon_type')
+                    ->options(self::getCouponTypes())
                     ->required()
+                    ->reactive(),
+                TextInput::make('code')
                     ->unique(ignoreRecord: true)
+                    ->required(),
+                Card::make([
+                    TextInput::make('value')
+                        ->numeric()
+                        ->required(),
+                    TextInput::make('name'),
+                ])->relationship('coupon'),
             ]);
     }
 
@@ -92,6 +85,14 @@ class CouponResource extends Resource
             'index' => ListCoupons::route('/'),
             'create' => CreateCoupon::route('/create'),
             'edit' => EditCoupon::route('/{record}/edit'),
+        ];
+    }
+
+    protected static function getCouponTypes(): array
+    {
+        return [
+            CartPercentCoupon::class => 'Cart Percent Coupon (%)',
+            CartValueCoupon::class => 'Cart Value Coupon (' . config('shop.currency.code') . ')',
         ];
     }
 }

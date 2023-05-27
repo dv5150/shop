@@ -3,6 +3,7 @@
 namespace DV5150\Shop\Models;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 

@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductValueDiscountResource\Pages\ListProductValueDiscounts;
 use App\Filament\Resources\ProductValueDiscountResource\Pages\CreateProductValueDiscount;
 use App\Filament\Resources\ProductValueDiscountResource\Pages\EditProductValueDiscount;
-use DV5150\Shop\Models\Discounts\ProductValueDiscount;
+use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;

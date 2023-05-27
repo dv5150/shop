@@ -3,9 +3,28 @@
 namespace App\Filament\Resources\CouponResource\Pages;
 
 use App\Filament\Resources\CouponResource;
+use DV5150\Shop\Models\Deals\Coupon;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class CreateCoupon extends CreateRecord
 {
     protected static string $resource = CouponResource::class;
+
+    protected function handleRecordCreation(array $data): Model
+    {
+        $data = $this->data;
+
+        $coupon = $data['coupon_type']::create($data['coupon']);
+
+        $baseCoupon = tap(new Coupon([
+            'code' => $data['code']
+        ]), function (Coupon $baseCoupon) use ($coupon) {
+            $baseCoupon->coupon()->associate($coupon);
+        });
+
+        $baseCoupon->save();
+
+        return $baseCoupon;
+    }
 }

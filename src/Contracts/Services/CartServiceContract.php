@@ -4,7 +4,7 @@ namespace DV5150\Shop\Contracts\Services;
 
 use DV5150\Shop\Support\CartCollection;
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\Coupon;
+use DV5150\Shop\Models\Deals\Coupon;
 
 interface CartServiceContract
 {

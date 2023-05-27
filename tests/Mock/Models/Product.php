@@ -3,7 +3,7 @@
 namespace DV5150\Shop\Tests\Mock\Models;
 
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\Discount;
+use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Tests\Mock\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;

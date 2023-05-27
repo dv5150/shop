@@ -4,7 +4,7 @@ namespace DV5150\Shop\Controllers\API;
 
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
-use DV5150\Shop\Models\Coupon;
+use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
 

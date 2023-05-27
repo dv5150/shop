@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Tests\Concerns;
 
-use DV5150\Shop\Models\Coupon;
-use DV5150\Shop\Models\Coupons\CartPercentCoupon;
-use DV5150\Shop\Models\Coupons\CartValueCoupon;
+use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
+use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
 
 trait CreatesCartCoupons
 {

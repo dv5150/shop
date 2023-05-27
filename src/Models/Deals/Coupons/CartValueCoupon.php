@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Models\Coupons;
+namespace DV5150\Shop\Models\Deals\Coupons;
 
 use DV5150\Shop\Concerns\HasBaseCoupons;
 use DV5150\Shop\Concerns\ProvidesValueDealData;

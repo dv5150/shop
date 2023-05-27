@@ -4,8 +4,8 @@ namespace DV5150\Shop\Tests\Unit;
 
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Models\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Discounts\ProductValueDiscount;
+use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;

@@ -7,7 +7,7 @@ use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Models\CartItemCapsule;
-use DV5150\Shop\Models\Coupon;
+use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Support\Facades\Session;
 
 class CartService implements CartServiceContract
