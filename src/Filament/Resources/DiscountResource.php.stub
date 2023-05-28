@@ -103,7 +103,7 @@ class DiscountResource extends Resource
     {
         $name = $state->getFullName();
 
-        if ($discountable = $state->baseDiscount->getDiscountable()) {
+        if ($discountable = $state->getBaseDiscount()->getDiscountable()) {
             $name .= " | {$discountable->getName()}";
         }
 

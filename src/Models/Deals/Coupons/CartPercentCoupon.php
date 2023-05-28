@@ -36,6 +36,7 @@ class CartPercentCoupon extends Model implements CouponContract
             'name' => $this->getFullName(),
             'quantity' => 1,
             'price_gross' => $this->calculateDiscountValue($orderItems),
+            'info' => "Code: {$this->getBaseCoupon()->code}",
         ]);
     }
 
@@ -51,6 +52,6 @@ class CartPercentCoupon extends Model implements CouponContract
 
     public function getTypeName(): string
     {
-        return 'Coupon';
+        return "Coupon [{$this->getBaseCoupon()->code}]";
     }
 }

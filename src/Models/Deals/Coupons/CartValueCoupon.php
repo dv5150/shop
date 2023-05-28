@@ -32,6 +32,7 @@ class CartValueCoupon extends Model implements CouponContract
             'name' => $this->getFullName(),
             'quantity' => 1,
             'price_gross' => 0 - $this->getValue(),
+            'info' => "Code: {$this->getBaseCoupon()->code}",
         ]);
     }
 

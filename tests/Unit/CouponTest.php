@@ -419,7 +419,7 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 1,
             'price_gross' => -1100.0,
-            'info' => null,
+            'info' => "Code: {$coupon->code}",
         ]);
     }
 
@@ -505,7 +505,7 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 1,
             'price_gross' => 0 - ($itemsTotal * 0.25),
-            'info' => null,
+            'info' => "Code: {$coupon->code}",
         ]);
     }
 

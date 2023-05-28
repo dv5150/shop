@@ -11,4 +11,9 @@ trait HasBaseCoupon
     {
         return $this->morphOne(Coupon::class, 'coupon');
     }
+
+    public function getBaseCoupon(): Coupon
+    {
+        return $this->baseCoupon;
+    }
 }

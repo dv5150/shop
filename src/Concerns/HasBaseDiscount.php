@@ -11,4 +11,9 @@ trait HasBaseDiscount
     {
         return $this->morphOne(Discount::class, 'discount');
     }
+
+    public function getBaseDiscount(): Discount
+    {
+        return $this->baseDiscount;
+    }
 }
