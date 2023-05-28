@@ -2,17 +2,17 @@
 
 return [
     'models' => [
-        // 'user' => \App\Models\User::class,
-        // 'product' => \App\Models\Shop\Product::class,
-        // 'category' => \App\Models\Shop\Category::class,
-        // 'order' => \App\Models\Shop\Order::class,
-        // 'orderItem' => \App\Models\Shop\OrderItem::class,
-        // 'paymentMode' => \App\Models\Shop\PaymentMode::class,
-        // 'shippingMode' => \App\Models\Shop\ShippingMode::class,
-        // 'billingAddress' => \App\Models\Shop\BillingAddress::class,
-        // 'shippingAddress' => \App\Models\Shop\ShippingAddress::class,
+        'user' => \App\Models\User::class,
+        'product' => \DV5150\Shop\Models\Default\Product::class,
+        'category' => \DV5150\Shop\Models\Default\Category::class,
+        'order' => \DV5150\Shop\Models\Default\Order::class,
+        'orderItem' => \DV5150\Shop\Models\Default\OrderItem::class,
+        'paymentMode' => \DV5150\Shop\Models\Default\PaymentMode::class,
+        'shippingMode' => \DV5150\Shop\Models\Default\ShippingMode::class,
+        'billingAddress' => \DV5150\Shop\Models\Default\BillingAddress::class,
+        'shippingAddress' => \DV5150\Shop\Models\Default\ShippingAddress::class,
     ],
     'currency' => [
-        'code' => 'EUR',
+        'code' => 'HUF',
     ],
 ];

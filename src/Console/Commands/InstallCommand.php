@@ -21,28 +21,7 @@ class InstallCommand extends Command
         '11_create_coupon_tables',
     ];
 
-    protected array $models = [
-        'BillingAddress',
-        'Category',
-        'Order',
-        'OrderItem',
-        'PaymentMode',
-        'Product',
-        'ShippingAddress',
-        'ShippingMode',
-    ];
-
     protected array $filamentResources = [
-        'CartPercentCouponResource',
-        'CartPercentCouponResource/Pages/CreateCartPercentCoupon',
-        'CartPercentCouponResource/Pages/EditCartPercentCoupon',
-        'CartPercentCouponResource/Pages/ListCartPercentCoupons',
-
-        'CartValueCouponResource',
-        'CartValueCouponResource/Pages/CreateCartValueCoupon',
-        'CartValueCouponResource/Pages/EditCartValueCoupon',
-        'CartValueCouponResource/Pages/ListCartValueCoupons',
-
         'CouponResource',
         'CouponResource/Pages/CreateCoupon',
         'CouponResource/Pages/EditCoupon',
@@ -54,30 +33,16 @@ class InstallCommand extends Command
         'OrderResource/Pages/ListOrders',
         'OrderResource/RelationManagers/ItemsRelationManager',
 
-        'ProductPercentDiscountResource',
-        'ProductPercentDiscountResource/Pages/CreateProductPercentDiscount',
-        'ProductPercentDiscountResource/Pages/EditProductPercentDiscount',
-        'ProductPercentDiscountResource/Pages/ListProductPercentDiscounts',
-
         'ProductResource',
         'ProductResource/Pages/CreateProduct',
         'ProductResource/Pages/EditProduct',
         'ProductResource/Pages/ListProducts',
         'ProductResource/RelationManagers/DiscountsRelationManager',
 
-        'ProductValueDiscountResource',
-        'ProductValueDiscountResource/Pages/CreateProductValueDiscount',
-        'ProductValueDiscountResource/Pages/EditProductValueDiscount',
-        'ProductValueDiscountResource/Pages/ListProductValueDiscounts',
-
         'UserResource/RelationManagers/OrdersRelationManager',
     ];
 
     protected array $requiredFilamentDirectories = [
-        'CartPercentCouponResource/Pages',
-
-        'CartValueCouponResource/Pages',
-
         'CouponResource/Pages',
 
         'OrderResource/Pages',
@@ -85,10 +50,6 @@ class InstallCommand extends Command
 
         'ProductResource/Pages',
         'ProductResource/RelationManagers',
-
-        'ProductPercentDiscountResource/Pages',
-
-        'ProductValueDiscountResource/Pages',
 
         'UserResource/RelationManagers',
     ];
@@ -133,12 +94,8 @@ class InstallCommand extends Command
 
     protected function runInstallationProcess(): void
     {
-        $this->copyMigrations();
         $this->copyConfigFile();
-
-        if ($this->confirm('Copy default models? (recommended)', true)) {
-            $this->copyDefaultModels();
-        }
+        $this->copyMigrations();
 
         if ($this->confirm('Copy Vue components and views? (recommended)', true)) {
             $this->copyFrontendAssets();
@@ -168,20 +125,6 @@ class InstallCommand extends Command
         $this->info('Copying config file...');
 
         File::copy($this->getPath('config/shop.php'), config_path('shop.php'));
-    }
-
-    protected function copyDefaultModels(): void
-    {
-        $this->info('Copying default models...');
-
-        File::ensureDirectoryExists(app_path('Models/Shop'));
-
-        foreach ($this->models as $model) {
-            File::copy(
-                $this->getPath("src/Models/Default/$model.php.stub"),
-                app_path("Models/Shop/$model.php")
-            );
-        }
     }
 
     protected function copyFrontendAssets(): void

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Models\Shop;
+namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -21,12 +23,17 @@ class Product extends Model implements ProductContract
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(config('shop.models.category'));
     }
 
     public function orders(): BelongsToMany
     {
-        return $this->belongsToMany(Order::class);
+        return $this->belongsToMany(config('shop.models.order'));
+    }
+
+    public function discounts(): MorphMany
+    {
+        return $this->morphMany(Discount::class, 'discountable');
     }
 
     public function getSlugOptions(): SlugOptions

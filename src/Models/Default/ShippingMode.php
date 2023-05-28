@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Shop;
+namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\ShippingModeContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

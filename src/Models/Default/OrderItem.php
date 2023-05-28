@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Tests\Mock\Models;
+namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\OrderItemContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +14,7 @@ class OrderItem extends Model implements OrderItemContract
     protected $guarded = [];
 
     protected $casts = [
+        'data' => 'json',
         'price_gross' => 'float',
     ];
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Shop;
+namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\OrderContract;
 use Illuminate\Database\Eloquent\Model;
@@ -13,12 +13,12 @@ class Order extends Model implements OrderContract
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(config('shop.models.user'));
     }
 
     public function items(): HasMany
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(config('shop.models.orderItem'));
     }
 
     public function getThankYouUrl(): string
