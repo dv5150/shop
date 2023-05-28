@@ -30,7 +30,7 @@ class CouponResource extends Resource
 
     protected static ?string $navigationGroup = 'Shop';
 
-    protected static ?string $navigationLabel = 'Coupon Codes';
+    protected static ?string $navigationLabel = 'Cart Coupon Codes';
 
     public static function form(Form $form): Form
     {
