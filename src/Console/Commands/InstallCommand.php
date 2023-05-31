@@ -39,6 +39,11 @@ class InstallCommand extends Command
         'ProductResource/Pages/ListProducts',
         'ProductResource/RelationManagers/DiscountsRelationManager',
 
+        'ShippingModeResource',
+        'ShippingModeResource/Pages/CreateProduct',
+        'ShippingModeResource/Pages/EditProduct',
+        'ShippingModeResource/Pages/ListProducts',
+
         'UserResource/RelationManagers/OrdersRelationManager',
     ];
 
@@ -50,6 +55,8 @@ class InstallCommand extends Command
 
         'ProductResource/Pages',
         'ProductResource/RelationManagers',
+
+        'ShippingModeResource/Pages',
 
         'UserResource/RelationManagers',
     ];
