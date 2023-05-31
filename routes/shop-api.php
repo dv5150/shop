@@ -12,6 +12,11 @@ Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
             ->name('erase');
     });
 
+    Route::group(['prefix' => 'shipping-mode', 'as' => 'shippingMode.'], function () {
+        Route::post('{provider}', [CartAPIController::class, 'setShippingMode'])
+            ->name('store');
+    });
+
     Route::get('/', [CartAPIController::class, 'index'])
         ->name('index');
     Route::post('{product}/add/{quantity?}', [CartAPIController::class, 'store'])

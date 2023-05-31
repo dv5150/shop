@@ -9,11 +9,13 @@ use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 
 class DiscountTest extends TestCase
 {
     use ProvidesSampleOrderData,
         ProvidesSampleProductData,
+        ProvidesSampleShippingModeData,
         CreatesDiscountsForProducts;
 
     protected function setUp(): void
@@ -22,6 +24,7 @@ class DiscountTest extends TestCase
 
         $this->setUpSampleOrderData();
         $this->setUpSampleProductData();
+        $this->setUpSampleShippingModeData();
 
         $this->productA->update(['price_gross' => 5000.0]);
         $this->productB->update(['price_gross' => 7500.0]);
@@ -84,7 +87,8 @@ class DiscountTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $expectedItems,
-                ]
+                    'shippingMode' => $this->expectedShippingModeData
+                ],
             ]);
     }
 
@@ -143,8 +147,9 @@ class DiscountTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $expectedItems
-                ]
+                    'items' => $expectedItems,
+                    'shippingMode' => $this->expectedShippingModeData
+                ],
             ]);
     }
 
@@ -228,7 +233,8 @@ class DiscountTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $expectedItems,
-                ]
+                    'shippingMode' => $this->expectedShippingModeData,
+                ],
             ]);
     }
 
@@ -271,6 +277,7 @@ class DiscountTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $expectedItems,
+                    'shippingMode' => $this->expectedShippingModeData,
                 ]
             ]);
 
@@ -304,6 +311,7 @@ class DiscountTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $expectedItems,
+                    'shippingMode' => $this->expectedShippingModeData,
                 ]
             ]);
 
@@ -337,6 +345,7 @@ class DiscountTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $expectedItems,
+                    'shippingMode' => $this->expectedShippingModeData,
                 ]
             ]);
     }
@@ -392,14 +401,14 @@ class DiscountTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 2,
             'price_gross' => 3300.0,
-            'info' => $discountA->getFullname(),
+            'info' => $discountA->getShortName(),
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
             'order_id' => $orderKey,
             'quantity' => 2,
             'price_gross' => 6675.0,
-            'info' => $discountB->getFullname(),
+            'info' => $discountB->getShortName(),
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductCData, [
@@ -407,6 +416,10 @@ class DiscountTest extends TestCase
             'quantity' => 2,
             'price_gross' => 12300.0,
             'info' => null,
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
         ]));
     }
 

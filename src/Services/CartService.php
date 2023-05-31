@@ -6,6 +6,8 @@ use DV5150\Shop\Support\CartCollection;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
+use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
+use DV5150\Shop\Contracts\ShippingModeContract;
 use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Support\Facades\Session;
@@ -13,10 +15,14 @@ use Illuminate\Support\Facades\Session;
 class CartService implements CartServiceContract
 {
     protected CouponServiceContract $couponService;
+    protected ShippingModeServiceContract $shippingModeService;
 
-    public function __construct(CouponServiceContract $couponService)
-    {
+    public function __construct(
+        CouponServiceContract $couponService,
+        ShippingModeServiceContract $shippingModeService
+    ) {
         $this->couponService = $couponService;
+        $this->shippingModeService = $shippingModeService;
     }
 
     public function all(): CartCollection
@@ -85,6 +91,11 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
+    public function getCoupon(): ?Coupon
+    {
+        return $this->couponService->getCoupon();
+    }
+
     public function getCouponSummary(CartCollection $cartResults): ?array
     {
         $cart = $this->all();
@@ -101,18 +112,27 @@ class CartService implements CartServiceContract
         ];
     }
 
-    public function getCoupon(): ?Coupon
+    public function setShippingMode(ShippingModeContract $shippingMode): CartCollection
     {
-        return $this->couponService->getCoupon();
+        $this->shippingModeService->setShippingMode($shippingMode);
+
+        return $this->all();
+    }
+
+    public function getShippingMode(): ShippingModeContract
+    {
+        return $this->shippingModeService->getShippingMode();
     }
 
     public function getTotal(CartCollection $cartResults): float
     {
-        if ($coupon = $this->getCoupon()) {
-            return floor($coupon->getDiscountedPriceGross($cartResults));
-        }
+        $coupon = $this->getCoupon();
 
-        return $cartResults->getTotalGrossPrice();
+        $grossTotal = $coupon
+            ? floor($coupon->getDiscountedPriceGross($cartResults))
+            : $cartResults->getTotalGrossPrice();
+
+        return $grossTotal + $this->getShippingMode()->getPriceGross();
     }
 
     public function hasDigitalItemsOnly(): bool

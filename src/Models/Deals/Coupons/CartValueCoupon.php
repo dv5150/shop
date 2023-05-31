@@ -3,7 +3,6 @@
 namespace DV5150\Shop\Models\Deals\Coupons;
 
 use DV5150\Shop\Concerns\HasBaseCoupon;
-use DV5150\Shop\Concerns\ProvidesValueDealData;
 use DV5150\Shop\Contracts\Deals\CouponContract;
 use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Support\CartCollection;
@@ -12,8 +11,7 @@ use Illuminate\Support\Collection;
 
 class CartValueCoupon extends Model implements CouponContract
 {
-    use ProvidesValueDealData,
-        HasBaseCoupon;
+    use HasBaseCoupon;
 
     protected $guarded = [];
 
@@ -29,15 +27,30 @@ class CartValueCoupon extends Model implements CouponContract
     public function toOrderItem(Collection $orderItems): OrderItemContract
     {
         return new (config('shop.models.orderItem'))([
-            'name' => $this->getFullName(),
+            'name' => $this->getShortName(),
             'quantity' => 1,
             'price_gross' => 0 - $this->getValue(),
-            'info' => "Code: {$this->getBaseCoupon()->code}",
+            'info' => "[COUPON] [Code: {$this->getCode()}]",
         ]);
     }
 
-    public function getTypeName(): string
+    public function getName(): ?string
     {
-        return 'Coupon';
+        return $this->name;
+    }
+
+    public function getValue(): float
+    {
+        return $this->value;
+    }
+
+    public function getUnit(): string
+    {
+        return config('shop.currency.code');
+    }
+
+    public function getShortName(): ?string
+    {
+        return trim("[COUPON -{$this->getValue()} {$this->getUnit()}] {$this->getName()}");
     }
 }

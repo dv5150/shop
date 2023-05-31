@@ -92,6 +92,11 @@ class CheckoutAPIController
             );
         }
 
+        $orderItems->push(
+            Cart::getShippingMode()
+                ->toOrderItem()
+        );
+
         $order->items()->saveMany($orderItems);
     }
 

@@ -45,10 +45,17 @@
             </tr>
             <tr v-if="cart.coupon?.couponItem">
                 <th>
-                    {{ cart.coupon.couponItem.fullName }}
+                    {{ cart.coupon.couponItem.shortName }}
                 </th>
                 <td></td>
                 <td>{{ cart.coupon.couponDiscountAmount }} {{ cart.currency?.code }}</td>
+            </tr>
+            <tr v-if="cart.shippingMode">
+                <th>
+                    {{ cart.shippingMode.name }}
+                </th>
+                <td></td>
+                <td>{{ cart.shippingMode.priceGross }} {{ cart.currency?.code }}</td>
             </tr>
             <tr>
                 <th>

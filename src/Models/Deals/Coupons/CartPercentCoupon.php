@@ -3,7 +3,6 @@
 namespace DV5150\Shop\Models\Deals\Coupons;
 
 use DV5150\Shop\Concerns\HasBaseCoupon;
-use DV5150\Shop\Concerns\ProvidesPercentDealData;
 use DV5150\Shop\Contracts\Deals\CouponContract;
 use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Support\CartCollection;
@@ -12,8 +11,7 @@ use Illuminate\Support\Collection;
 
 class CartPercentCoupon extends Model implements CouponContract
 {
-    use ProvidesPercentDealData,
-        HasBaseCoupon;
+    use HasBaseCoupon;
 
     protected $guarded = [];
 
@@ -33,10 +31,10 @@ class CartPercentCoupon extends Model implements CouponContract
     public function toOrderItem(Collection $orderItems): OrderItemContract
     {
         return new (config('shop.models.orderItem'))([
-            'name' => $this->getFullName(),
+            'name' => $this->getShortName(),
             'quantity' => 1,
             'price_gross' => $this->calculateDiscountValue($orderItems),
-            'info' => "Code: {$this->getBaseCoupon()->code}",
+            'info' => "[COUPON] [Code: {$this->getCode()}]",
         ]);
     }
 
@@ -50,8 +48,23 @@ class CartPercentCoupon extends Model implements CouponContract
         ) * ($this->getValue() / 100));
     }
 
-    public function getTypeName(): string
+    public function getName(): ?string
     {
-        return "Coupon [{$this->getBaseCoupon()->code}]";
+        return $this->name;
+    }
+
+    public function getValue(): float
+    {
+        return $this->value;
+    }
+
+    public function getUnit(): string
+    {
+        return '%';
+    }
+
+    public function getShortName(): ?string
+    {
+        return trim("[COUPON -{$this->getValue()}{$this->getUnit()}] {$this->getName()}");
     }
 }

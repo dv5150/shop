@@ -4,15 +4,18 @@ namespace DV5150\Shop\Tests\Unit;
 
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Tests\Mock\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 
 class CheckoutTest extends TestCase
 {
     use ProvidesSampleOrderData,
-        ProvidesSampleProductData;
+        ProvidesSampleProductData,
+        ProvidesSampleShippingModeData;
 
     protected User $testUser;
 
@@ -22,6 +25,7 @@ class CheckoutTest extends TestCase
 
         $this->setUpSampleOrderData();
         $this->setUpSampleProductData();
+        $this->setUpSampleShippingModeData();
 
         $this->testUser = config('shop.models.user')::create([
             'name' => 'Johnny Jackson',
@@ -69,6 +73,10 @@ class CheckoutTest extends TestCase
             'quantity' => 4,
         ]));
 
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
+        ]));
+
         $this->checkThankYouPageAccessWithOrderAvailable($response);
     }
 
@@ -111,6 +119,10 @@ class CheckoutTest extends TestCase
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
             'order_id' => $orderKey,
             'quantity' => 3,
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
         ]));
 
         $this->checkThankYouPageAccessWithOrderAvailable($response);
@@ -168,9 +180,15 @@ class CheckoutTest extends TestCase
             'user_id' => $this->testUser->getKey(),
         ]));
 
+        $orderKey = config('shop.models.order')::first()->getKey();
+
         $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
-            'order_id' => config('shop.models.order')::first()->getKey(),
+            'order_id' => $orderKey,
             'quantity' => 2,
+        ]));
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
         ]));
 
         $this->checkThankYouPageAccessWithOrderAvailable($response);

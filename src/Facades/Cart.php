@@ -10,12 +10,19 @@ class Cart extends Facade
     /**
      * @method static all()
      * @method static reset()
+     *
      * @method static addItem()
      * @method static removeItem()
      * @method static eraseItem()
+     *
      * @method static setCoupon()
-     * @method static getCoupon()
+     * @method static removeCoupon()
+     *
+     * @method static setShippingMode()
+     * @method static getShippingMode()
+     *
      * @method static getTotal()
+     *
      * @method static toArray()
      * @method static toJson()
      *

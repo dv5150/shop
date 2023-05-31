@@ -6,12 +6,15 @@ use DV5150\Shop\Console\Commands\InstallCommand;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
+use DV5150\Shop\Contracts\Services\CouponServiceContract;
+use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Observers\DeleteCouponObserver;
 use DV5150\Shop\Observers\DeleteDiscountObserver;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CouponService;
+use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
 use Illuminate\Support\Facades\App;
@@ -51,8 +54,21 @@ class ShopServiceProvider extends ServiceProvider
     protected function registerCartService(): void
     {
         App::bind(
+            CouponServiceContract::class,
+            fn () => new CouponService(),
+        );
+
+        App::bind(
+            ShippingModeServiceContract::class,
+            fn () => new ShippingModeService(),
+        );
+
+        App::bind(
             CartServiceContract::class,
-            fn () => new CartService(new CouponService())
+            fn () => new CartService(
+                app(CouponServiceContract::class),
+                app(ShippingModeServiceContract::class)
+            )
         );
     }
 

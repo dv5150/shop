@@ -30,10 +30,10 @@ class Coupon extends Model implements BaseDealContract
             ->getDiscountedPriceGross($cart);
     }
 
-    public function getFullName(): ?string
+    public function getShortName(): ?string
     {
         return $this->getCoupon()
-            ->getFullName();
+            ->getShortName();
     }
 
     public function getName(): ?string
@@ -57,7 +57,7 @@ class Coupon extends Model implements BaseDealContract
     public function toArray(): array
     {
         return [
-            'fullName' => $this->getFullName(),
+            'shortName' => $this->getShortName(),
             'name' => $this->getName(),
             'value' => $this->getValue(),
             'unit' => $this->getUnit(),

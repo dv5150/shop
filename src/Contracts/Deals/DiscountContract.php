@@ -11,5 +11,4 @@ interface DiscountContract extends BaseDealContract
     public function getDiscountedPriceGross(CartItemCapsule $capsule): float;
     public function baseDiscount(): MorphOne;
     public function getBaseDiscount(): Discount;
-    public function getTypeName(): string;
 }

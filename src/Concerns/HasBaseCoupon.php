@@ -16,4 +16,9 @@ trait HasBaseCoupon
     {
         return $this->baseCoupon;
     }
+
+    public function getCode(): string
+    {
+        return $this->getBaseCoupon()->code;
+    }
 }

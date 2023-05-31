@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 interface BaseDealContract extends Arrayable
 {
-    public function getFullName(): ?string;
+    public function getShortName(): ?string;
     public function getName(): ?string;
     public function getValue(): float;
     public function getUnit(): string;

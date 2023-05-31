@@ -3,15 +3,13 @@
 namespace DV5150\Shop\Models\Deals\Discounts;
 
 use DV5150\Shop\Concerns\HasBaseDiscount;
-use DV5150\Shop\Concerns\ProvidesValueDealData;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Models\CartItemCapsule;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductValueDiscount extends Model implements DiscountContract
 {
-    use ProvidesValueDealData,
-        HasBaseDiscount;
+    use HasBaseDiscount;
 
     protected $guarded = [];
 
@@ -26,8 +24,23 @@ class ProductValueDiscount extends Model implements DiscountContract
         ]);
     }
 
-    public function getTypeName(): string
+    public function getName(): ?string
     {
-        return 'Discount';
+        return $this->name;
+    }
+
+    public function getValue(): float
+    {
+        return $this->value;
+    }
+
+    public function getUnit(): string
+    {
+        return config('shop.currency.code');
+    }
+
+    public function getShortName(): ?string
+    {
+        return "[DISCOUNT] {$this->getValue()} {$this->getUnit()}";
     }
 }

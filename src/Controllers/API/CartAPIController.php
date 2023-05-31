@@ -4,7 +4,10 @@ namespace DV5150\Shop\Controllers\API;
 
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
+use DV5150\Shop\Contracts\ShippingModeContract;
+use DV5150\Shop\Http\Resources\ShippingModeResource;
 use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Support\CartCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,91 +22,77 @@ class CartAPIController
 
     public function index(): JsonResponse
     {
-        $cartResults = $this->cart->all();
-
-        return new JsonResponse(data: [
-            'cart' => [
-                'items' => $cartResults->toArray(),
-                'coupon' => $this->cart->getCouponSummary($cartResults),
-                'total' => $this->cart->getTotal($cartResults),
-                'currency' => config('shop.currency'),
-            ]
-        ]);
+        return $this->getCartResponse(
+            $this->cart->all()
+        );
     }
 
     public function store($productID, int $quantity = 1): JsonResponse
     {
-        $cartResults = $this->cart->addItem(
-            $this->resolveProduct($productID),
-            $quantity
+        return $this->getCartResponse(
+            $this->cart->addItem(
+                $this->resolveProduct($productID),
+                $quantity
+            )
         );
-
-        return new JsonResponse(data: [
-            'cart' => [
-                'items' => $cartResults->toArray(),
-                'coupon' => $this->cart->getCouponSummary($cartResults),
-                'total' => $this->cart->getTotal($cartResults),
-                'currency' => config('shop.currency'),
-            ]
-        ]);
     }
 
     public function remove($productID, int $quantity = 1): JsonResponse
     {
-        $cartResults = $this->cart->removeItem(
-            $this->resolveProduct($productID),
-            $quantity
+        return $this->getCartResponse(
+            $this->cart->removeItem(
+                $this->resolveProduct($productID),
+                $quantity
+            )
         );
-
-        return new JsonResponse(data: [
-            'cart' => [
-                'items' => $cartResults->toArray(),
-                'coupon' => $this->cart->getCouponSummary($cartResults),
-                'total' => $this->cart->getTotal($cartResults),
-                'currency' => config('shop.currency'),
-            ]
-        ]);
     }
 
     public function erase($productID): JsonResponse
     {
-        $cartResults = $this->cart->eraseItem($this->resolveProduct($productID));
-
-        return new JsonResponse(data: [
-            'cart' => [
-                'items' => $cartResults->toArray(),
-                'coupon' => $this->cart->getCouponSummary($cartResults),
-                'total' => $this->cart->getTotal($cartResults),
-                'currency' => config('shop.currency'),
-            ]
-        ]);
+        return $this->getCartResponse(
+            $this->cart->eraseItem(
+                $this->resolveProduct($productID)
+            )
+        );
     }
 
     public function setCoupon(string $couponCode): JsonResponse
     {
-        $cartResults = $this->cart->setCoupon($this->resolveCoupon($couponCode));
-
-        return new JsonResponse(data: [
-            'cart' => [
-                'items' => $cartResults->toArray(),
-                'coupon' => $this->cart->getCouponSummary($cartResults),
-                'total' => $this->cart->getTotal($cartResults),
-                'currency' => config('shop.currency'),
-            ]
-        ]);
+        return $this->getCartResponse(
+            $this->cart->setCoupon(
+                $this->resolveCoupon($couponCode)
+            )
+        );
     }
 
     public function removeCoupon(): JsonResponse
     {
-        $cartResults = $this->cart->setCoupon(null);
+        return $this->getCartResponse(
+            $this->cart->setCoupon(null)
+        );
+    }
 
+    public function setShippingMode(string $shippingModeProvider): JsonResponse
+    {
+        return $this->getCartResponse(
+            $this->cart->setShippingMode(
+                $this->resolveShippingMode($shippingModeProvider)
+            )
+        );
+    }
+
+    protected function getCartResponse(CartCollection $cartResults): JsonResponse
+    {
         return new JsonResponse(data: [
             'cart' => [
                 'items' => $cartResults->toArray(),
                 'coupon' => $this->cart->getCouponSummary($cartResults),
                 'total' => $this->cart->getTotal($cartResults),
                 'currency' => config('shop.currency'),
-            ]
+                'shippingMode' => new ShippingModeResource(
+                    $this->cart->getShippingMode()
+                ),
+            ],
         ]);
     }
 
@@ -122,5 +111,10 @@ class CartAPIController
     protected function resolveCoupon(string $couponCode): ?Coupon
     {
         return Coupon::firstWhere('code', $couponCode);
+    }
+
+    protected function resolveShippingMode(string $shippingModeProvider): ShippingModeContract
+    {
+        return config('shop.models.shippingMode')::firstWhere('provider', $shippingModeProvider);
     }
 }

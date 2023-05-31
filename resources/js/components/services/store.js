@@ -9,13 +9,16 @@ export const useCartStore = defineStore('cart', {
             coupon: null,
             total: 0,
             currency: null,
+            shippingMode: null,
         }
     },
     getters: {
         cartItemLength: (state) => _.sumBy(state.products, (product) => product.quantity),
-        subtotal: (state) => !state.coupon.couponDiscountAmount
-            ? state.total
-            : state.total - state.coupon.couponDiscountAmount,
+        subtotal: (state) => {
+            let baseTotal = state.total - state.shippingMode.priceGross
+
+            return baseTotal - state.coupon.couponDiscountAmount
+        },
     },
     actions: {
         init() {
@@ -47,6 +50,7 @@ export const useCartStore = defineStore('cart', {
             this.coupon = response.data.cart.coupon
             this.total = response.data.cart.total
             this.currency = response.data.cart.currency
+            this.shippingMode = response.data.cart.shippingMode
         }
     }
 })

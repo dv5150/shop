@@ -41,10 +41,10 @@ class Discount extends Model implements BaseDealContract
             ->getDiscountedPriceGross($capsule);
     }
 
-    public function getFullName(): ?string
+    public function getShortName(): ?string
     {
         return $this->getDiscount()
-            ->getFullName();
+            ->getShortName();
     }
 
     public function getName(): ?string
@@ -68,7 +68,7 @@ class Discount extends Model implements BaseDealContract
     public function toArray(): array
     {
         return [
-            'fullName' => $this->getFullName(),
+            'shortName' => $this->getShortName(),
             'name' => $this->getName(),
             'value' => $this->getValue(),
             'unit' => $this->getUnit(),

@@ -101,7 +101,7 @@ class DiscountResource extends Resource
 
     public static function getDiscountAdminName(DiscountContract $state): string
     {
-        $name = $state->getFullName();
+        $name = $state->getShortName();
 
         if ($discountable = $state->getBaseDiscount()->getDiscountable()) {
             $name .= " | {$discountable->getName()}";

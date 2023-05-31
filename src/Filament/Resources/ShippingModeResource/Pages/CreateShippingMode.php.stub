@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Filament\Resources\ShippingModeResource\Pages;
+
+use App\Filament\Resources\ShippingModeResource;
+use Filament\Resources\Pages\CreateRecord;
+
+class CreateShippingMode extends CreateRecord
+{
+    protected static string $resource = ShippingModeResource::class;
+}

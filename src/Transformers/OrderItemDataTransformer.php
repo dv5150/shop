@@ -12,7 +12,7 @@ class OrderItemDataTransformer implements OrderItemDataTransformerContract
         return array_merge(['quantity' => $capsule->getQuantity()], [
             'name' => $capsule->getItem()->getName(),
             'price_gross' => $capsule->getPriceGross(),
-            'info' => $capsule->getDiscount()?->getFullName(),
+            'info' => $capsule->getDiscount()?->getShortName(),
         ]);
     }
 }

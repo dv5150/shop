@@ -15,4 +15,8 @@ return [
     'currency' => [
         'code' => 'HUF',
     ],
+    'defaultShippingMode' => [
+        'name' => 'Standard Shipping Service',
+        'priceGross' => 990.0,
+    ]
 ];

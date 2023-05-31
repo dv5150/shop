@@ -41,7 +41,12 @@ class TestCase extends Orchestra
         Config::set('shop.models.shippingMode', ShippingMode::class);
         Config::set('shop.models.shippingAddress', ShippingAddress::class);
 
+        /** Currency setup */
         Config::set('shop.currency.code', 'HUF');
+
+        /** Default shipping mode settings */
+        Config::set('shop.defaultShippingMode.name', 'TEST SHIPPING MODE');
+        Config::set('shop.defaultShippingMode.priceGross', 490.0);
     }
 
     protected function getPackageProviders($app)

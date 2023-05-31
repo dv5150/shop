@@ -10,10 +10,12 @@ use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
 use DV5150\Shop\Tests\Concerns\CreatesCartCoupons;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 
 class CouponTest extends TestCase
 {
     use ProvidesSampleOrderData,
+        ProvidesSampleShippingModeData,
         CreatesCartCoupons,
         CreatesDiscountsForProducts;
 
@@ -28,6 +30,7 @@ class CouponTest extends TestCase
         parent::setUp();
 
         $this->setUpSampleOrderData();
+        $this->setUpSampleShippingModeData();
 
         $this->productA = config('shop.models.product')::factory()
             ->create(['price_gross' => 3000.0])
@@ -101,7 +104,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -117,7 +121,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 25200.0,
+                    'total' => 25200.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => $couponA->toArray(),
                         'couponDiscountAmount' => -2800.0,
@@ -133,7 +138,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -149,7 +155,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 21000.0,
+                    'total' => 21000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => $couponB->toArray(),
                         'couponDiscountAmount' => -7000.0,
@@ -163,7 +170,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -195,7 +203,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -211,7 +220,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 27300.0,
+                    'total' => 27300.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => $couponA->toArray(),
                         'couponDiscountAmount' => -700.0,
@@ -227,7 +237,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -243,7 +254,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 26100.0,
+                    'total' => 26100.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => $couponB->toArray(),
                         'couponDiscountAmount' => -1900.0,
@@ -257,7 +269,8 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => $this->expectedProductData,
-                    'total' => 28000.0,
+                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => null,
                         'couponDiscountAmount' => null,
@@ -333,7 +346,8 @@ class CouponTest extends TestCase
                             'subtotal' => 34000.0,
                         ],
                     ],
-                    'total' => 4500.0 + 24000.0 + 34000.0 - 660.0,
+                    'total' => 4500.0 + 24000.0 + 34000.0 - 660.0 + $this->expectedShippingModeData['priceGross'],
+                    'shippingMode' => $this->expectedShippingModeData,
                     'coupon' => [
                         'couponItem' => $coupon->toArray(),
                         'couponDiscountAmount' => -660.0,
@@ -400,7 +414,7 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 7,
             'price_gross' => 1500.0,
-            'info' => $discountA->getFullname(),
+            'info' => $discountA->getShortName(),
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
@@ -410,17 +424,21 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 7,
             'price_gross' => 7100.0,
-            'info' => $discountB->getFullname(),
+            'info' => $discountB->getShortName(),
         ]));
 
         $this->assertDatabaseHas('order_items', [
             'product_id' => null,
-            'name' => $coupon->getFullName(),
+            'name' => $coupon->getShortName(),
             'order_id' => $orderKey,
             'quantity' => 1,
             'price_gross' => -1100.0,
-            'info' => "Code: {$coupon->code}",
+            'info' => "[COUPON] [Code: {$coupon->code}]",
         ]);
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
+        ]));
     }
 
     /** @test */
@@ -481,7 +499,7 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 8,
             'price_gross' => 2100.0,
-            'info' => $discountA->getFullname(),
+            'info' => $discountA->getShortName(),
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
@@ -491,7 +509,7 @@ class CouponTest extends TestCase
             'order_id' => $orderKey,
             'quantity' => 8,
             'price_gross' => 7500.0,
-            'info' => $discountB->getFullname(),
+            'info' => $discountB->getShortName(),
         ]));
 
         $itemsTotal = array_sum([
@@ -501,12 +519,16 @@ class CouponTest extends TestCase
 
         $this->assertDatabaseHas('order_items', [
             'product_id' => null,
-            'name' => $coupon->getFullName(),
+            'name' => $coupon->getShortName(),
             'order_id' => $orderKey,
             'quantity' => 1,
             'price_gross' => 0 - ($itemsTotal * 0.25),
-            'info' => "Code: {$coupon->code}",
+            'info' => "[COUPON] [Code: {$coupon->code}]",
         ]);
+
+        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
+            'order_id' => $orderKey
+        ]));
     }
 
     /** @test */

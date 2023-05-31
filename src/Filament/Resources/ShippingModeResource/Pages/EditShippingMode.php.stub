@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\ShippingModeResource\Pages;
+
+use App\Filament\Resources\ShippingModeResource;
+use Filament\Pages\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+
+class EditShippingMode extends EditRecord
+{
+    protected static string $resource = ShippingModeResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            DeleteAction::make(),
+        ];
+    }
+}
