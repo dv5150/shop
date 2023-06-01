@@ -21,6 +21,7 @@ class Cart extends Facade
      * @method static setShippingMode()
      * @method static getShippingMode()
      *
+     * @method static getSubtotal()
      * @method static getTotal()
      *
      * @method static toArray()

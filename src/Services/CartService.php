@@ -124,6 +124,11 @@ class CartService implements CartServiceContract
         return $this->shippingModeService->getShippingMode();
     }
 
+    public function getSubTotal(CartCollection $cartResults): float
+    {
+        return $cartResults->getTotalGrossPrice();
+    }
+
     public function getTotal(CartCollection $cartResults): float
     {
         $coupon = $this->getCoupon();

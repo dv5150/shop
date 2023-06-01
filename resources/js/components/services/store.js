@@ -6,19 +6,15 @@ export const useCartStore = defineStore('cart', {
         return {
             isOpen: false,
             products: [],
-            coupon: null,
-            total: 0,
             currency: null,
+            coupon: null,
             shippingMode: null,
+            subtotal: 0,
+            total: 0,
         }
     },
     getters: {
         cartItemLength: (state) => _.sumBy(state.products, (product) => product.quantity),
-        subtotal: (state) => {
-            let baseTotal = state.total - state.shippingMode.priceGross
-
-            return baseTotal - state.coupon.couponDiscountAmount
-        },
     },
     actions: {
         init() {
@@ -48,6 +44,7 @@ export const useCartStore = defineStore('cart', {
         updateWholeTable(response) {
             this.products = response.data.cart.items
             this.coupon = response.data.cart.coupon
+            this.subtotal = response.data.cart.subtotal
             this.total = response.data.cart.total
             this.currency = response.data.cart.currency
             this.shippingMode = response.data.cart.shippingMode
@@ -94,7 +91,7 @@ export const useCheckoutStore = defineStore('checkout', {
             axios.post(`/api/shop/cart/shipping-mode/${shippingMode.provider}`)
                 .then(response => {
                     this.selectedShippingMode = response.data.cart.shippingMode
-                    cart.$patch({ shippingMode: response.data.cart.shippingMode })
+                    cart.updateWholeTable(response)
                 })
         },
         selectPaymentMode(paymentMode) {

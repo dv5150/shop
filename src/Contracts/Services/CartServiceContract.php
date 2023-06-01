@@ -15,6 +15,7 @@ interface CartServiceContract
     public function removeItem(ProductContract $item, int $quantity = 1): CartCollection;
     public function eraseItem(ProductContract $item): CartCollection;
 
+    public function getSubtotal(CartCollection $cartResults): float;
     public function getTotal(CartCollection $cartResults): float;
     public function hasDigitalItemsOnly(): bool;
 

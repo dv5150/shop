@@ -87,6 +87,7 @@ class CartAPIController
             'cart' => [
                 'items' => $cartResults->toArray(),
                 'coupon' => $this->cart->getCouponSummary($cartResults),
+                'subtotal' => $this->cart->getSubtotal($cartResults),
                 'total' => $this->cart->getTotal($cartResults),
                 'currency' => config('shop.currency'),
                 'shippingMode' => new ShippingModeResource(

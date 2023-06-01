@@ -8,6 +8,7 @@ use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Facades\Cart;
+use DV5150\Shop\Http\Resources\ShippingModeResource;
 use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Requests\StoreOrderRequest;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,9 @@ class CheckoutAPIController
     public function shippingModes(): JsonResponse
     {
         return new JsonResponse(data: [
-            'shippingModes' => config('shop.models.shippingMode')::all()
+            'shippingModes' => ShippingModeResource::collection(
+                config('shop.models.shippingMode')::all()
+            )
         ]);
     }
 
