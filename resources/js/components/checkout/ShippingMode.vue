@@ -9,7 +9,7 @@
         <tbody>
             <tr v-for="shippingMode in checkout.shippingModes" @click.prevent="checkout.selectShippingMode(shippingMode)"
                 :style="[{
-                    'color: red;': checkActiveShippingMode(shippingMode.id),
+                    'color: red;': checkout.selectedShippingMode?.id === shippingMode.id,
                 }]">
                 <td>{{ shippingMode.name }}</td>
                 <td>{{ shippingMode.price_gross }}</td>
@@ -27,8 +27,6 @@ import FoxPost from '../shippingModes/FoxPost'
 import PickPackPont from '../shippingModes/PickPackPont'
 
 let checkout = useCheckoutStore()
-
-let checkActiveShippingMode = (id) => checkout.selectedShippingMode?.id === id
 
 let shippingModeComponents = {
     expressone: ExpressOne,

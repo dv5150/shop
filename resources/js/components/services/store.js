@@ -89,7 +89,13 @@ export const useCheckoutStore = defineStore('checkout', {
                 .then(response => this.shippingModes = response.data.shippingModes)
         },
         selectShippingMode(shippingMode) {
-            this.selectedShippingMode = { ...shippingMode }
+            let cart = useCartStore()
+
+            axios.post(`/api/shop/cart/shipping-mode/${shippingMode.provider}`)
+                .then(response => {
+                    this.selectedShippingMode = response.data.cart.shippingMode
+                    cart.$patch({ shippingMode: response.data.cart.shippingMode })
+                })
         },
         selectPaymentMode(paymentMode) {
             this.selectedPaymentMode = { ...paymentMode }
