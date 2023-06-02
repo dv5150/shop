@@ -28,7 +28,7 @@ class ShippingModeService implements ShippingModeServiceContract
 
         Session::put(
             $this->getSessionKey(),
-            $shippingMode?->exists() ? serialize($shippingMode) : null
+            $shippingMode?->exists() ? serialize($shippingMode->refresh()) : null
         );
     }
 
@@ -48,6 +48,7 @@ class ShippingModeService implements ShippingModeServiceContract
         ], [
             'name' => config('shop.defaultShippingMode.name'),
             'price_gross' => config('shop.defaultShippingMode.priceGross'),
+            'componentName' => null,
         ]);
     }
 

@@ -32,9 +32,6 @@ class ShippingModeResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('provider')
-                    ->unique()
-                    ->required(),
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('price_gross')

@@ -5,9 +5,8 @@ namespace DV5150\Shop\Tests\Unit;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Tests\Mock\Models\User;
-use Illuminate\Support\Arr;
+use DV5150\Shop\Tests\TestCase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 

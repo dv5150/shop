@@ -33,7 +33,6 @@ import Overview from './checkout/Overview'
 import PersonalData from './checkout/PersonalData'
 
 let cart = useCartStore()
-
 let checkout = useCheckoutStore()
 
 let submitOrder = () => {

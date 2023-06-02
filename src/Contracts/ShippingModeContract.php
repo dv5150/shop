@@ -9,5 +9,6 @@ interface ShippingModeContract
     public function getShortName(): string;
     public function getProvider(): string;
     public function getPriceGross(): float;
+    public function getComponentName(): ?string;
     public function toOrderItem(): OrderItemContract;
 }

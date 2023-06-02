@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+import { defineAsyncComponent } from 'vue'
 
 export const useCartStore = defineStore('cart', {
     state: () => {
@@ -104,5 +105,18 @@ export const useCheckoutStore = defineStore('checkout', {
                 ...pickupPoint
             }
         }
-    }
+    },
+    getters: {
+        activeShippingModeComponent: (state) => {
+            let cart = useCartStore()
+
+            let componentName = cart.shippingMode?.componentName
+
+            if (!componentName) {
+                return null
+            }
+
+            return defineAsyncComponent(() => import(`../shippingModes/${componentName}.vue`))
+        },
+    },
 })

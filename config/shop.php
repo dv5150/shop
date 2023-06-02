@@ -12,6 +12,9 @@ return [
         'billingAddress' => \DV5150\Shop\Models\Default\BillingAddress::class,
         'shippingAddress' => \DV5150\Shop\Models\Default\ShippingAddress::class,
     ],
+    'resources' => [
+        'shippingMode' => \DV5150\Shop\Http\Resources\ShippingModeResource::class,
+    ],
     'currency' => [
         'code' => 'HUF',
     ],

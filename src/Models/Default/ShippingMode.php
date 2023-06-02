@@ -42,6 +42,11 @@ class ShippingMode extends Model implements ShippingModeContract
         return $this->price_gross;
     }
 
+    public function getComponentName(): ?string
+    {
+        return $this->component_name;
+    }
+
     public function toOrderItem(): OrderItemContract
     {
         return new (config('shop.models.orderItem'))([

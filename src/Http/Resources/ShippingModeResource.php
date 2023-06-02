@@ -18,6 +18,7 @@ class ShippingModeResource extends JsonResource
             'provider' => $this->getProvider(),
             'name' => $this->getName(),
             'priceGross' => $this->getPriceGross(),
+            'componentName' => $this->getComponentName(),
         ];
     }
 }
