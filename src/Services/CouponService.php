@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Session;
 
 class CouponService implements CouponServiceContract
 {
+    protected const SESSION_KEY = 'coupon';
+
     public function getCoupon(): ?Coupon
     {
-        if ($coupon = Session::get($this->getSessionKey())) {
+        if ($coupon = Session::get(self::SESSION_KEY)) {
             $coupon = !is_null($coupon) ? unserialize($coupon) : null;
             $coupon = $coupon?->exists() ? $coupon : null;
         }
@@ -23,13 +25,8 @@ class CouponService implements CouponServiceContract
     public function setCoupon(?Coupon $coupon): void
     {
         Session::put(
-            $this->getSessionKey(),
+            self::SESSION_KEY,
             $coupon?->exists() ? serialize($coupon) : null
         );
-    }
-
-    protected function getSessionKey(): string
-    {
-        return 'coupon';
     }
 }

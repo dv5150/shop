@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShippingModeService implements ShippingModeServiceContract
 {
+    protected const SESSION_KEY = 'shippingMode';
+
     public function getShippingMode(): ?ShippingModeContract
     {
-        if ($shippingMode = Session::get($this->getSessionKey())) {
+        if ($shippingMode = Session::get(self::SESSION_KEY)) {
             $shippingMode = $this->unserializeShippingMode($shippingMode);
             $this->setShippingMode($shippingMode);
         } else {
@@ -27,7 +29,7 @@ class ShippingModeService implements ShippingModeServiceContract
         /** @var Model $shippingMode */
 
         Session::put(
-            $this->getSessionKey(),
+            self::SESSION_KEY,
             $shippingMode?->exists() ? serialize($shippingMode->refresh()) : null
         );
     }
@@ -50,10 +52,5 @@ class ShippingModeService implements ShippingModeServiceContract
             'price_gross' => config('shop.defaultShippingMode.priceGross'),
             'componentName' => null,
         ]);
-    }
-
-    protected function getSessionKey(): string
-    {
-        return 'shippingMode';
     }
 }

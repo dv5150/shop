@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Session;
 
 class CartService implements CartServiceContract
 {
+    protected const SESSION_KEY = 'cart';
+
     public function __construct(
         protected CouponServiceContract $couponService,
         protected ShippingModeServiceContract $shippingModeService
@@ -21,7 +23,7 @@ class CartService implements CartServiceContract
 
     public function all(): CartCollection
     {
-        if ($cart = Session::get($this->getSessionKey())) {
+        if ($cart = Session::get(self::SESSION_KEY)) {
             return unserialize($cart)
                 ->map(fn (CartItemCapsule $capsule) => $capsule->removeDiscount())
                 ->refreshDiscounts();
@@ -142,7 +144,7 @@ class CartService implements CartServiceContract
 
     public function saveCart(CartCollection $cart): CartCollection
     {
-        Session::put($this->getSessionKey(), serialize($cart));
+        Session::put(self::SESSION_KEY, serialize($cart));
 
         return $cart;
     }
@@ -157,10 +159,5 @@ class CartService implements CartServiceContract
     {
         return $this->all()
             ->toJson($options);
-    }
-
-    protected function getSessionKey(): string
-    {
-        return 'cart';
     }
 }
