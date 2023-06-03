@@ -2,7 +2,9 @@
 
 namespace DV5150\Shop\Models\Default;
 
+use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\OrderItemContract;
+use DV5150\Shop\Contracts\ProductContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +28,16 @@ class OrderItem extends Model implements OrderItemContract
     public function product(): BelongsTo
     {
         return $this->belongsTo(config('shop.models.product'));
+    }
+
+    public function getOrder(): OrderContract
+    {
+        return $this->order;
+    }
+
+    public function getProduct(): ProductContract
+    {
+        return $this->product;
     }
 
     public function getPriceGross(): float

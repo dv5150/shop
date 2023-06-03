@@ -17,11 +17,6 @@ class ShippingMode extends Model implements ShippingModeContract
         'price_gross' => 'float',
     ];
 
-    public function getID()
-    {
-        return $this->getKey();
-    }
-
     public function getName(): string
     {
         return $this->name;

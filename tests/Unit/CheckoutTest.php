@@ -42,13 +42,13 @@ class CheckoutTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 2,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 4,
                     ],
@@ -90,13 +90,13 @@ class CheckoutTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 5,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 3,
                     ],
@@ -136,7 +136,7 @@ class CheckoutTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 1,
                     ],
@@ -167,7 +167,7 @@ class CheckoutTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 2,
                     ],

@@ -10,9 +10,9 @@ use Illuminate\Support\Collection;
 
 interface CouponContract extends BaseDealContract
 {
-    public function getDiscountedPriceGross(CartCollection $cart): float;
     public function baseCoupon(): MorphOne;
     public function getBaseCoupon(): Coupon;
     public function getCode(): string;
+    public function getDiscountedPriceGross(CartCollection $cart): float;
     public function toOrderItem(Collection $orderItems): OrderItemContract;
 }

@@ -49,7 +49,7 @@ class CheckoutService implements CheckoutServiceContract
         $orderItems = config('shop.models.product')::with('discounts.discount')
             ->find($IDs)
             ->map(fn (ProductContract $product) => $this->makeOrderItem(
-                (new CartItemCapsule($product, $quantities[$product->getID()]))
+                (new CartItemCapsule($product, $quantities[$product->getKey()]))
                     ->applyDiscount()
             ));
 

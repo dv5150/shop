@@ -38,7 +38,7 @@ class CartTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => $this->productA->getPriceGross(),
                 ],
@@ -46,7 +46,7 @@ class CartTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => $this->productB->getPriceGross(),
                 ],
@@ -67,7 +67,7 @@ class CartTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => $this->productA->getPriceGross(),
                 ],
@@ -75,7 +75,7 @@ class CartTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => $this->productB->getPriceGross(),
                 ],
@@ -105,7 +105,7 @@ class CartTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => $this->productA->getPriceGross(),
                 ],
@@ -113,7 +113,7 @@ class CartTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => $this->productB->getPriceGross(),
                 ],
@@ -121,7 +121,7 @@ class CartTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productC->getID(),
+                    'id' => $this->productC->getKey(),
                     'name' => $this->productC->getName(),
                     'price_gross' => $this->productC->getPriceGross(),
                 ],

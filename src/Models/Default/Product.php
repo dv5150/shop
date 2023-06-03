@@ -53,11 +53,6 @@ class Product extends Model implements ProductContract
         return $this->price_gross;
     }
 
-    public function getID()
-    {
-        return $this->getKey();
-    }
-
     public function isDigitalProduct(): bool
     {
         return $this->is_digital_product;

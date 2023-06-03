@@ -47,7 +47,7 @@ class CouponTest extends TestCase
         $this->expectedProductData = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => $this->productA->getPriceGross(),
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -58,7 +58,7 @@ class CouponTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => $this->productB->getPriceGross(),
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -69,7 +69,7 @@ class CouponTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productC->getID(),
+                    'id' => $this->productC->getKey(),
                     'name' => $this->productC->getName(),
                     'price_gross' => $this->productC->getPriceGross(),
                     'price_gross_original' => $this->productC->getPriceGross(),
@@ -314,7 +314,7 @@ class CouponTest extends TestCase
                     'items' => [
                         [
                             'item' => [
-                                'id' => $this->productA->getID(),
+                                'id' => $this->productA->getKey(),
                                 'name' => $this->productA->getName(),
                                 'price_gross' => 1500.0,
                                 'price_gross_original' => $this->productA->getPriceGross(),
@@ -325,7 +325,7 @@ class CouponTest extends TestCase
                         ],
                         [
                             'item' => [
-                                'id' => $this->productB->getID(),
+                                'id' => $this->productB->getKey(),
                                 'name' => $this->productB->getName(),
                                 'price_gross' => 4800.0,
                                 'price_gross_original' => $this->productB->getPriceGross(),
@@ -336,7 +336,7 @@ class CouponTest extends TestCase
                         ],
                         [
                             'item' => [
-                                'id' => $this->productC->getID(),
+                                'id' => $this->productC->getKey(),
                                 'name' => $this->productC->getName(),
                                 'price_gross' => 17000.0,
                                 'price_gross_original' => $this->productC->getPriceGross(),
@@ -387,13 +387,13 @@ class CouponTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 7,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 7,
                     ],
@@ -408,7 +408,7 @@ class CouponTest extends TestCase
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productA->getID(),
+            'product_id' => $this->productA->getKey(),
             'name' => $this->productA->getName(),
         ], [
             'order_id' => $orderKey,
@@ -418,7 +418,7 @@ class CouponTest extends TestCase
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productB->getID(),
+            'product_id' => $this->productB->getKey(),
             'name' => $this->productB->getName(),
         ], [
             'order_id' => $orderKey,
@@ -472,13 +472,13 @@ class CouponTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 8,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 8,
                     ],
@@ -493,7 +493,7 @@ class CouponTest extends TestCase
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productA->getID(),
+            'product_id' => $this->productA->getKey(),
             'name' => $this->productA->getName(),
         ], [
             'order_id' => $orderKey,
@@ -503,7 +503,7 @@ class CouponTest extends TestCase
         ]));
 
         $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productB->getID(),
+            'product_id' => $this->productB->getKey(),
             'name' => $this->productB->getName(),
         ], [
             'order_id' => $orderKey,

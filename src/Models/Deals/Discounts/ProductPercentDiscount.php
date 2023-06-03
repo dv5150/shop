@@ -17,9 +17,9 @@ class ProductPercentDiscount extends Model implements DiscountContract
         'value' => 'float'
     ];
 
-    public function getDiscountedPriceGross(CartItemCapsule $cartItem): float
+    public function getDiscountedPriceGross(CartItemCapsule $capsule): float
     {
-        $originalPrice = $cartItem->getOriginalProductPriceGross();
+        $originalPrice = $capsule->getOriginalProductPriceGross();
 
         $discount = $originalPrice * ($this->getValue() / 100);
 

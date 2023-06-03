@@ -53,7 +53,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => 2000.0,
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -63,7 +63,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => 6525.0,
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -73,7 +73,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productC->getID(),
+                    'id' => $this->productC->getKey(),
                     'name' => $this->productC->getName(),
                     'price_gross' => 12300.0,
                     'price_gross_original' => $this->productC->getPriceGross(),
@@ -114,7 +114,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => 4000.0,
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -124,7 +124,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => 3100.0,
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -134,7 +134,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productC->getID(),
+                    'id' => $this->productC->getKey(),
                     'name' => $this->productC->getName(),
                     'price_gross' => 12300.0,
                     'price_gross_original' => $this->productC->getPriceGross(),
@@ -199,7 +199,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => 2000.0,
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -209,7 +209,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => 2250.0,
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -219,7 +219,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productC->getID(),
+                    'id' => $this->productC->getKey(),
                     'name' => $this->productC->getName(),
                     'price_gross' => 11300.0,
                     'price_gross_original' => $this->productC->getPriceGross(),
@@ -253,7 +253,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => 600.0,
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -263,7 +263,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => 5990.0,
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -287,7 +287,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => 2250.0,
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -297,7 +297,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => 6990.0,
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -321,7 +321,7 @@ class DiscountTest extends TestCase
         $expectedItems = [
             [
                 'item' => [
-                    'id' => $this->productA->getID(),
+                    'id' => $this->productA->getKey(),
                     'name' => $this->productA->getName(),
                     'price_gross' => $this->productA->getPriceGross(),
                     'price_gross_original' => $this->productA->getPriceGross(),
@@ -331,7 +331,7 @@ class DiscountTest extends TestCase
             ],
             [
                 'item' => [
-                    'id' => $this->productB->getID(),
+                    'id' => $this->productB->getKey(),
                     'name' => $this->productB->getName(),
                     'price_gross' => $this->productB->getPriceGross(),
                     'price_gross_original' => $this->productB->getPriceGross(),
@@ -371,19 +371,19 @@ class DiscountTest extends TestCase
                 'cartData' => [
                     [
                         'item' => [
-                            'id' => $this->productA->getID(),
+                            'id' => $this->productA->getKey(),
                         ],
                         'quantity' => 2,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productB->getID(),
+                            'id' => $this->productB->getKey(),
                         ],
                         'quantity' => 2,
                     ],
                     [
                         'item' => [
-                            'id' => $this->productC->getID(),
+                            'id' => $this->productC->getKey(),
                         ],
                         'quantity' => 2,
                     ],

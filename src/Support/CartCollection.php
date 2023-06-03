@@ -49,14 +49,14 @@ class CartCollection extends Collection
     {
         $productKeys = collect($this->all())
             ->mapWithKeys(fn (CartItemCapsule $capsule) => [
-                $capsule->getItem()->getID() => $capsule->getQuantity()
+                $capsule->getItem()->getKey() => $capsule->getQuantity()
             ])->all();
 
         $products = config('shop.models.product')::with('discounts.discount')
             ->find(array_keys($productKeys));
 
         $capsules = $products->map(function (ProductContract $product) use ($productKeys) {
-            return (new CartItemCapsule($product, $productKeys[$product->getID()]))
+            return (new CartItemCapsule($product, $productKeys[$product->getKey()]))
                 ->applyDiscount();
         });
 

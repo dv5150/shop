@@ -30,19 +30,19 @@ trait ProvidesSampleProductData
             ->refresh();
 
         $this->expectedProductAData = [
-            'product_id' => $this->productA->getID(),
+            'product_id' => $this->productA->getKey(),
             'name' => $this->productA->getName(),
             'price_gross' => $this->productA->getPriceGross(),
         ];
 
         $this->expectedProductBData = [
-            'product_id' => $this->productB->getID(),
+            'product_id' => $this->productB->getKey(),
             'name' => $this->productB->getName(),
             'price_gross' => $this->productB->getPriceGross(),
         ];
 
         $this->expectedProductCData = [
-            'product_id' => $this->productC->getID(),
+            'product_id' => $this->productC->getKey(),
             'name' => $this->productC->getName(),
             'price_gross' => $this->productC->getPriceGross(),
         ];

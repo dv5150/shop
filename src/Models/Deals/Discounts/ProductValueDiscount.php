@@ -17,10 +17,10 @@ class ProductValueDiscount extends Model implements DiscountContract
         'value' => 'float'
     ];
 
-    public function getDiscountedPriceGross(CartItemCapsule $cartItem): float
+    public function getDiscountedPriceGross(CartItemCapsule $capsule): float
     {
         return max([
-            $cartItem->getOriginalProductPriceGross() - $this->getValue(), 0.0
+            $capsule->getOriginalProductPriceGross() - $this->getValue(), 0.0
         ]);
     }
 

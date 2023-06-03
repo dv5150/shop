@@ -47,7 +47,7 @@ class CartItemCapsule implements Arrayable
     {
         return [
             'item' => [
-                'id' => $this->getItem()->getID(),
+                'id' => $this->getItem()->getKey(),
                 'name' => $this->getItem()->getName(),
                 'price_gross' => $this->getPriceGross(),
                 'price_gross_original' => $this->getOriginalProductPriceGross(),

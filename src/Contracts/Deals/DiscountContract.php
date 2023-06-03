@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 interface DiscountContract extends BaseDealContract
 {
-    public function getDiscountedPriceGross(CartItemCapsule $capsule): float;
     public function baseDiscount(): MorphOne;
     public function getBaseDiscount(): Discount;
+    public function getDiscountedPriceGross(CartItemCapsule $capsule): float;
 }
