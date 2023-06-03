@@ -1,8 +1,7 @@
 <?php
 
-namespace DV5150\Shop\Tests\Unit;
+namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
@@ -10,6 +9,7 @@ use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
+use DV5150\Shop\Tests\TestCase;
 
 class DiscountTest extends TestCase
 {

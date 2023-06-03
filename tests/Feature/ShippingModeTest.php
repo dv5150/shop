@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Tests\Unit;
+namespace DV5150\Shop\Tests\Feature;
 
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;

@@ -1,10 +1,10 @@
 <?php
 
-namespace DV5150\Shop\Tests\Unit;
+namespace DV5150\Shop\Tests\Feature;
 
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Tests\TestCase;
 use DV5150\Shop\Facades\Cart;
+use DV5150\Shop\Tests\TestCase;
 
 class CartTest extends TestCase
 {
