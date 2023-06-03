@@ -14,16 +14,10 @@ use Illuminate\Support\Facades\Session;
 
 class CartService implements CartServiceContract
 {
-    protected CouponServiceContract $couponService;
-    protected ShippingModeServiceContract $shippingModeService;
-
     public function __construct(
-        CouponServiceContract $couponService,
-        ShippingModeServiceContract $shippingModeService
-    ) {
-        $this->couponService = $couponService;
-        $this->shippingModeService = $shippingModeService;
-    }
+        protected CouponServiceContract $couponService,
+        protected ShippingModeServiceContract $shippingModeService
+    ){}
 
     public function all(): CartCollection
     {

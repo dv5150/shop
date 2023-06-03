@@ -13,13 +13,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartAPIController
 {
-    protected CartServiceContract $cart;
+    public function __construct(
+        protected CartServiceContract $cart
+    ){}
 
-    public function __construct(CartServiceContract $cart)
-    {
-        $this->cart = $cart;
-    }
-
+    #[Route("/api/shop/cart", methods: ["GET"])]
     public function index(): JsonResponse
     {
         return $this->getCartResponse(
@@ -27,6 +25,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/{product}/add/{quantity?}", methods: ["POST"])]
     public function store($productID, int $quantity = 1): JsonResponse
     {
         return $this->getCartResponse(
@@ -37,6 +36,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/{product}/remove/{quantity?}", methods: ["POST"])]
     public function remove($productID, int $quantity = 1): JsonResponse
     {
         return $this->getCartResponse(
@@ -47,6 +47,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/{product}", methods: ["DELETE"])]
     public function erase($productID): JsonResponse
     {
         return $this->getCartResponse(
@@ -56,6 +57,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/coupon/{code}", methods: ["POST"])]
     public function setCoupon(string $couponCode): JsonResponse
     {
         return $this->getCartResponse(
@@ -65,6 +67,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/coupon", methods: ["DELETE"])]
     public function removeCoupon(): JsonResponse
     {
         return $this->getCartResponse(
@@ -72,6 +75,7 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/shipping-mode/{provider}", methods: ["POST"])]
     public function setShippingMode(string $shippingModeProvider): JsonResponse
     {
         return $this->getCartResponse(

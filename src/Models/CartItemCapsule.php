@@ -9,19 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class CartItemCapsule implements Arrayable
 {
-    protected ProductContract $item;
-
-    protected int $quantity;
-
     protected ?Discount $discount = null;
 
     protected ?float $discountedPriceGross = null;
 
-    public function __construct(ProductContract $item, int $quantity)
-    {
-        $this->item = $item;
-        $this->quantity = $quantity;
-    }
+    public function __construct(
+        protected ProductContract $item,
+        protected int $quantity
+    ){}
 
     /**
      * @return ProductContract|Model

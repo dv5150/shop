@@ -32,17 +32,19 @@ class OrderDataTransformer implements OrderDataTransformerContract
         ];
     }
 
-    public function transform($orderData): array
+    public function transform(array $orderData): array
     {
         return [
             'email' => Arr::get($orderData, 'personalData.email'),
             'phone' => Arr::get($orderData, 'personalData.phone'),
             'comment' => Arr::get($orderData, 'personalData.comment'),
+
             'shipping_name' => Arr::get($orderData, 'shippingData.name'),
             'shipping_zip_code' => Arr::get($orderData, 'shippingData.zipCode'),
             'shipping_city' => Arr::get($orderData, 'shippingData.city'),
             'shipping_address' => Arr::get($orderData, 'shippingData.street'),
             'shipping_comment' => Arr::get($orderData, 'shippingData.comment'),
+
             'billing_name' => Arr::get($orderData, 'billingData.name'),
             'billing_zip_code' => Arr::get($orderData, 'billingData.zipCode'),
             'billing_city' => Arr::get($orderData, 'billingData.city'),

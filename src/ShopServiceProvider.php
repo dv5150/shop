@@ -6,6 +6,7 @@ use DV5150\Shop\Console\Commands\InstallCommand;
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
+use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Models\Deals\Coupon;
@@ -13,6 +14,7 @@ use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Observers\DeleteCouponObserver;
 use DV5150\Shop\Observers\DeleteDiscountObserver;
 use DV5150\Shop\Services\CartService;
+use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
 use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
@@ -30,8 +32,11 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerCartService();
         $this->registerTransformers();
+
+        $this->registerCartService();
+        $this->registerCheckoutService();
+
         $this->registerApiRoutes();
 
         $this->commands([
@@ -51,16 +56,29 @@ class ShopServiceProvider extends ServiceProvider
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
     }
 
+    protected function registerTransformers(): void
+    {
+        App::bind(
+            OrderDataTransformerContract::class,
+            fn () => new OrderDataTransformer()
+        );
+
+        App::bind(
+            OrderItemDataTransformerContract::class,
+            fn () => new OrderItemDataTransformer()
+        );
+    }
+
     protected function registerCartService(): void
     {
         App::bind(
             CouponServiceContract::class,
-            fn () => new CouponService(),
+            fn () => new CouponService()
         );
 
         App::bind(
             ShippingModeServiceContract::class,
-            fn () => new ShippingModeService(),
+            fn () => new ShippingModeService()
         );
 
         App::bind(
@@ -72,16 +90,14 @@ class ShopServiceProvider extends ServiceProvider
         );
     }
 
-    protected function registerTransformers(): void
+    protected function registerCheckoutService(): void
     {
         App::bind(
-            OrderDataTransformerContract::class,
-            fn () => new OrderDataTransformer()
-        );
-
-        App::bind(
-            OrderItemDataTransformerContract::class,
-            fn () => new OrderItemDataTransformer()
+            CheckoutServiceContract::class,
+            fn () => new CheckoutService(
+                app(OrderDataTransformerContract::class),
+                app(OrderItemDataTransformerContract::class)
+            )
         );
     }
 
