@@ -2,18 +2,21 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Support\CartCollection;
+use DV5150\Shop\Concerns\Cart\HandlesCoupons;
+use DV5150\Shop\Concerns\Cart\HandlesShippingModes;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
 use DV5150\Shop\Models\CartItemCapsule;
-use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Facades\Session;
 
 class CartService implements CartServiceContract
 {
+    use HandlesCoupons,
+        HandlesShippingModes;
+
     protected const SESSION_KEY = 'cart';
 
     public function __construct(
@@ -78,46 +81,6 @@ class CartService implements CartServiceContract
         $this->saveCart($cart);
 
         return $this->all();
-    }
-
-    public function setCoupon(?Coupon $coupon): CartCollection
-    {
-        $this->couponService->setCoupon($coupon);
-
-        return $this->all();
-    }
-
-    public function getCoupon(): ?Coupon
-    {
-        return $this->couponService->getCoupon();
-    }
-
-    public function getCouponSummary(CartCollection $cartResults): ?array
-    {
-        $cart = $this->all();
-
-        $coupon = $this->getCoupon();
-
-        $couponDiscountAmount = $coupon
-            ? $coupon->getDiscountedPriceGross($cart) - $cart->getTotalGrossPrice()
-            : null;
-
-        return [
-            'couponItem' => $coupon,
-            'couponDiscountAmount' => floor($couponDiscountAmount),
-        ];
-    }
-
-    public function setShippingMode(ShippingModeContract $shippingMode): CartCollection
-    {
-        $this->shippingModeService->setShippingMode($shippingMode);
-
-        return $this->all();
-    }
-
-    public function getShippingMode(): ShippingModeContract
-    {
-        return $this->shippingModeService->getShippingMode();
     }
 
     public function getSubTotal(CartCollection $cartResults): float
