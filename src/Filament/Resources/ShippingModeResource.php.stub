@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ShippingModeResource\Pages\CreateShippingMode;
 use App\Filament\Resources\ShippingModeResource\Pages\EditShippingMode;
 use App\Filament\Resources\ShippingModeResource\Pages\ListShippingModes;
+use App\Filament\Resources\ShippingModeResource\RelationManagers\PaymentModesRelationManager;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -62,7 +63,7 @@ class ShippingModeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PaymentModesRelationManager::class,
         ];
     }
 

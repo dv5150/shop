@@ -1,34 +1,39 @@
 <template>
-    <table width="100%">
-        <thead>
-            <tr>
-                <th>Overview</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <h5>SHIPPING DATA</h5>
-                    <p>Name: {{ checkout.shippingData.name }}</p>
-                    <p>Zip code: {{ checkout.shippingData.zipCode }}</p>
-                    <p>City: {{ checkout.shippingData.city }}</p>
-                    <p>Address: {{ checkout.shippingData.street }}</p>
-                    <p>Comments: {{ checkout.shippingData.comment }}</p>
-                </td>
-                <td>
-                    <h5>BILLING DATA</h5>
-                    <p>Name: {{ checkout.billingData.name }}</p>
-                    <p>Zip code: {{ checkout.billingData.zipCode }}</p>
-                    <p>City: {{ checkout.billingData.city }}</p>
-                    <p>Address: {{ checkout.billingData.street }}</p>
-                    <p>Tax number: {{ checkout.billingData.taxNumber }}</p>
-                </td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
+    <div style="margin-bottom: 7rem;">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">OVERVIEW</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Shipping Data</th>
+                    <th>Billing Data</th>
+                </tr>
+                <tr>
+                    <td>Name: {{ checkout.shippingData.name }}</td>
+                    <td>Name: {{ checkout.billingData.name }}</td>
+                </tr>
+                <tr>
+                    <td>Zip code: {{ checkout.shippingData.zipCode }}</td>
+                    <td>Zip code: {{ checkout.billingData.zipCode }}</td>
+                </tr>
+                <tr>
+                    <td>City: {{ checkout.shippingData.city }}</td>
+                    <td>City: {{ checkout.billingData.city }}</td>
+                </tr>
+                <tr>
+                    <td>Address: {{ checkout.shippingData.street }}</td>
+                    <td>Address: {{ checkout.billingData.street }}</td>
+                </tr>
+                <tr>
+                    <td>Comments: {{ checkout.shippingData.comment }}</td>
+                    <td>Tax number: {{ checkout.billingData.taxNumber }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </template>
 
 <script setup>

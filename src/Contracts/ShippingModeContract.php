@@ -2,8 +2,11 @@
 
 namespace DV5150\Shop\Contracts;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 interface ShippingModeContract
 {
+    public function paymentModes(): BelongsToMany;
     public function getName(): string;
     public function getShortName(): string;
     public function getProvider(): string;

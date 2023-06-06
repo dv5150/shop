@@ -14,7 +14,7 @@ class CouponService implements CouponServiceContract
     {
         if ($coupon = Session::get(self::SESSION_KEY)) {
             $coupon = !is_null($coupon) ? unserialize($coupon) : null;
-            $coupon = $coupon?->exists() ? $coupon : null;
+            $coupon = $coupon?->exists() ? $coupon->refresh() : null;
         }
 
         $this->setCoupon($coupon);
@@ -26,7 +26,7 @@ class CouponService implements CouponServiceContract
     {
         Session::put(
             self::SESSION_KEY,
-            $coupon?->exists() ? serialize($coupon) : null
+            $coupon?->exists() ? serialize($coupon->refresh()) : null
         );
     }
 }

@@ -1,8 +1,6 @@
-@extends('shop::layouts.app')
+@extends('shop::layouts.shop')
 
 @section('content')
-    <cart-widget></cart-widget>
-
     <div id="cart-drawer"></div>
 
     <checkout></checkout>

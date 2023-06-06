@@ -17,6 +17,11 @@ Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
             ->name('store');
     });
 
+    Route::group(['prefix' => 'payment-mode', 'as' => 'paymentMode.'], function () {
+        Route::post('{provider}', [CartAPIController::class, 'setPaymentMode'])
+            ->name('store');
+    });
+
     Route::get('/', [CartAPIController::class, 'index'])
         ->name('index');
     Route::post('{product}/add/{quantity?}', [CartAPIController::class, 'store'])
@@ -28,12 +33,6 @@ Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
 });
 
 Route::group(['prefix' => 'checkout', 'as' => 'checkout.'], function () {
-    Route::get('shipping-modes', [CheckoutAPIController::class, 'shippingModes'])
-        ->name('shippingMode.index');
-
-    Route::get('payment-modes', [CheckoutAPIController::class, 'paymentModes'])
-        ->name('paymentMode.index');
-
     Route::post('/', [CheckoutAPIController::class, 'store'])
         ->name('store');
 });

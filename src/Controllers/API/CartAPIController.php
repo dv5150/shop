@@ -2,14 +2,15 @@
 
 namespace DV5150\Shop\Controllers\API;
 
+use DV5150\Shop\Contracts\PaymentModeContract;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\ShippingModeContract;
-use DV5150\Shop\Http\Resources\ShippingModeResource;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Support\CartCollection;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 
 class CartAPIController
 {
@@ -85,8 +86,33 @@ class CartAPIController
         );
     }
 
+    #[Route("/api/shop/cart/payment-mode/{provider}", methods: ["POST"])]
+    public function setPaymentMode(string $paymentModeProvider): JsonResponse
+    {
+        return $this->getCartResponse(
+            $this->cart->setPaymentMode(
+                $this->resolvePaymentMode($paymentModeProvider)
+            )
+        );
+    }
+
+    protected function getAllShippingModes(ShippingModeContract $selected): Collection
+    {
+        return config('shop.models.shippingMode')::with('paymentModes')
+            ->get()
+            ->map(fn (ShippingModeContract $shippingMode) => tap(
+                $shippingMode,
+                function (ShippingModeContract $shippingMode) use ($selected) {
+                    $shippingMode->selected = $shippingMode->is($selected);
+                })
+            );
+    }
+
     protected function getCartResponse(CartCollection $cartResults): JsonResponse
     {
+        $selectedShippingMode = $this->cart->getShippingMode();
+        $selectedPaymentMode = $this->cart->getPaymentMode();
+
         return new JsonResponse(data: [
             'cart' => [
                 'items' => $cartResults->toArray(),
@@ -94,9 +120,16 @@ class CartAPIController
                 'subtotal' => $this->cart->getSubtotal($cartResults),
                 'total' => $this->cart->getTotal($cartResults),
                 'currency' => config('shop.currency'),
-                'shippingMode' => new ShippingModeResource(
-                    $this->cart->getShippingMode()
+                'availableShippingModes' => config('shop.resources.shippingMode')::collection(
+                    $this->getAllShippingModes($selectedShippingMode)
                 ),
+                'shippingMode' => config('shop.resources.shippingMode')::make(
+                    $selectedShippingMode
+                ),
+                'paymentMode' => $selectedPaymentMode
+                    ? config('shop.resources.paymentMode')::make(
+                        $selectedPaymentMode
+                    ) : null,
             ],
         ]);
     }
@@ -120,6 +153,12 @@ class CartAPIController
 
     protected function resolveShippingMode(string $shippingModeProvider): ShippingModeContract
     {
-        return config('shop.models.shippingMode')::firstWhere('provider', $shippingModeProvider);
+        return config('shop.models.shippingMode')::with('paymentModes')
+            ->firstWhere('provider', $shippingModeProvider);
+    }
+
+    protected function resolvePaymentMode(string $paymentModeProvider): PaymentModeContract
+    {
+        return config('shop.models.paymentMode')::firstWhere('provider', $paymentModeProvider);
     }
 }

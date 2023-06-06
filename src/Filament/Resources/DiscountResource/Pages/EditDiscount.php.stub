@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\DiscountResource\Pages;
 
 use App\Filament\Resources\DiscountResource;
+use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Models\Deals\Discount;
 use Filament\Pages\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -15,11 +16,13 @@ class EditDiscount extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        /** @var Discount $record */
         $record->update([
             'discountable_type' => $data['discountable_type'],
             'discountable_id' => $data['discountable_id'],
         ]);
 
+        /** @var DiscountContract $requiredDiscountType */
         $requiredDiscountType = $data['discount_type'];
 
         $newDiscountData = Arr::except(
@@ -27,9 +30,10 @@ class EditDiscount extends EditRecord
             ['id', 'created_at', 'updated_at']
         );
 
-        $existingProductDiscount = $record->discount;
+        $existingProductDiscount = $record->getDiscount();
 
         if (!$existingProductDiscount instanceof $requiredDiscountType) {
+            /** @var Model $currentDiscountClass */
             $currentDiscountClass = get_class($existingProductDiscount);
 
             $currentDiscountClass::withoutEvents(function () use ($existingProductDiscount) {

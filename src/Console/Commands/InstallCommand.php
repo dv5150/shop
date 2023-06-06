@@ -8,17 +8,19 @@ use Illuminate\Support\Facades\File;
 class InstallCommand extends Command
 {
     protected array $migrations = [
+        '00_create_users_table',
         '01_create_billing_addresses_table',
         '02_create_shipping_addresses_table',
         '03_create_products_table',
         '04_create_categories_table',
-        '05_create_orders_table',
-        '06_create_order_items_table',
-        '07_create_category_product_table',
-        '08_create_shipping_modes_table',
-        '09_create_payment_modes_table',
-        '10_create_discount_tables',
-        '11_create_coupon_tables',
+        '05_create_category_product_table',
+        '06_create_shipping_modes_table',
+        '07_create_payment_modes_table',
+        '08_create_payment_mode_shipping_mode_table',
+        '09_create_orders_table',
+        '10_create_order_items_table',
+        '11_create_discount_tables',
+        '12_create_coupon_tables',
     ];
 
     protected array $filamentResources = [
@@ -140,16 +142,11 @@ class InstallCommand extends Command
 
         File::ensureDirectoryExists(resource_path('js/components/shop'));
         File::ensureDirectoryExists(resource_path('views/vendor/shop'));
+        File::ensureDirectoryExists(public_path('vendor/shop/css'));
 
-        File::copyDirectory(
-            $this->getPath('resources/js/components'),
-            resource_path('js/components/shop')
-        );
-
-        File::copyDirectory(
-            $this->getPath('resources/views'),
-            resource_path('views/vendor/shop')
-        );
+        File::copyDirectory($this->getPath('resources/js/components'), resource_path('js/components/shop'));
+        File::copyDirectory($this->getPath('resources/views'), resource_path('views/vendor/shop'));
+        File::copyDirectory($this->getPath('resources/css'), public_path('vendor/shop/css'));
     }
 
     protected function copyFilamentResources(): void

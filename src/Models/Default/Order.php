@@ -21,6 +21,16 @@ class Order extends Model implements OrderContract
         return $this->hasMany(config('shop.models.orderItem'));
     }
 
+    public function shippingMode(): BelongsTo
+    {
+        return $this->belongsTo(config('shop.models.shippingMode'));
+    }
+
+    public function paymentMode(): BelongsTo
+    {
+        return $this->belongsTo(config('shop.models.paymentMode'));
+    }
+
     public function getThankYouUrl(): string
     {
         return route('shop.order.thankYou', [

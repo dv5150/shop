@@ -25,13 +25,13 @@ trait HandlesCoupons
 
         $coupon = $this->getCoupon();
 
-        $couponDiscountAmount = $coupon
-            ? $coupon->getDiscountedPriceGross($cart) - $cart->getTotalGrossPrice()
-            : null;
-
         return [
             'couponItem' => $coupon,
-            'couponDiscountAmount' => floor($couponDiscountAmount),
+            'couponDiscountAmount' => floor(
+                $coupon
+                    ? $coupon->getDiscountedPriceGross($cart) - $cart->getTotalGrossPrice()
+                    : null
+            ),
         ];
     }
 }

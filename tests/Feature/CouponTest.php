@@ -9,6 +9,7 @@ use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
 use DV5150\Shop\Tests\Concerns\CreatesCartCoupons;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
+use DV5150\Shop\Tests\Concerns\ProvidesSamplePaymentModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
 
@@ -16,6 +17,7 @@ class CouponTest extends TestCase
 {
     use ProvidesSampleOrderData,
         ProvidesSampleShippingModeData,
+        ProvidesSamplePaymentModeData,
         CreatesCartCoupons,
         CreatesDiscountsForProducts;
 
@@ -31,6 +33,7 @@ class CouponTest extends TestCase
 
         $this->setUpSampleOrderData();
         $this->setUpSampleShippingModeData();
+        $this->setUpSamplePaymentModeData();
 
         $this->productA = config('shop.models.product')::factory()
             ->create(['price_gross' => 3000.0])
@@ -79,6 +82,9 @@ class CouponTest extends TestCase
                 'subtotal' => $this->productC->getPriceGross(),
             ],
         ];
+
+        $shippingMode = config('shop.models.shippingMode')::create($this->shippingModeData);
+        $shippingMode->paymentModes()->create($this->paymentModeData);
     }
 
     /** @test */
@@ -381,6 +387,14 @@ class CouponTest extends TestCase
             'code' => $coupon->code
         ]));
 
+        $this->post(route('api.shop.cart.shippingMode.store', [
+            'provider' => $this->shippingModeData['provider']
+        ]));
+
+        $this->post(route('api.shop.cart.paymentMode.store', [
+            'provider' => $this->paymentModeData['provider']
+        ]));
+
         $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
@@ -464,6 +478,14 @@ class CouponTest extends TestCase
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => $coupon->code
+        ]));
+
+        $this->post(route('api.shop.cart.shippingMode.store', [
+            'provider' => $this->shippingModeData['provider']
+        ]));
+
+        $this->post(route('api.shop.cart.paymentMode.store', [
+            'provider' => $this->paymentModeData['provider']
         ]));
 
         $this->post(

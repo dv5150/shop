@@ -5,6 +5,7 @@ namespace DV5150\Shop\Contracts\Services;
 use DV5150\Shop\Support\CartCollection;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\ShippingModeContract;
+use DV5150\Shop\Contracts\PaymentModeContract;
 use DV5150\Shop\Models\Deals\Coupon;
 
 interface CartServiceContract
@@ -25,6 +26,9 @@ interface CartServiceContract
 
     public function setShippingMode(ShippingModeContract $shippingMode): CartCollection;
     public function getShippingMode(): ShippingModeContract;
+
+    public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollection;
+    public function getPaymentMode(): ?PaymentModeContract;
 
     public function toArray(): array;
     public function toJson($options = 0): string;

@@ -28,6 +28,12 @@ trait ProvidesSampleOrderData
                 'street' => 'Street 9000',
                 'taxNumber' => '900000000',
             ],
+            'shippingMode' => [
+                'provider' => 'default',
+            ],
+            'paymentMode' => [
+                'provider' => 'default',
+            ],
         ];
 
         $this->expectedBaseOrderData = [
@@ -43,6 +49,8 @@ trait ProvidesSampleOrderData
             'billing_city' => $this->testOrderData['billingData']['city'],
             'billing_address' => $this->testOrderData['billingData']['street'],
             'billing_tax_number' => $this->testOrderData['billingData']['taxNumber'],
+            'shipping_mode_provider' => $this->testOrderData['shippingMode']['provider'],
+            'payment_mode_provider' => $this->testOrderData['paymentMode']['provider'],
         ];
     }
 }

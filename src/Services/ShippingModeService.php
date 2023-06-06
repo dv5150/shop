@@ -39,7 +39,7 @@ class ShippingModeService implements ShippingModeServiceContract
         $shippingMode = unserialize($serializedShippingMode);
 
         return $shippingMode->exists()
-            ? $shippingMode
+            ? $shippingMode->refresh()
             : $this->getDefaultShippingMode();
     }
 

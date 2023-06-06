@@ -1,9 +1,6 @@
 <template>
     <div :style="{ display: cart.isOpen ? 'block' : 'none' }">
-        <h5>
-            Cart <span v-if="cart.products.length === 0">&nbsp;(empty)</span>
-        </h5>
-        <button type="button" @click.prevent="cart.$patch({ isOpen: false })">
+        <button type="button" class="button button-outline" @click.prevent="cart.$patch({ isOpen: false })">
             [ CLOSE ]
         </button>
         <div>

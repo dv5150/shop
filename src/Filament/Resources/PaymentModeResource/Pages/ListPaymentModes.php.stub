@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Filament\Resources\PaymentModeResource\Pages;
+
+use App\Filament\Resources\PaymentModeResource;
+use Filament\Resources\Pages\ListRecords;
+
+class ListPaymentModes extends ListRecords
+{
+    protected static string $resource = PaymentModeResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            //
+        ];
+    }
+}

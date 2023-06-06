@@ -8,6 +8,7 @@ use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
+use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Models\Deals\Discount;
@@ -16,11 +17,14 @@ use DV5150\Shop\Observers\DeleteDiscountObserver;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
+use DV5150\Shop\Services\PaymentModeService;
 use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
+use DV5150\Shop\View\Composers\ProductListComposer;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class ShopServiceProvider extends ServiceProvider
@@ -54,6 +58,8 @@ class ShopServiceProvider extends ServiceProvider
         $this->registerObservers();
 
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
+
+        View::composer('shop::partials.productList', ProductListComposer::class);
     }
 
     protected function registerTransformers(): void
@@ -82,10 +88,16 @@ class ShopServiceProvider extends ServiceProvider
         );
 
         App::bind(
+            PaymentModeServiceContract::class,
+            fn () => new PaymentModeService()
+        );
+
+        App::bind(
             CartServiceContract::class,
             fn () => new CartService(
                 app(CouponServiceContract::class),
-                app(ShippingModeServiceContract::class)
+                app(ShippingModeServiceContract::class),
+                app(PaymentModeServiceContract::class),
             )
         );
     }

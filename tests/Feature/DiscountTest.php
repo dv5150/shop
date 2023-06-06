@@ -7,6 +7,7 @@ use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
+use DV5150\Shop\Tests\Concerns\ProvidesSamplePaymentModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
@@ -16,6 +17,7 @@ class DiscountTest extends TestCase
     use ProvidesSampleOrderData,
         ProvidesSampleProductData,
         ProvidesSampleShippingModeData,
+        ProvidesSamplePaymentModeData,
         CreatesDiscountsForProducts;
 
     protected function setUp(): void
@@ -25,10 +27,14 @@ class DiscountTest extends TestCase
         $this->setUpSampleOrderData();
         $this->setUpSampleProductData();
         $this->setUpSampleShippingModeData();
+        $this->setUpSamplePaymentModeData();
 
         $this->productA->update(['price_gross' => 5000.0]);
         $this->productB->update(['price_gross' => 7500.0]);
         $this->productC->update(['price_gross' => 12300.0]);
+
+        $shippingMode = config('shop.models.shippingMode')::create($this->shippingModeData);
+        $shippingMode->paymentModes()->create($this->paymentModeData);
     }
 
     /** @test */
@@ -364,6 +370,14 @@ class DiscountTest extends TestCase
             '11% OFF discount',
             11.0
         );
+
+        $this->post(route('api.shop.cart.shippingMode.store', [
+            'provider' => $this->shippingModeData['provider']
+        ]));
+
+        $this->post(route('api.shop.cart.paymentMode.store', [
+            'provider' => $this->paymentModeData['provider']
+        ]));
 
         $this->post(
             route('api.shop.checkout.store'),

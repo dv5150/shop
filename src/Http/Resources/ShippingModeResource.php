@@ -19,6 +19,10 @@ class ShippingModeResource extends JsonResource
             'name' => $this->getName(),
             'priceGross' => $this->getPriceGross(),
             'componentName' => $this->getComponentName(),
+            'paymentModes' => config('shop.resources.paymentMode')::collection(
+                $this->paymentModes
+            ),
+            'selected' => $this->when(is_bool($this->selected), $this->selected),
         ];
     }
 }

@@ -24,9 +24,11 @@ class CheckoutService implements CheckoutServiceContract
 
     public function saveOrder(array $orderData): OrderContract
     {
+        $orderData = $this->orderDataTransformer->transform($orderData);
+
         /** @var Model|OrderContract $order */
         $order = new (config('shop.models.order'))(
-            array_merge($this->orderDataTransformer->transform($orderData), [
+            array_merge($orderData, [
                 'uuid' => $this->generateUniqueUuid()
             ])
         );
@@ -34,6 +36,18 @@ class CheckoutService implements CheckoutServiceContract
         if ($user = Auth::user()) {
             $order->user()->associate($user);
         }
+
+        $order->shippingMode()->associate(
+            config('shop.models.shippingMode')::firstWhere(
+                'provider', $order->shipping_mode_provider
+            )
+        );
+
+        $order->paymentMode()->associate(
+            config('shop.models.paymentMode')::firstWhere(
+                'provider', $order->payment_mode_provider
+            )
+        );
 
         $order->save();
 
@@ -62,6 +76,11 @@ class CheckoutService implements CheckoutServiceContract
 
         $orderItems->push(
             Cart::getShippingMode()
+                ->toOrderItem()
+        );
+
+        $orderItems->push(
+            Cart::getPaymentMode()
                 ->toOrderItem()
         );
 

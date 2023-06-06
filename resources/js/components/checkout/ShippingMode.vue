@@ -1,30 +1,39 @@
 <template>
-    <div>
-        <table width="100%">
+    <div style="margin-bottom: 7rem;">
+        <table>
             <thead>
                 <tr>
                     <th>Shipping mode</th>
-                    <th>Price</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr v-for="shippingMode in checkout.shippingModes"
-                    @click.prevent="checkout.selectShippingMode(shippingMode)" :style="[{
-                        'color: red;': checkout.selectedShippingMode?.id === shippingMode.id,
-                    }]">
-                    <td>{{ shippingMode.name }}</td>
-                    <td>{{ shippingMode.price_gross }}</td>
-                </tr>
-            </tbody>
         </table>
-        <component :is="checkout.activeShippingModeComponent"></component>
+        <div class="row">
+            <div class="column" v-for="shippingMode in cart.availableShippingModes">
+                <label
+                    :for="'shipping-mode-'+shippingMode.provider"
+                    class="label-inline"
+                >
+                    <input
+                        type="radio"
+                        :checked="cart.selectedShippingMode?.provider === shippingMode.provider"
+                        @click.prevent="cart.selectShippingMode(shippingMode)"
+                        :id="'shipping-mode-'+shippingMode.provider"
+                    > {{ shippingMode.name }} ({{ shippingMode.priceGross }} {{ cart.currency.code }})
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <component :is="checkout.activeShippingModeComponent"></component>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import _ from 'lodash'
-import { useCheckoutStore } from '../services/store'
+import {useCartStore, useCheckoutStore} from '../services/store'
 
+let cart = useCartStore()
 let checkout = useCheckoutStore()
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <button type="button" @click.prevent="cart.$patch({ isOpen: true })">
+    <button type="button" class="button" @click.prevent="cart.$patch({ isOpen: true })">
         Cart ({{ cart.cartItemLength }})
     </button>
 </template>

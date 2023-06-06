@@ -26,7 +26,7 @@ class EditCoupon extends EditRecord
             ['id', 'created_at', 'updated_at']
         );
 
-        $existingCartCoupon = $record->coupon;
+        $existingCartCoupon = $record->getCoupon();
 
         if (!$existingCartCoupon instanceof $requiredCouponType) {
             $currentCouponClass = get_class($existingCartCoupon);

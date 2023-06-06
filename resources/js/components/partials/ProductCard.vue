@@ -1,17 +1,15 @@
 <template>
-    <div style="padding: 10px 0px;">
+    <div style="min-height: 20rem;">
         <h5>{{ product.name }}</h5>
         <p>
             <s v-if="product.price_gross < product.price_gross_original">
-                {{ product.price_gross_original }}
+                {{ product.price_gross_original }} {{ cart.currency?.code }}
             </s>
-            {{ product.price_gross }}
+            {{ product.price_gross }} {{ cart.currency?.code }}
         </p>
-        <p>
-            <a href="#" @click.prevent="cart.increaseQuantity(product.id, 1)">
-                [ Add to cart ]
-            </a>
-        </p>
+        <a href="#" @click.prevent="cart.increaseQuantity(product.id, 1)" class="button button-outline">
+            [ ADD TO CART ]
+        </a>
     </div>
 </template>
 
@@ -24,5 +22,3 @@ let props = defineProps({
 
 let cart = useCartStore()
 </script>
-
-<style lang="scss" scoped></style>

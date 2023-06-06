@@ -8,11 +8,11 @@
 
     <title>{{ config('app.name') }}</title>
 
-    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/shop/css/milligram.min.css') }}">
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" class="container">
         @yield('content')
     </div>
     <script src="{{ mix('js/app.js') }}"></script>

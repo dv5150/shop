@@ -2,6 +2,9 @@
 
 namespace DV5150\Shop\Tests;
 
+use DV5150\Shop\Http\Resources\PaymentModeResource;
+use DV5150\Shop\Http\Resources\ProductListResource;
+use DV5150\Shop\Http\Resources\ShippingModeResource;
 use DV5150\Shop\Models\Default\BillingAddress;
 use DV5150\Shop\Models\Default\Category;
 use DV5150\Shop\Models\Default\Order;
@@ -41,12 +44,21 @@ class TestCase extends Orchestra
         Config::set('shop.models.shippingMode', ShippingMode::class);
         Config::set('shop.models.shippingAddress', ShippingAddress::class);
 
+        /** API Resources */
+        Config::set('shop.resources.shippingMode', ShippingModeResource::class);
+        Config::set('shop.resources.paymentMode', PaymentModeResource::class);
+        Config::set('shop.resources.productList', ProductListResource::class);
+
         /** Currency setup */
         Config::set('shop.currency.code', 'HUF');
 
         /** Default shipping mode settings */
         Config::set('shop.defaultShippingMode.name', 'TEST SHIPPING MODE');
         Config::set('shop.defaultShippingMode.priceGross', 490.0);
+
+        /** Default payment mode settings */
+        Config::set('shop.defaultPaymentMode.name', 'Cash on delivery');
+        Config::set('shop.defaultPaymentMode.priceGross', 290.0);
     }
 
     protected function getPackageProviders($app)

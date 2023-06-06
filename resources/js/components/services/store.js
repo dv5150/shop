@@ -5,17 +5,24 @@ import { defineAsyncComponent } from 'vue'
 export const useCartStore = defineStore('cart', {
     state: () => {
         return {
-            isOpen: false,
             products: [],
+            selectedShippingMode: null,
+            selectedPaymentMode: null,
+
+            isOpen: false,
             currency: null,
             coupon: null,
-            shippingMode: null,
+            availableShippingModes: [],
             subtotal: 0,
             total: 0,
         }
     },
     getters: {
         cartItemLength: (state) => _.sumBy(state.products, (product) => product.quantity),
+        availablePaymentModes: (state) => state.selectedShippingMode?.paymentModes,
+        disableShippingModeFields: (state) => {
+            return state.selectedShippingMode?.provider && (state.selectedShippingMode?.provider !== 'default')
+        },
     },
     actions: {
         init() {
@@ -42,13 +49,23 @@ export const useCartStore = defineStore('cart', {
             axios.delete(`/api/shop/cart/coupon`)
                 .then(response => this.updateWholeTable(response))
         },
+        selectShippingMode(shippingMode) {
+            axios.post(`/api/shop/cart/shipping-mode/${shippingMode.provider}`)
+                .then(response => this.updateWholeTable(response))
+        },
+        selectPaymentMode(paymentMode) {
+            axios.post(`/api/shop/cart/payment-mode/${paymentMode.provider}`)
+                .then(response => this.updateWholeTable(response))
+        },
         updateWholeTable(response) {
             this.products = response.data.cart.items
             this.coupon = response.data.cart.coupon
             this.subtotal = response.data.cart.subtotal
             this.total = response.data.cart.total
             this.currency = response.data.cart.currency
-            this.shippingMode = response.data.cart.shippingMode
+            this.availableShippingModes = response.data.cart.availableShippingModes
+            this.selectedShippingMode = response.data.cart.shippingMode
+            this.selectedPaymentMode = response.data.cart.paymentMode
         }
     }
 })
@@ -56,10 +73,6 @@ export const useCartStore = defineStore('cart', {
 export const useCheckoutStore = defineStore('checkout', {
     state: () => {
         return {
-            shippingModes: [],
-            selectedShippingMode: null,
-            paymentModes: [],
-            selectedPaymentMode: null,
             personalData: {
                 email: '',
                 phone: '',
@@ -82,22 +95,6 @@ export const useCheckoutStore = defineStore('checkout', {
         }
     },
     actions: {
-        init() {
-            axios.get('/api/shop/checkout/shipping-modes')
-                .then(response => this.shippingModes = response.data.shippingModes)
-        },
-        selectShippingMode(shippingMode) {
-            let cart = useCartStore()
-
-            axios.post(`/api/shop/cart/shipping-mode/${shippingMode.provider}`)
-                .then(response => {
-                    this.selectedShippingMode = response.data.cart.shippingMode
-                    cart.updateWholeTable(response)
-                })
-        },
-        selectPaymentMode(paymentMode) {
-            this.selectedPaymentMode = { ...paymentMode }
-        },
         setPickupPoint(pickupPoint) {
             this.shippingData = {
                 name: this.shippingData.name,
@@ -110,13 +107,13 @@ export const useCheckoutStore = defineStore('checkout', {
         activeShippingModeComponent: (state) => {
             let cart = useCartStore()
 
-            let componentName = cart.shippingMode?.componentName
+            let componentName = cart.selectedShippingMode?.componentName
 
             if (!componentName) {
                 return null
             }
 
             return defineAsyncComponent(() => import(`../shippingModes/${componentName}.vue`))
-        },
+        }
     },
 })

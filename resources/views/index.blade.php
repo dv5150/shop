@@ -1,12 +1,15 @@
-@extends('shop::layouts.app')
+@extends('shop::layouts.shop')
 
 @section('content')
-    <cart-widget></cart-widget>
+    <div class="row">
+        <div class="column">
+            <cart-widget></cart-widget>
 
-    <cart-drawer
-        :checkout-url="'{{ route('checkout') }}'"
-        @openCartDrawer="openDrawer"
-    ></cart-drawer>
-
+            <cart-drawer
+                :checkout-url="'{{ route('checkout') }}'"
+                @openCartDrawer="openDrawer"
+            ></cart-drawer>
+        </div>
+    </div>
     @include('shop::partials.productList')
 @endsection

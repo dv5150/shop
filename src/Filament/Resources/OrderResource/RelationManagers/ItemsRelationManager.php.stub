@@ -66,9 +66,9 @@ class ItemsRelationManager extends RelationManager
             ->actions([
                 Action::make('viewItem')
                     ->label('View Item')
-                    ->visible(fn ($record) => $record->getProduct())
+                    ->visible(fn ($record) => $record->product)
                     ->url(fn ($record) => ProductResource::getUrl('edit', [
-                        'record' => $record->getProduct()
+                        'record' => $record->product
                     ]))
                     ->openUrlInNewTab()
                     ->icon('heroicon-o-eye'),

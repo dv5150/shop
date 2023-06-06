@@ -3,10 +3,12 @@
 namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Concerns\Cart\HandlesCoupons;
+use DV5150\Shop\Concerns\Cart\HandlesPaymentModes;
 use DV5150\Shop\Concerns\Cart\HandlesShippingModes;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
+use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Support\CartCollection;
@@ -15,13 +17,15 @@ use Illuminate\Support\Facades\Session;
 class CartService implements CartServiceContract
 {
     use HandlesCoupons,
-        HandlesShippingModes;
+        HandlesShippingModes,
+        HandlesPaymentModes;
 
     protected const SESSION_KEY = 'cart';
 
     public function __construct(
         protected CouponServiceContract $couponService,
-        protected ShippingModeServiceContract $shippingModeService
+        protected ShippingModeServiceContract $shippingModeService,
+        protected PaymentModeServiceContract $paymentModeService,
     ){}
 
     public function all(): CartCollection
@@ -96,7 +100,9 @@ class CartService implements CartServiceContract
             ? floor($coupon->getDiscountedPriceGross($cartResults))
             : $cartResults->getTotalGrossPrice();
 
-        return $grossTotal + $this->getShippingMode()->getPriceGross();
+        return $grossTotal
+            + $this->getShippingMode()->getPriceGross()
+            + $this->getPaymentMode()?->getPriceGross();
     }
 
     public function hasDigitalItemsOnly(): bool

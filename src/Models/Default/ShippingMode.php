@@ -6,6 +6,7 @@ use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Contracts\ShippingModeContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ShippingMode extends Model implements ShippingModeContract
 {
@@ -16,6 +17,11 @@ class ShippingMode extends Model implements ShippingModeContract
     protected $casts = [
         'price_gross' => 'float',
     ];
+
+    public function paymentModes(): BelongsToMany
+    {
+        return $this->belongsToMany(config('shop.models.paymentMode'));
+    }
 
     public function getName(): string
     {

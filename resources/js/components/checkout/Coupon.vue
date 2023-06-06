@@ -1,12 +1,12 @@
 <template>
-    <table width="100%">
-        <thead style="text-align: left">
+    <table style="margin-bottom: 7rem;">
+        <thead>
             <tr>
                 <th colspan="2">Coupon</th>
             </tr>
         </thead>
-        <tbody v-if="!cart.coupon?.couponItem">
-            <tr>
+        <tbody>
+            <tr v-if="!cart.coupon?.couponItem">
                 <td>
                     Coupon code
                 </td>
@@ -14,20 +14,18 @@
                     <input type="text" id="couponCode" placeholder="ABCDEF123">
                 </td>
                 <td>
-                    <button @click="applyCoupon">[APPLY COUPON]</button>
+                    <a href="#" class="button" @click="applyCoupon">[ APPLY COUPON ]</a>
+                </td>
+            </tr>
+            <tr v-if="cart.coupon?.couponItem">
+                <td>
+                    {{ cart.coupon.couponItem.name }}
+                </td>
+                <td>
+                    <a href="#" class="button button-clear" @click="cart.eraseCoupon()">[ REMOVE COUPON ]</a>
                 </td>
             </tr>
         </tbody>
-        <tfoot v-if="cart.coupon?.couponItem">
-            <tr>
-                <td class="bg-gray-400 p-5">
-                    {{ cart.coupon.couponItem.name }}
-                </td>
-                <td class="bg-gray-400 p-5">
-                    <a href="#" @click="cart.eraseCoupon()">[REMOVE COUPON]</a>
-                </td>
-            </tr>
-        </tfoot>
     </table>
 </template>
 
@@ -44,5 +42,3 @@ let applyCoupon = () => {
     codeInputField.value = ''
 }
 </script>
-
-<style lang="scss" scoped></style>

@@ -29,6 +29,9 @@ class OrderDataTransformer implements OrderDataTransformerContract
             'cartData' => 'required|array|min:1',
             'cartData.*.item.id' => 'required|exists:products,id',
             'cartData.*.quantity' => 'required|integer|min:1',
+
+            'shippingMode.provider' => 'required|exists:shipping_modes,provider',
+            'paymentMode.provider' => 'required|exists:payment_modes,provider',
         ];
     }
 
@@ -50,6 +53,9 @@ class OrderDataTransformer implements OrderDataTransformerContract
             'billing_city' => Arr::get($orderData, 'billingData.city'),
             'billing_address' => Arr::get($orderData, 'billingData.street'),
             'billing_tax_number' => Arr::get($orderData, 'billingData.taxNumber'),
+
+            'shipping_mode_provider' => Arr::get($orderData, 'shippingMode.provider'),
+            'payment_mode_provider' => Arr::get($orderData, 'paymentMode.provider'),
         ];
     }
 }
