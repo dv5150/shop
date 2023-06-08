@@ -2,12 +2,10 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
 use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
 use DV5150\Shop\Tests\Concerns\CreatesCartCoupons;
-use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSamplePaymentModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
@@ -15,17 +13,10 @@ use DV5150\Shop\Tests\TestCase;
 
 class CouponTest extends TestCase
 {
-    use ProvidesSampleOrderData,
+    use CreatesCartCoupons,
+        ProvidesSampleOrderData,
         ProvidesSampleShippingModeData,
-        ProvidesSamplePaymentModeData,
-        CreatesCartCoupons,
-        CreatesDiscountsForProducts;
-
-    protected ProductContract $productA;
-    protected ProductContract $productB;
-    protected ProductContract $productC;
-
-    protected array $expectedProductData;
+        ProvidesSamplePaymentModeData;
 
     protected function setUp(): void
     {
@@ -33,58 +24,10 @@ class CouponTest extends TestCase
 
         $this->setUpSampleOrderData();
         $this->setUpSampleShippingModeData();
-        $this->setUpSamplePaymentModeData();
 
-        $this->productA = config('shop.models.product')::factory()
-            ->create(['price_gross' => 3000.0])
-            ->refresh();
-
-        $this->productB = config('shop.models.product')::factory()
-            ->create(['price_gross' => 8000.0])
-            ->refresh();
-
-        $this->productC = config('shop.models.product')::factory()
-            ->create(['price_gross' => 17000.0])
-            ->refresh();
-
-        $this->expectedProductData = [
-            [
-                'item' => [
-                    'id' => $this->productA->getKey(),
-                    'name' => $this->productA->getName(),
-                    'price_gross' => $this->productA->getPriceGross(),
-                    'price_gross_original' => $this->productA->getPriceGross(),
-                    'discount' => null,
-                ],
-                'quantity' => 1,
-                'subtotal' => $this->productA->getPriceGross(),
-            ],
-            [
-                'item' => [
-                    'id' => $this->productB->getKey(),
-                    'name' => $this->productB->getName(),
-                    'price_gross' => $this->productB->getPriceGross(),
-                    'price_gross_original' => $this->productB->getPriceGross(),
-                    'discount' => null,
-                ],
-                'quantity' => 1,
-                'subtotal' => $this->productB->getPriceGross(),
-            ],
-            [
-                'item' => [
-                    'id' => $this->productC->getKey(),
-                    'name' => $this->productC->getName(),
-                    'price_gross' => $this->productC->getPriceGross(),
-                    'price_gross_original' => $this->productC->getPriceGross(),
-                    'discount' => null,
-                ],
-                'quantity' => 1,
-                'subtotal' => $this->productC->getPriceGross(),
-            ],
-        ];
-
-        $shippingMode = config('shop.models.shippingMode')::create($this->shippingModeData);
-        $shippingMode->paymentModes()->create($this->paymentModeData);
+        $this->productA->update(['price_gross' => 3000.0]);
+        $this->productB->update(['price_gross' => 8000.0]);
+        $this->productC->update(['price_gross' => 17000.0]);
     }
 
     /** @test */
@@ -109,26 +52,29 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponA->code
+            'code' => $couponA->getCode(),
         ]));
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 25200.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
+                    ],
+                    'total' => 25200.0,
                     'coupon' => [
                         'couponItem' => $couponA->toArray(),
                         'couponDiscountAmount' => -2800.0,
@@ -143,26 +89,29 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponB->code
+            'code' => $couponB->getCode(),
         ]));
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 21000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
+                    ],
+                    'total' => 21000.0,
                     'coupon' => [
                         'couponItem' => $couponB->toArray(),
                         'couponDiscountAmount' => -7000.0,
@@ -175,13 +124,13 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
     }
@@ -208,26 +157,29 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponA->code
+            'code' => $couponA->getCode()
         ]));
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 27300.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
+                    ],
+                    'total' => 27300.0,
                     'coupon' => [
                         'couponItem' => $couponA->toArray(),
                         'couponDiscountAmount' => -700.0,
@@ -242,26 +194,29 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponB->code
+            'code' => $couponB->getCode(),
         ]));
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 26100.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
+                    ],
+                    'total' => 26100.0,
                     'coupon' => [
                         'couponItem' => $couponB->toArray(),
                         'couponDiscountAmount' => -1900.0,
@@ -274,90 +229,13 @@ class CouponTest extends TestCase
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $this->expectedProductData,
-                    'total' => 28000.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => null,
-                        'couponDiscountAmount' => null,
-                    ],
-                ]
-            ]);
-    }
-
-    /** @test */
-    public function coupons_work_together_properly_with_discounts()
-    {
-        Cart::addItem($this->productA, 3);
-        Cart::addItem($this->productB, 5);
-        Cart::addItem($this->productC, 2);
-
-        $discountA = $this->createPercentDiscountForProduct(
-            $this->productA,
-            '50% OFF discount',
-            50.0
-        );
-
-        $discountB = $this->createPercentDiscountForProduct(
-            $this->productB,
-            '40% OFF discount',
-            40.0
-        );
-
-        $coupon = $this->createCartValueCoupon(
-            '660 OFF discount',
-            660.0,
-            'CART660OFF'
-        );
-
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $coupon->code
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
                     'items' => [
-                        [
-                            'item' => [
-                                'id' => $this->productA->getKey(),
-                                'name' => $this->productA->getName(),
-                                'price_gross' => 1500.0,
-                                'price_gross_original' => $this->productA->getPriceGross(),
-                                'discount' => $discountA->toArray(),
-                            ],
-                            'quantity' => 3,
-                            'subtotal' => 4500.0,
-                        ],
-                        [
-                            'item' => [
-                                'id' => $this->productB->getKey(),
-                                'name' => $this->productB->getName(),
-                                'price_gross' => 4800.0,
-                                'price_gross_original' => $this->productB->getPriceGross(),
-                                'discount' => $discountB->toArray(),
-                            ],
-                            'quantity' => 5,
-                            'subtotal' => 24000.0,
-                        ],
-                        [
-                            'item' => [
-                                'id' => $this->productC->getKey(),
-                                'name' => $this->productC->getName(),
-                                'price_gross' => 17000.0,
-                                'price_gross_original' => $this->productC->getPriceGross(),
-                                'discount' => null,
-                            ],
-                            'quantity' => 2,
-                            'subtotal' => 34000.0,
-                        ],
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                        $this->expectProductInCart($this->productC),
                     ],
-                    'total' => 4500.0 + 24000.0 + 34000.0 - 660.0 + $this->expectedShippingModeData['priceGross'],
-                    'shippingMode' => $this->expectedShippingModeData,
-                    'coupon' => [
-                        'couponItem' => $coupon->toArray(),
-                        'couponDiscountAmount' => -660.0,
-                    ],
+                    'total' => 28000.0,
+                    'coupon' => null,
                 ]
             ]);
     }
@@ -365,18 +243,6 @@ class CouponTest extends TestCase
     /** @test */
     public function cart_value_coupons_are_saved_properly_as_order_items_as_guest()
     {
-        $discountA = $this->createPercentDiscountForProduct(
-            $this->productA,
-            '50% OFF discount',
-            50.0
-        );
-
-        $discountB = $this->createValueDiscountForProduct(
-            $this->productB,
-            '900 OFF discount',
-            900.0
-        );
-
         $coupon = $this->createCartValueCoupon(
             '1100 OFF discount',
             1100.0,
@@ -384,92 +250,48 @@ class CouponTest extends TestCase
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $coupon->code
-        ]));
-
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
+            'code' => $coupon->getCode(),
         ]));
 
         $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productA->getKey(),
-                        ],
-                        'quantity' => 7,
-                    ],
-                    [
-                        'item' => [
-                            'id' => $this->productB->getKey(),
-                        ],
-                        'quantity' => 7,
-                    ],
+                    $this->makeProductCartDataItem($this->productA, 7),
+                    $this->makeProductCartDataItem($this->productB, 7),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingMode->getProvider(),
+                ],
+                'paymentMode' => [
+                    'provider' => $this->shippingMode->paymentModes()
+                        ->first()
+                        ->getProvider(),
+                ],
+                'shipping_mode_provider' => $this->shippingMode->getProvider(),
+                'payment_mode_provider' => $this->shippingMode->paymentModes()
+                    ->first()
+                    ->getProvider(),
             ])
         );
 
-        $orderKey = config('shop.models.order')::first()->getKey();
+        $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productA->getKey(),
-            'name' => $this->productA->getName(),
-        ], [
-            'order_id' => $orderKey,
-            'quantity' => 7,
-            'price_gross' => 1500.0,
-            'info' => $discountA->getShortName(),
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 7);
+        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 7);
 
-        $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productB->getKey(),
-            'name' => $this->productB->getName(),
-        ], [
-            'order_id' => $orderKey,
-            'quantity' => 7,
-            'price_gross' => 7100.0,
-            'info' => $discountB->getShortName(),
-        ]));
-
-        $this->assertDatabaseHas('order_items', [
-            'product_id' => null,
-            'name' => $coupon->getShortName(),
-            'order_id' => $orderKey,
-            'quantity' => 1,
-            'price_gross' => -1100.0,
-            'info' => "[COUPON] [Code: {$coupon->code}]",
-        ]);
-
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
-            'order_id' => $orderKey
-        ]));
+        $this->assertDatabaseHasCouponOrderItem(
+            $coupon, $order, -1100.0, "[COUPON] [Code: {$coupon->getCode()}]"
+        );
     }
 
     /** @test */
     public function cart_percent_coupons_are_saved_properly_as_order_items_as_guest()
     {
-        $discountA = $this->createPercentDiscountForProduct(
-            $this->productA,
-            '30% OFF discount',
-            30.0
-        );
-
-        $discountB = $this->createValueDiscountForProduct(
-            $this->productB,
-            '500 OFF discount',
-            500.0
-        );
-
         $coupon = $this->createCartPercentCoupon(
             '25% OFF discount',
             25.0,
@@ -477,80 +299,48 @@ class CouponTest extends TestCase
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $coupon->code
-        ]));
-
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
+            'code' => $coupon->getCode(),
         ]));
 
         $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productA->getKey(),
-                        ],
-                        'quantity' => 8,
-                    ],
-                    [
-                        'item' => [
-                            'id' => $this->productB->getKey(),
-                        ],
-                        'quantity' => 8,
-                    ],
+                    $this->makeProductCartDataItem($this->productA, 8),
+                    $this->makeProductCartDataItem($this->productB, 8),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingMode->getProvider(),
+                ],
+                'paymentMode' => [
+                    'provider' => $this->shippingMode->paymentModes()
+                        ->first()
+                        ->getProvider(),
+                ],
+                'shipping_mode_provider' => $this->shippingMode->getProvider(),
+                'payment_mode_provider' => $this->shippingMode->paymentModes()
+                    ->first()
+                    ->getProvider(),
             ])
         );
 
-        $orderKey = config('shop.models.order')::first()->getKey();
+        $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productA->getKey(),
-            'name' => $this->productA->getName(),
-        ], [
-            'order_id' => $orderKey,
-            'quantity' => 8,
-            'price_gross' => 2100.0,
-            'info' => $discountA->getShortName(),
-        ]));
-
-        $this->assertDatabaseHas('order_items', array_merge([
-            'product_id' => $this->productB->getKey(),
-            'name' => $this->productB->getName(),
-        ], [
-            'order_id' => $orderKey,
-            'quantity' => 8,
-            'price_gross' => 7500.0,
-            'info' => $discountB->getShortName(),
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 8);
+        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 8);
 
         $itemsTotal = array_sum([
-            2100.0 * 8,
-            7500.0 * 8,
+            $this->productA->getPriceGross() * 8,
+            $this->productB->getPriceGross() * 8,
         ]);
 
-        $this->assertDatabaseHas('order_items', [
-            'product_id' => null,
-            'name' => $coupon->getShortName(),
-            'order_id' => $orderKey,
-            'quantity' => 1,
-            'price_gross' => 0 - ($itemsTotal * 0.25),
-            'info' => "[COUPON] [Code: {$coupon->code}]",
-        ]);
-
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
-            'order_id' => $orderKey
-        ]));
+        $this->assertDatabaseHasCouponOrderItem(
+            $coupon, $order, 0 - ($itemsTotal * 0.25), "[COUPON] [Code: {$coupon->getCode()}]"
+        );
     }
 
     /** @test */

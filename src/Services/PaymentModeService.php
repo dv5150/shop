@@ -35,8 +35,6 @@ class PaymentModeService implements PaymentModeServiceContract
     {
         $paymentMode = unserialize($serializedPaymentMode);
 
-        return $paymentMode->exists()
-            ? $paymentMode->refresh()
-            : null;
+        return $paymentMode->exists() ? $paymentMode->refresh() : null;
     }
 }

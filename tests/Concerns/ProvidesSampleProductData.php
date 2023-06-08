@@ -2,7 +2,12 @@
 
 namespace DV5150\Shop\Tests\Concerns;
 
+use DV5150\Shop\Contracts\Deals\DiscountContract;
+use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Model;
 
 trait ProvidesSampleProductData
@@ -10,41 +15,132 @@ trait ProvidesSampleProductData
     protected ProductContract|Model $productA;
     protected ProductContract|Model $productB;
     protected ProductContract|Model $productC;
-
-    public array $expectedProductAData;
-    public array $expectedProductBData;
-    public array $expectedProductCData;
+    protected ProductContract|Model $productD;
+    protected ProductContract|Model $productE;
 
     public function setUpSampleProductData()
     {
-        $this->productA = config('shop.models.product')::factory()
-            ->create()
-            ->refresh();
+        $this->productA = config('shop.models.product')::factory()->create([
+            'price_gross' => 500.0,
+        ]);
 
-        $this->productB = config('shop.models.product')::factory()
-            ->create()
-            ->refresh();
+        $this->productB = config('shop.models.product')::factory()->create([
+            'price_gross' => 1500.0,
+        ]);
 
-        $this->productC = config('shop.models.product')::factory()
-            ->create()
-            ->refresh();
+        $this->productC = config('shop.models.product')::factory()->create([
+            'price_gross' => 1800.0,
+        ]);
 
-        $this->expectedProductAData = [
-            'product_id' => $this->productA->getKey(),
-            'name' => $this->productA->getName(),
-            'price_gross' => $this->productA->getPriceGross(),
+        $this->productD = config('shop.models.product')::factory()->create([
+            'price_gross' => 4200.0,
+        ]);
+
+        $this->productE = config('shop.models.product')::factory()->create([
+            'price_gross' => 17300.0,
+        ]);
+    }
+
+    public function expectProductInCart(
+        ProductContract $product,
+        int $quantity = 1,
+        Discount $discount = null,
+        float $overwriteGrossPrice = null,
+    ): array {
+        $product = new CartItemCapsule($product, $quantity);
+
+        return $this->expectedProductCartitem(
+            id: $product->getItem()->getKey(),
+            name: $product->getItem()->getName(),
+            priceGross: $overwriteGrossPrice ?? $product->getPriceGross(),
+            priceGrossOriginal: $product->getOriginalProductPriceGross(),
+            quantity: $product->getQuantity(),
+            subtotal: $quantity * ($overwriteGrossPrice ?? $product->getPriceGross()),
+            discount: $discount?->getDiscount(),
+        );
+    }
+
+    public function makeProductCartDataItem(ProductContract $product, int $quantity = 1): array
+    {
+        return $this->getProductCartDataItem(
+            id: $product->getKey(),
+            quantity: $quantity,
+        );
+    }
+
+    public function assertDatabaseHasProductOrderItem(
+        ProductContract $product,
+        OrderContract $order,
+        int $quantity = 1,
+        string $info = null,
+        float $overwriteGrossPrice = null,
+    ): void {
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->getKey(),
+            'product_id' => $product->getKey(),
+            'name' => $product->getName(),
+            'quantity' => $quantity,
+            'price_gross' => $overwriteGrossPrice ?? $product->getPriceGross(),
+            'info' => $info,
+        ]);
+    }
+
+    public function assertDatabaseHasCouponOrderItem(
+        Coupon $coupon,
+        OrderContract $order,
+        float $priceGross,
+        string $info = null,
+    ): void {
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->getKey(),
+            'product_id' => null,
+            'name' => $coupon->getShortName(),
+            'quantity' => 1,
+            'price_gross' => $priceGross,
+            'info' => $info,
+        ]);
+    }
+
+    protected function expectedProductCartitem(
+        string $id,
+        string $name,
+        string $priceGross,
+        string $priceGrossOriginal,
+        int $quantity,
+        float $subtotal,
+        DiscountContract $discount = null,
+    ): array {
+        return [
+            'item' => [
+                'id' => $id,
+                'name' => $name,
+                'price_gross' => $priceGross,
+                'price_gross_original' => $priceGrossOriginal,
+                'discount' => $discount
+                    ? $this->expectedProductCartItemDiscount($discount)
+                    : null
+            ],
+            'quantity' => $quantity,
+            'subtotal' => $subtotal,
         ];
+    }
 
-        $this->expectedProductBData = [
-            'product_id' => $this->productB->getKey(),
-            'name' => $this->productB->getName(),
-            'price_gross' => $this->productB->getPriceGross(),
+    protected function expectedProductCartItemDiscount(DiscountContract $discount): array {
+        return [
+            'name' => $discount->getName(),
+            'shortName' => $discount->getShortName(),
+            'unit' => $discount->getUnit(),
+            'value' => $discount->getValue(),
         ];
+    }
 
-        $this->expectedProductCData = [
-            'product_id' => $this->productC->getKey(),
-            'name' => $this->productC->getName(),
-            'price_gross' => $this->productC->getPriceGross(),
+    protected function getProductCartDataItem(string $id, int $quantity): array
+    {
+        return [
+            'item' => [
+                'id' => $id,
+            ],
+            'quantity' => $quantity,
         ];
     }
 }

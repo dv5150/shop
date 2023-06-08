@@ -24,8 +24,8 @@ interface CartServiceContract
     public function getCoupon(): ?Coupon;
     public function getCouponSummary(CartCollection $cartResults): ?array;
 
-    public function setShippingMode(ShippingModeContract $shippingMode): CartCollection;
-    public function getShippingMode(): ShippingModeContract;
+    public function setShippingMode(?ShippingModeContract $shippingMode): CartCollection;
+    public function getShippingMode(): ?ShippingModeContract;
 
     public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollection;
     public function getPaymentMode(): ?PaymentModeContract;

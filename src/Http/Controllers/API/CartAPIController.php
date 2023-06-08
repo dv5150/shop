@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Controllers\API;
+namespace DV5150\Shop\Http\Controllers\API;
 
 use DV5150\Shop\Contracts\PaymentModeContract;
 use DV5150\Shop\Contracts\ProductContract;
@@ -120,16 +120,16 @@ class CartAPIController
                 'subtotal' => $this->cart->getSubtotal($cartResults),
                 'total' => $this->cart->getTotal($cartResults),
                 'currency' => config('shop.currency'),
-                'availableShippingModes' => config('shop.resources.shippingMode')::collection(
-                    $this->getAllShippingModes($selectedShippingMode)
-                ),
-                'shippingMode' => config('shop.resources.shippingMode')::make(
-                    $selectedShippingMode
-                ),
+                'availableShippingModes' => $selectedShippingMode
+                    ? config('shop.resources.shippingMode')::collection(
+                        $this->getAllShippingModes($selectedShippingMode)
+                    ) : [],
+                'shippingMode' => $selectedShippingMode
+                    ? config('shop.resources.shippingMode')::make($selectedShippingMode)
+                    : null,
                 'paymentMode' => $selectedPaymentMode
-                    ? config('shop.resources.paymentMode')::make(
-                        $selectedPaymentMode
-                    ) : null,
+                    ? config('shop.resources.paymentMode')::make($selectedPaymentMode)
+                    : null,
             ],
         ]);
     }

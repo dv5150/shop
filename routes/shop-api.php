@@ -1,7 +1,7 @@
 <?php
 
-use DV5150\Shop\Controllers\API\CartAPIController;
-use DV5150\Shop\Controllers\API\CheckoutAPIController;
+use DV5150\Shop\Http\Controllers\API\CartAPIController;
+use DV5150\Shop\Http\Controllers\API\CheckoutAPIController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {

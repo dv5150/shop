@@ -16,15 +16,12 @@ class ShippingModeService implements ShippingModeServiceContract
         if ($shippingMode = Session::get(self::SESSION_KEY)) {
             $shippingMode = $this->unserializeShippingMode($shippingMode);
             $this->setShippingMode($shippingMode);
-        } else {
-            $shippingMode = $this->getDefaultShippingMode();
-            $this->setShippingMode($shippingMode);
         }
 
         return $shippingMode;
     }
 
-    public function setShippingMode(ShippingModeContract $shippingMode): void
+    public function setShippingMode(?ShippingModeContract $shippingMode): void
     {
         /** @var Model $shippingMode */
 
@@ -34,23 +31,10 @@ class ShippingModeService implements ShippingModeServiceContract
         );
     }
 
-    protected function unserializeShippingMode(string $serializedShippingMode): ShippingModeContract
+    protected function unserializeShippingMode(string $serializedShippingMode): ?ShippingModeContract
     {
         $shippingMode = unserialize($serializedShippingMode);
 
-        return $shippingMode->exists()
-            ? $shippingMode->refresh()
-            : $this->getDefaultShippingMode();
-    }
-
-    protected function getDefaultShippingMode(): ShippingModeContract
-    {
-        return config('shop.models.shippingMode')::firstOrNew([
-            'provider' => 'default',
-        ], [
-            'name' => config('shop.defaultShippingMode.name'),
-            'price_gross' => config('shop.defaultShippingMode.priceGross'),
-            'componentName' => null,
-        ]);
+        return $shippingMode->exists() ? $shippingMode->refresh() : null;
     }
 }

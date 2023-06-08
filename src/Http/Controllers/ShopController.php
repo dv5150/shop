@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Controllers;
+namespace DV5150\Shop\Http\Controllers;
 
 class ShopController
 {

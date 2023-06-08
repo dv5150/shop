@@ -9,19 +9,21 @@ use DV5150\Shop\Models\Default\BillingAddress;
 use DV5150\Shop\Models\Default\Category;
 use DV5150\Shop\Models\Default\Order;
 use DV5150\Shop\Models\Default\OrderItem;
-use DV5150\Shop\Models\Default\PaymentMode;
 use DV5150\Shop\Models\Default\ShippingAddress;
-use DV5150\Shop\Models\Default\ShippingMode;
-use DV5150\Shop\Tests\Mock\Models\Product;
-use DV5150\Shop\Tests\Mock\Models\User;
 use DV5150\Shop\ShopServiceProvider;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
+use DV5150\Shop\Tests\Mock\Models\PaymentMode;
+use DV5150\Shop\Tests\Mock\Models\Product;
+use DV5150\Shop\Tests\Mock\Models\ShippingMode;
+use DV5150\Shop\Tests\Mock\Models\User;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\Concerns\HandlesRoutes;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    use HandlesRoutes;
+    use ProvidesSampleProductData,
+        HandlesRoutes;
 
     protected function setUp(): void
     {
@@ -52,13 +54,7 @@ class TestCase extends Orchestra
         /** Currency setup */
         Config::set('shop.currency.code', 'HUF');
 
-        /** Default shipping mode settings */
-        Config::set('shop.defaultShippingMode.name', 'TEST SHIPPING MODE');
-        Config::set('shop.defaultShippingMode.priceGross', 490.0);
-
-        /** Default payment mode settings */
-        Config::set('shop.defaultPaymentMode.name', 'Cash on delivery');
-        Config::set('shop.defaultPaymentMode.priceGross', 290.0);
+        $this->setUpSampleProductData();
     }
 
     protected function getPackageProviders($app)

@@ -101,7 +101,7 @@ class CartService implements CartServiceContract
             : $cartResults->getTotalGrossPrice();
 
         return $grossTotal
-            + $this->getShippingMode()->getPriceGross()
+            + $this->getShippingMode()?->getPriceGross()
             + $this->getPaymentMode()?->getPriceGross();
     }
 

@@ -74,15 +74,13 @@ class CheckoutService implements CheckoutServiceContract
             );
         }
 
-        $orderItems->push(
-            Cart::getShippingMode()
-                ->toOrderItem()
-        );
+        if ($shippingMode = Cart::getShippingMode()) {
+            $orderItems->push($shippingMode->toOrderItem());
+        }
 
-        $orderItems->push(
-            Cart::getPaymentMode()
-                ->toOrderItem()
-        );
+        if ($paymentMode = Cart::getPaymentMode()) {
+            $orderItems->push($paymentMode->toOrderItem());
+        }
 
         $order->items()->saveMany($orderItems);
     }

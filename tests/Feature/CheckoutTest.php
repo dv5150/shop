@@ -2,96 +2,59 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Facades\Cart;
+use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSamplePaymentModeData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\Mock\Models\User;
+use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
 use DV5150\Shop\Tests\TestCase;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
 
 class CheckoutTest extends TestCase
 {
-    use ProvidesSampleOrderData,
-        ProvidesSampleProductData,
-        ProvidesSampleShippingModeData,
-        ProvidesSamplePaymentModeData;
-
-    protected User $testUser;
+    use ProvidesSampleUser,
+        ProvidesSampleOrderData,
+        ProvidesSampleShippingModeData;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->setUpSampleUser();
         $this->setUpSampleOrderData();
-        $this->setUpSampleProductData();
         $this->setUpSampleShippingModeData();
-        $this->setUpSamplePaymentModeData();
-
-        $this->testUser = config('shop.models.user')::create([
-            'name' => 'Johnny Jackson',
-            'email' => 'johnny+12345@jackson.com',
-            'password' => Hash::make('testing'),
-        ]);
-
-        $shippingMode = config('shop.models.shippingMode')::create($this->shippingModeData);
-        $shippingMode->paymentModes()->create($this->paymentModeData);
     }
 
     /** @test */
     public function an_order_with_multiple_items_can_be_stored_as_guest()
     {
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
-        ]));
-
         $response = $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productA->getKey(),
-                        ],
-                        'quantity' => 2,
-                    ],
-                    [
-                        'item' => [
-                            'id' => $this->productB->getKey(),
-                        ],
-                        'quantity' => 4,
-                    ],
+                    $this->makeProductCartDataItem($this->productA, 2),
+                    $this->makeProductCartDataItem($this->productB, 4),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
             ])
         );
 
-        $orderKey = config('shop.models.order')::first()->getKey();
+        $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductAData, [
-            'order_id' => $orderKey,
-            'quantity' => 2,
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 2);
+        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 4);
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
-            'order_id' => $orderKey,
-            'quantity' => 4,
-        ]));
-
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
-            'order_id' => $orderKey
-        ]));
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response);
+        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -99,92 +62,65 @@ class CheckoutTest extends TestCase
     {
         $this->be($this->testUser);
 
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
-        ]));
-
         $response = $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productA->getKey(),
-                        ],
-                        'quantity' => 5,
-                    ],
-                    [
-                        'item' => [
-                            'id' => $this->productB->getKey(),
-                        ],
-                        'quantity' => 3,
-                    ],
+                    $this->makeProductCartDataItem($this->productA, 5),
+                    $this->makeProductCartDataItem($this->productB, 3),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
             ])
         );
 
-        $orderKey = config('shop.models.order')::first()->getKey();
+        $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => $this->testUser->getKey(),
         ]));
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductAData, [
-            'order_id' => $orderKey,
-            'quantity' => 5,
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 5);
+        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 3);
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
-            'order_id' => $orderKey,
-            'quantity' => 3,
-        ]));
-
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
-            'order_id' => $orderKey
-        ]));
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response);
+        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
     public function an_order_with_a_single_item_can_be_stored_as_guest()
     {
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
-        ]));
-
         $response = $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productA->getKey(),
-                        ],
-                        'quantity' => 1,
-                    ],
+                    $this->makeProductCartDataItem($this->productA, 1),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
             ])
         );
+
+        $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductAData, [
-            'order_id' => config('shop.models.order')::first()->getKey(),
-            'quantity' => 1,
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productA, $order);
 
-        $this->checkThankYouPageAccessWithOrderAvailable($response);
+        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -192,25 +128,20 @@ class CheckoutTest extends TestCase
     {
         $this->be($this->testUser);
 
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeData['provider']
-        ]));
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => $this->paymentModeData['provider']
-        ]));
-
         $response = $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    [
-                        'item' => [
-                            'id' => $this->productB->getKey(),
-                        ],
-                        'quantity' => 2,
-                    ],
+                    $this->makeProductCartDataItem($this->productB, 2),
                 ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
             ])
         );
 
@@ -218,18 +149,11 @@ class CheckoutTest extends TestCase
             'user_id' => $this->testUser->getKey(),
         ]));
 
-        $orderKey = config('shop.models.order')::first()->getKey();
+        $order = config('shop.models.order')::first();
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedProductBData, [
-            'order_id' => $orderKey,
-            'quantity' => 2,
-        ]));
+        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 2);
 
-        $this->assertDatabaseHas('order_items', array_merge($this->expectedShippingModeOrderItemData, [
-            'order_id' => $orderKey
-        ]));
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response);
+        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -240,10 +164,10 @@ class CheckoutTest extends TestCase
         ]))->assertStatus(404);
     }
 
-    public function checkThankYouPageAccessWithOrderAvailable(TestResponse $response): void
-    {
-        $order = config('shop.models.order')::first();
-
+    protected function checkThankYouPageAccessWithOrderAvailable(
+        TestResponse $response,
+        OrderContract $order
+    ): void {
         $response->assertStatus(201)
             ->assertJson([
                 'redirectUrl' => $order->getThankYouUrl()

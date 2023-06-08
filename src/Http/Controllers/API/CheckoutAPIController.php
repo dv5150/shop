@@ -1,9 +1,9 @@
 <?php
 
-namespace DV5150\Shop\Controllers\API;
+namespace DV5150\Shop\Http\Controllers\API;
 
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
-use DV5150\Shop\Requests\StoreOrderRequest;
+use DV5150\Shop\Http\Requests\StoreOrderRequest;
 use Illuminate\Http\JsonResponse;
 
 class CheckoutAPIController

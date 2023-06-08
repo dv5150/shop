@@ -2,91 +2,37 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Facades\Cart;
 use DV5150\Shop\Tests\TestCase;
 
 class CartTest extends TestCase
 {
-    protected ProductContract $productA;
-    protected ProductContract $productB;
-    protected ProductContract $productC; // digital product
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->productA = config('shop.models.product')::factory()
-            ->create()
-            ->refresh();
-
-        $this->productB = config('shop.models.product')::factory()
-            ->create()
-            ->refresh();
-
-        $this->productC = config('shop.models.product')::factory()
-            ->create(['is_digital_product' => true])
-            ->refresh();
-    }
-
     /** @test */
     public function items_can_be_added()
     {
         Cart::addItem($this->productA);
         Cart::addItem($this->productB);
 
-        $expectedItems = [
-            [
-                'item' => [
-                    'id' => $this->productA->getKey(),
-                    'name' => $this->productA->getName(),
-                    'price_gross' => $this->productA->getPriceGross(),
-                ],
-                'quantity' => 1,
-            ],
-            [
-                'item' => [
-                    'id' => $this->productB->getKey(),
-                    'name' => $this->productB->getName(),
-                    'price_gross' => $this->productB->getPriceGross(),
-                ],
-                'quantity' => 1,
-            ],
-        ];
-
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $expectedItems,
+                    'items' => [
+                        $this->expectProductInCart($this->productA),
+                        $this->expectProductInCart($this->productB),
+                    ],
                 ]
             ]);
 
         Cart::addItem($this->productA, 5);
         Cart::addItem($this->productB, 9);
 
-        $expectedItems = [
-            [
-                'item' => [
-                    'id' => $this->productA->getKey(),
-                    'name' => $this->productA->getName(),
-                    'price_gross' => $this->productA->getPriceGross(),
-                ],
-                'quantity' => 6,
-            ],
-            [
-                'item' => [
-                    'id' => $this->productB->getKey(),
-                    'name' => $this->productB->getName(),
-                    'price_gross' => $this->productB->getPriceGross(),
-                ],
-                'quantity' => 10,
-            ],
-        ];
-
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $expectedItems,
+                    'items' => [
+                        $this->expectProductInCart($this->productA, 6),
+                        $this->expectProductInCart($this->productB, 10),
+                    ],
                 ]
             ]);
     }
@@ -102,37 +48,14 @@ class CartTest extends TestCase
         Cart::removeItem($this->productB);
         Cart::removeItem($this->productC);
 
-        $expectedItems = [
-            [
-                'item' => [
-                    'id' => $this->productA->getKey(),
-                    'name' => $this->productA->getName(),
-                    'price_gross' => $this->productA->getPriceGross(),
-                ],
-                'quantity' => 14,
-            ],
-            [
-                'item' => [
-                    'id' => $this->productB->getKey(),
-                    'name' => $this->productB->getName(),
-                    'price_gross' => $this->productB->getPriceGross(),
-                ],
-                'quantity' => 11,
-            ],
-            [
-                'item' => [
-                    'id' => $this->productC->getKey(),
-                    'name' => $this->productC->getName(),
-                    'price_gross' => $this->productC->getPriceGross(),
-                ],
-                'quantity' => 5,
-            ]
-        ];
-
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
-                    'items' => $expectedItems
+                    'items' => [
+                        $this->expectProductInCart($this->productA, 14),
+                        $this->expectProductInCart($this->productB, 11),
+                        $this->expectProductInCart($this->productC, 5),
+                    ],
                 ]
             ]);
 
@@ -165,14 +88,16 @@ class CartTest extends TestCase
     /** @test */
     public function cart_can_be_recognized_as_digital_cart()
     {
+        $this->productC->update(['is_digital_product' => true]);
+
         Cart::addItem($this->productA, 3);
         Cart::addItem($this->productB, 6);
         Cart::addItem($this->productC, 2);
 
         $this->assertFalse(Cart::hasDigitalItemsOnly());
 
-        Cart::removeItem($this->productA, 3);
-        Cart::removeItem($this->productB, 6);
+        Cart::eraseItem($this->productA);
+        Cart::eraseItem($this->productB);
 
         $this->assertTrue(Cart::hasDigitalItemsOnly());
     }

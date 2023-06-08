@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Requests;
+namespace DV5150\Shop\Http\Requests;
 
 use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use Illuminate\Foundation\Http\FormRequest;

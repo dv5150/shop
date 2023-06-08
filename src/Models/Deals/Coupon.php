@@ -24,6 +24,11 @@ class Coupon extends Model implements BaseDealContract
         return $this->coupon;
     }
 
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
     public function getDiscountedPriceGross(CartCollection $cart): float
     {
         return $this->getCoupon()
