@@ -124,16 +124,4 @@ class CartService implements CartServiceContract
 
         return $cart;
     }
-
-    public function toArray(): array
-    {
-        return $this->all()
-            ->toArray();
-    }
-
-    public function toJson($options = 0): string
-    {
-        return $this->all()
-            ->toJson($options);
-    }
 }

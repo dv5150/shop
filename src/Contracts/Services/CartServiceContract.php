@@ -30,7 +30,5 @@ interface CartServiceContract
     public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollection;
     public function getPaymentMode(): ?PaymentModeContract;
 
-    public function toArray(): array;
-    public function toJson($options = 0): string;
     public function saveCart(CartCollection $cart): CartCollection;
 }

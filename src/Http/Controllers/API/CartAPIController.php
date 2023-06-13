@@ -134,7 +134,7 @@ class CartAPIController
         ]);
     }
 
-    protected function resolveProduct($productID): ProductContract
+    private function resolveProduct($productID): ProductContract
     {
         /** @var Model $product */
         $product = config('shop.models.product')::findOrFail($productID);
@@ -146,18 +146,18 @@ class CartAPIController
         return $product;
     }
 
-    protected function resolveCoupon(string $couponCode): ?Coupon
+    private function resolveCoupon(string $couponCode): ?Coupon
     {
         return Coupon::firstWhere('code', $couponCode);
     }
 
-    protected function resolveShippingMode(string $shippingModeProvider): ShippingModeContract
+    private function resolveShippingMode(string $shippingModeProvider): ShippingModeContract
     {
         return config('shop.models.shippingMode')::with('paymentModes')
             ->firstWhere('provider', $shippingModeProvider);
     }
 
-    protected function resolvePaymentMode(string $paymentModeProvider): PaymentModeContract
+    private function resolvePaymentMode(string $paymentModeProvider): PaymentModeContract
     {
         return config('shop.models.paymentMode')::firstWhere('provider', $paymentModeProvider);
     }

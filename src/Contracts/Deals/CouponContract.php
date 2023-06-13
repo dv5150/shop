@@ -12,7 +12,7 @@ interface CouponContract extends BaseDealContract
 {
     public function baseCoupon(): MorphOne;
     public function getBaseCoupon(): Coupon;
-    public function getCode(): string;
     public function getDiscountedPriceGross(CartCollection $cart): float;
+    public function getCode(): string;
     public function toOrderItem(Collection $orderItems): OrderItemContract;
 }
