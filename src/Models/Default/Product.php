@@ -26,11 +26,6 @@ class Product extends Model implements ProductContract
         return $this->belongsToMany(config('shop.models.category'));
     }
 
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(config('shop.models.order'));
-    }
-
     public function discounts(): MorphMany
     {
         return $this->morphMany(Discount::class, 'discountable');

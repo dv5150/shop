@@ -46,6 +46,7 @@ class CartItemCapsule implements CartItemCapsuleContract
                 'price_gross' => $this->getPriceGross(),
                 'price_gross_original' => $this->getOriginalProductPriceGross(),
                 'discount' => $this->getDiscount()?->toArray(),
+                'is_digital' => $this->getProduct()->isDigitalProduct(),
             ],
             'quantity' => $this->getQuantity(),
             'subtotal' => $this->getSubtotalGrossPrice(),

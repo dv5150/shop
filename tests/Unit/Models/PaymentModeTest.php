@@ -3,8 +3,10 @@
 namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\PaymentModeContract;
+use DV5150\Shop\Contracts\ShippingModeContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
+use Illuminate\Database\Eloquent\Collection;
 
 class PaymentModeTest extends TestCase
 {
@@ -21,6 +23,18 @@ class PaymentModeTest extends TestCase
         $this->paymentMode = $this->shippingMode
             ->paymentModes()
             ->first();
+    }
+
+    /** @test */
+    public function payment_mode_has_shipping_modes()
+    {
+        $shippingModes = $this->paymentMode->shippingModes()->get();
+
+        $this->assertInstanceOf(Collection::class, $shippingModes);
+
+        $shippingModes->each(function ($shippingMode) {
+            $this->assertInstanceOf(ShippingModeContract::class, $shippingMode);
+        });
     }
 
     /** @test */

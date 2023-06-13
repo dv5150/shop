@@ -3,6 +3,9 @@
 namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Models\Deals\Discount;
+use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
 use DV5150\Shop\Tests\TestCase;
 use Illuminate\Support\Facades\Hash;
@@ -33,5 +36,24 @@ class DiscountTest extends TestCase
 
         $this->expectException(TypeError::class);
         $this->assertInstanceOf(ProductContract::class, $discount->getDiscountable());
+    }
+
+    /** @test */
+    public function discounts_have_a_base_discount()
+    {
+        $this->createPercentDiscountForProduct(
+            $this->productA,
+            '10% OFF discount',
+            10.0
+        );
+
+        $this->createValueDiscountForProduct(
+            $this->productB,
+            '100 OFF discount',
+            100.0
+        );
+
+        $this->assertInstanceOf(Discount::class, ProductPercentDiscount::first()->getBaseDiscount());
+        $this->assertInstanceOf(Discount::class, ProductValueDiscount::first()->getBaseDiscount());
     }
 }

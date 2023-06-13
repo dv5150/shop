@@ -2,12 +2,13 @@
 
 namespace DV5150\Shop\Tests\Mock\Factories;
 
+use DV5150\Shop\Tests\Mock\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 
 class CategoryFactory extends Factory
 {
-    protected $model = Product::class;
+    protected $model = Category::class;
 
     /**
      * Define the model's default state.

@@ -18,7 +18,7 @@ class CartAPIController
         protected CartServiceContract $cart
     ){}
 
-    #[Route("/api/shop/cart", methods: ["GET"])]
+    /** GET /api/shop/cart */
     public function index(): JsonResponse
     {
         return $this->getCartResponse(
@@ -26,7 +26,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/{product}/add/{quantity?}", methods: ["POST"])]
+    /** POST /api/shop/cart/{product}/add/{quantity?} */
     public function store($productID, int $quantity = 1): JsonResponse
     {
         return $this->getCartResponse(
@@ -37,7 +37,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/{product}/remove/{quantity?}", methods: ["POST"])]
+    /** POST /api/shop/cart/{product}/remove/{quantity?} */
     public function remove($productID, int $quantity = 1): JsonResponse
     {
         return $this->getCartResponse(
@@ -48,7 +48,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/{product}", methods: ["DELETE"])]
+    /** DELETE /api/shop/cart/{product} */
     public function erase($productID): JsonResponse
     {
         return $this->getCartResponse(
@@ -58,7 +58,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/coupon/{code}", methods: ["POST"])]
+    /** POST /api/shop/cart/coupon/{code} */
     public function setCoupon(string $couponCode): JsonResponse
     {
         return $this->getCartResponse(
@@ -68,7 +68,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/coupon", methods: ["DELETE"])]
+    /** DELETE /api/shop/cart/coupon */
     public function removeCoupon(): JsonResponse
     {
         return $this->getCartResponse(
@@ -76,7 +76,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/shipping-mode/{provider}", methods: ["POST"])]
+    /** POST /api/shop/cart/shipping-mode/{provider} */
     public function setShippingMode(string $shippingModeProvider): JsonResponse
     {
         return $this->getCartResponse(
@@ -86,7 +86,7 @@ class CartAPIController
         );
     }
 
-    #[Route("/api/shop/cart/payment-mode/{provider}", methods: ["POST"])]
+    /** POST /api/shop/cart/payment-mode/{provider} */
     public function setPaymentMode(string $paymentModeProvider): JsonResponse
     {
         return $this->getCartResponse(
@@ -151,14 +151,19 @@ class CartAPIController
         return Coupon::firstWhere('code', $couponCode);
     }
 
-    private function resolveShippingMode(string $shippingModeProvider): ShippingModeContract
+    private function resolveShippingMode(string $shippingModeProvider): ?ShippingModeContract
     {
         return config('shop.models.shippingMode')::with('paymentModes')
             ->firstWhere('provider', $shippingModeProvider);
     }
 
-    private function resolvePaymentMode(string $paymentModeProvider): PaymentModeContract
+    private function resolvePaymentMode(string $paymentModeProvider): ?PaymentModeContract
     {
-        return config('shop.models.paymentMode')::firstWhere('provider', $paymentModeProvider);
+        if ($shippingMode = $this->cart->getShippingMode()) {
+            return $shippingMode->paymentModes()
+                ->firstWhere('provider', $paymentModeProvider);
+        }
+
+        return null;
     }
 }
