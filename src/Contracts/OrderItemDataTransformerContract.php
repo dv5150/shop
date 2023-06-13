@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Contracts;
 
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 
 interface OrderItemDataTransformerContract
 {
-    public function transform(CartItemCapsule $capsule): array;
+    public function transform(CartItemCapsuleContract $capsule): array;
 }

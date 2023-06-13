@@ -6,11 +6,11 @@ use DV5150\Shop\Concerns\Cart\HandlesCoupons;
 use DV5150\Shop\Concerns\Cart\HandlesPaymentModes;
 use DV5150\Shop\Concerns\Cart\HandlesShippingModes;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
-use DV5150\Shop\Models\CartItemCapsule;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Facades\Session;
 
@@ -31,9 +31,11 @@ class CartService implements CartServiceContract
     public function all(): CartCollection
     {
         if ($cart = Session::get(self::SESSION_KEY)) {
-            return unserialize($cart)
-                ->map(fn (CartItemCapsule $capsule) => $capsule->removeDiscount())
-                ->refreshDiscounts();
+            /** @var CartCollection $cart */
+            $cart = unserialize($cart)
+                ->map(fn (CartItemCapsuleContract $capsule) => $capsule->removeDiscount());
+
+            return $cart->refreshDiscounts();
         }
 
         return $this->reset();
@@ -54,7 +56,12 @@ class CartService implements CartServiceContract
 
         $cart = $cart->hasItem($item)
             ? $cart->incrementQuantityBy($item, $quantity)
-            : $cart->push(new CartItemCapsule($item, $quantity));
+            : $cart->push(
+                new (config('shop.support.cartItemCapsule'))(
+                    product: $item,
+                    quantity: $quantity
+                )
+            );
 
         $this->saveCart($cart);
 

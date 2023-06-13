@@ -11,6 +11,7 @@ use DV5150\Shop\Models\Default\Order;
 use DV5150\Shop\Models\Default\OrderItem;
 use DV5150\Shop\Models\Default\ShippingAddress;
 use DV5150\Shop\ShopServiceProvider;
+use DV5150\Shop\Support\CartItemCapsule;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleProductData;
 use DV5150\Shop\Tests\Mock\Models\PaymentMode;
 use DV5150\Shop\Tests\Mock\Models\Product;
@@ -45,6 +46,9 @@ class TestCase extends Orchestra
         Config::set('shop.models.product', Product::class);
         Config::set('shop.models.shippingMode', ShippingMode::class);
         Config::set('shop.models.shippingAddress', ShippingAddress::class);
+
+        /** Support tools */
+        Config::set('shop.support.cartItemCapsule', CartItemCapsule::class);
 
         /** API Resources */
         Config::set('shop.resources.shippingMode', ShippingModeResource::class);

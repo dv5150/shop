@@ -3,14 +3,14 @@
 namespace DV5150\Shop\Transformers;
 
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 
 class OrderItemDataTransformer implements OrderItemDataTransformerContract
 {
-    public function transform(CartItemCapsule $capsule): array
+    public function transform(CartItemCapsuleContract $capsule): array
     {
         return array_merge(['quantity' => $capsule->getQuantity()], [
-            'name' => $capsule->getItem()->getName(),
+            'name' => $capsule->getProduct()->getName(),
             'price_gross' => $capsule->getPriceGross(),
             'info' => $capsule->getDiscount()?->getShortName(),
         ]);

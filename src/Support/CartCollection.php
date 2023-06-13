@@ -3,20 +3,20 @@
 namespace DV5150\Shop\Support;
 
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use Illuminate\Support\Collection;
 
 class CartCollection extends Collection
 {
     public function hasItem(ProductContract $item): bool
     {
-        return $this->contains(fn (CartItemCapsule $capsule) => $capsule->getItem()->is($item));
+        return $this->contains(fn (CartItemCapsuleContract $capsule) => $capsule->getProduct()->is($item));
     }
 
     public function incrementQuantityBy(ProductContract $item, int $quantity): self
     {
-        return $this->map(function (CartItemCapsule $capsule) use ($item, $quantity) {
-            if ($capsule->getItem()->is($item)) {
+        return $this->map(function (CartItemCapsuleContract $capsule) use ($item, $quantity) {
+            if ($capsule->getProduct()->is($item)) {
                 return $capsule->setQuantity($capsule->getQuantity() + $quantity);
             }
 
@@ -26,8 +26,8 @@ class CartCollection extends Collection
 
     public function decrementQuantityBy(ProductContract $item, int $quantity): self
     {
-        return $this->map(function (CartItemCapsule $capsule) use ($item, $quantity) {
-            if ($capsule->getItem()->is($item)) {
+        return $this->map(function (CartItemCapsuleContract $capsule) use ($item, $quantity) {
+            if ($capsule->getProduct()->is($item)) {
                 return $capsule->getQuantity() > $quantity
                     ? $capsule->setQuantity($capsule->getQuantity() - $quantity)
                     : null;
@@ -40,7 +40,7 @@ class CartCollection extends Collection
 
     public function eraseItem(ProductContract $item): self
     {
-        return $this->reject(fn (CartItemCapsule $capsule) => $capsule->getItem()->is($item))
+        return $this->reject(fn (CartItemCapsuleContract $capsule) => $capsule->getProduct()->is($item))
             ->filter()
             ->values();
     }
@@ -48,17 +48,17 @@ class CartCollection extends Collection
     public function refreshDiscounts(): self
     {
         $productKeys = collect($this->all())
-            ->mapWithKeys(fn (CartItemCapsule $capsule) => [
-                $capsule->getItem()->getKey() => $capsule->getQuantity()
+            ->mapWithKeys(fn (CartItemCapsuleContract $capsule) => [
+                $capsule->getProduct()->getKey() => $capsule->getQuantity()
             ])->all();
 
         $products = config('shop.models.product')::with('discounts.discount')
             ->find(array_keys($productKeys));
 
-        $capsules = $products->map(function (ProductContract $product) use ($productKeys) {
-            return (new CartItemCapsule($product, $productKeys[$product->getKey()]))
-                ->applyDiscount();
-        });
+        $capsules = $products->map(fn (ProductContract $product) => (new (config('shop.support.cartItemCapsule'))(
+            product: $product,
+            quantity: $productKeys[$product->getKey()]
+        ))->applyDiscount());
 
         return new static($capsules->all());
     }
@@ -66,14 +66,14 @@ class CartCollection extends Collection
     public function hasDigitalItemsOnly(): bool
     {
         return $this->doesntContain(
-            fn (CartItemCapsule $capsule) => !$capsule->getItem()->isDigitalProduct()
+            fn (CartItemCapsuleContract $capsule) => !$capsule->getProduct()->isDigitalProduct()
         );
     }
 
     public function getTotalGrossPrice(): float
     {
         return $this->sum(
-            fn (CartItemCapsule $capsule) => $capsule->getSubtotalGrossPrice()
+            fn (CartItemCapsuleContract $capsule) => $capsule->getSubtotalGrossPrice()
         );
     }
 }

@@ -5,7 +5,7 @@ namespace DV5150\Shop\Models\Deals;
 use DV5150\Shop\Contracts\Deals\BaseDealContract;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -35,7 +35,7 @@ class Discount extends Model implements BaseDealContract
         return $this->discount;
     }
 
-    public function getDiscountedPriceGross(CartItemCapsule $capsule): float
+    public function getDiscountedPriceGross(CartItemCapsuleContract $capsule): float
     {
         return $this->getDiscount()
             ->getDiscountedPriceGross($capsule);

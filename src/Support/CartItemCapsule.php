@@ -1,29 +1,23 @@
 <?php
 
-namespace DV5150\Shop\Models;
+namespace DV5150\Shop\Support;
 
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use DV5150\Shop\Models\Deals\Discount;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Model;
 
-class CartItemCapsule implements Arrayable
+class CartItemCapsule implements CartItemCapsuleContract
 {
-    protected ?Discount $discount = null;
-
-    protected ?float $discountedPriceGross = null;
-
     public function __construct(
-        protected ProductContract $item,
-        protected int $quantity
+        protected ProductContract $product,
+        protected int $quantity,
+        protected ?Discount $discount = null,
+        protected ?float $discountedPriceGross = null
     ){}
 
-    /**
-     * @return ProductContract|Model
-     */
-    public function getItem(): ProductContract
+    public function getProduct(): ProductContract
     {
-        return $this->item;
+        return $this->product;
     }
 
     public function getQuantity(): int
@@ -40,15 +34,15 @@ class CartItemCapsule implements Arrayable
 
     public function getOriginalProductPriceGross(): float
     {
-        return $this->getItem()->getPriceGross();
+        return $this->getProduct()->getPriceGross();
     }
 
     public function toArray()
     {
         return [
             'item' => [
-                'id' => $this->getItem()->getKey(),
-                'name' => $this->getItem()->getName(),
+                'id' => $this->getProduct()->getKey(),
+                'name' => $this->getProduct()->getName(),
                 'price_gross' => $this->getPriceGross(),
                 'price_gross_original' => $this->getOriginalProductPriceGross(),
                 'discount' => $this->getDiscount()?->toArray(),
@@ -84,8 +78,9 @@ class CartItemCapsule implements Arrayable
 
     public function applyDiscount(): self
     {
-        $this->getItem()
-            ->discounts
+        $this->getProduct()
+            ->discounts()
+            ->get()
             ->each(fn (Discount $discount) => $this->tryDiscount($discount));
 
         return $this;

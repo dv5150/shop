@@ -99,7 +99,7 @@ class CheckoutTest extends TestCase
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 1),
+                    $this->makeProductCartDataItem($this->productA),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingModeProvider,

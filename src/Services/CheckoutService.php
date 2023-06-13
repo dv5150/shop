@@ -7,9 +7,9 @@ use DV5150\Shop\Contracts\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\OrderItemContract;
 use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Models\CartItemCapsule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -63,8 +63,10 @@ class CheckoutService implements CheckoutServiceContract
         $orderItems = config('shop.models.product')::with('discounts.discount')
             ->find($IDs)
             ->map(fn (ProductContract $product) => $this->makeOrderItem(
-                (new CartItemCapsule($product, $quantities[$product->getKey()]))
-                    ->applyDiscount()
+                (new (config('shop.support.cartItemCapsule'))(
+                    product: $product,
+                    quantity: $quantities[$product->getKey()]
+                ))->applyDiscount()
             ));
 
         if ($coupon = Cart::getCoupon()) {
@@ -94,13 +96,13 @@ class CheckoutService implements CheckoutServiceContract
         return $uuid;
     }
 
-    protected function makeOrderItem(CartItemCapsule $capsule): OrderItemContract
+    protected function makeOrderItem(CartItemCapsuleContract $capsule): OrderItemContract
     {
         $orderItem = new (config('shop.models.orderItem'))(
             $this->orderItemDataTransformer->transform($capsule)
         );
 
-        $orderItem->product()->associate($capsule->getItem());
+        $orderItem->product()->associate($capsule->getProduct());
 
         return $orderItem;
     }

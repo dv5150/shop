@@ -17,15 +17,10 @@ return [
         'paymentMode' => \DV5150\Shop\Http\Resources\PaymentModeResource::class,
         'productList' => \DV5150\Shop\Http\Resources\ProductListResource::class,
     ],
+    'support' => [
+        'cartItemCapsule' => \DV5150\Shop\Support\CartItemCapsule::class,
+    ],
     'currency' => [
         'code' => 'HUF',
-    ],
-    'defaultShippingMode' => [
-        'name' => 'Standard Shipping Service',
-        'priceGross' => 990.0,
-    ],
-    'defaultPaymentMode' => [
-        'name' => 'Cash on delivery',
-        'priceGross' => 290.0,
     ],
 ];

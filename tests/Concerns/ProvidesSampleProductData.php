@@ -5,7 +5,7 @@ namespace DV5150\Shop\Tests\Concerns;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\CartItemCapsule;
+use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Model;
@@ -47,15 +47,19 @@ trait ProvidesSampleProductData
         Discount $discount = null,
         float $overwriteGrossPrice = null,
     ): array {
-        $product = new CartItemCapsule($product, $quantity);
+        /** @var CartItemCapsuleContract $capsule */
+        $capsule = new (config('shop.support.cartItemCapsule'))(
+            product: $product,
+            quantity: $quantity
+        );
 
         return $this->expectedProductCartitem(
-            id: $product->getItem()->getKey(),
-            name: $product->getItem()->getName(),
-            priceGross: $overwriteGrossPrice ?? $product->getPriceGross(),
-            priceGrossOriginal: $product->getOriginalProductPriceGross(),
-            quantity: $product->getQuantity(),
-            subtotal: $quantity * ($overwriteGrossPrice ?? $product->getPriceGross()),
+            id: $capsule->getProduct()->getKey(),
+            name: $capsule->getProduct()->getName(),
+            priceGross: $overwriteGrossPrice ?? $capsule->getPriceGross(),
+            priceGrossOriginal: $capsule->getOriginalProductPriceGross(),
+            quantity: $capsule->getQuantity(),
+            subtotal: $quantity * ($overwriteGrossPrice ?? $capsule->getPriceGross()),
             discount: $discount?->getDiscount(),
         );
     }
