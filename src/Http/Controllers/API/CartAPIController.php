@@ -96,16 +96,21 @@ class CartAPIController
         );
     }
 
-    protected function getAllShippingModes(ShippingModeContract $selected): Collection
+    protected function getAllShippingModes(?ShippingModeContract $selected = null): Collection
     {
-        return config('shop.models.shippingMode')::with('paymentModes')
-            ->get()
-            ->map(fn (ShippingModeContract $shippingMode) => tap(
+        $shippingModes = config('shop.models.shippingMode')::with('paymentModes')
+            ->get();
+
+        if ($selected) {
+            return $shippingModes->map(fn (ShippingModeContract $shippingMode) => tap(
                 $shippingMode,
                 function (ShippingModeContract $shippingMode) use ($selected) {
                     $shippingMode->selected = $shippingMode->is($selected);
                 })
             );
+        }
+
+        return $shippingModes;
     }
 
     protected function getCartResponse(CartCollection $cartResults): JsonResponse
@@ -120,10 +125,9 @@ class CartAPIController
                 'subtotal' => $this->cart->getSubtotal($cartResults),
                 'total' => $this->cart->getTotal($cartResults),
                 'currency' => config('shop.currency'),
-                'availableShippingModes' => $selectedShippingMode
-                    ? config('shop.resources.shippingMode')::collection(
-                        $this->getAllShippingModes($selectedShippingMode)
-                    ) : [],
+                'availableShippingModes' => config('shop.resources.shippingMode')::collection(
+                    $this->getAllShippingModes($selectedShippingMode)
+                ),
                 'shippingMode' => $selectedShippingMode
                     ? config('shop.resources.shippingMode')::make($selectedShippingMode)
                     : null,
