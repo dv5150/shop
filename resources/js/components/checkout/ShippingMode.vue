@@ -24,6 +24,11 @@
         </div>
         <div class="row">
             <div class="column">
+                <input-error :field-name="'shippingMode.provider'"></input-error>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
                 <component :is="checkout.activeShippingModeComponent"></component>
             </div>
         </div>
@@ -32,6 +37,7 @@
 
 <script setup>
 import {useCartStore, useCheckoutStore} from '../services/store'
+import InputError from "../partials/InputError"
 
 let cart = useCartStore()
 let checkout = useCheckoutStore()

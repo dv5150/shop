@@ -22,11 +22,17 @@
                 </label>
             </div>
         </div>
+        <div class="row">
+            <div class="column">
+                <input-error :field-name="'paymentMode.provider'"></input-error>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
 import {useCartStore, useCheckoutStore} from '../services/store'
+import InputError from "../partials/InputError.vue";
 
 let cart = useCartStore()
 let checkout = useCheckoutStore()

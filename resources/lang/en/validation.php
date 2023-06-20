@@ -13,8 +13,8 @@ return [
         'shippingData.street' => 'street',
         'shippingData.zipCode' => 'zip code',
 
-        'shippingMode.provider' => null,
-        'paymentMode.provider' => null,
+        'shippingMode.provider' => 'shipping mode',
+        'paymentMode.provider' => 'payment mode',
 
         'personalData.email' => 'e-mail',
         'personalData.phone' => 'phone',

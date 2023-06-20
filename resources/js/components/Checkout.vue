@@ -44,8 +44,10 @@ let submitOrder = () => {
         if (response.status === 201) {
             window.location = response.data.redirectUrl
         }
-
-        // @todo: handle error
+    }).catch(err => {
+        if (err.response.status === 422) {
+            checkout.updateErrorMessages(err.response)
+        }
     })
 }
 </script>

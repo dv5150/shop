@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 import { defineAsyncComponent } from 'vue'
+import _ from "lodash";
 
 export const useCartStore = defineStore('cart', {
     state: () => {
@@ -92,6 +93,7 @@ export const useCheckoutStore = defineStore('checkout', {
                 street: '',
                 taxNumber: '',
             },
+            errors: {},
         }
     },
     actions: {
@@ -101,6 +103,9 @@ export const useCheckoutStore = defineStore('checkout', {
                 comment: this.shippingData.comment,
                 ...pickupPoint
             }
+        },
+        updateErrorMessages(response) {
+            this.errors = {...response.data.errors}
         }
     },
     getters: {

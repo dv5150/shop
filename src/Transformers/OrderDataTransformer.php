@@ -24,7 +24,7 @@ class OrderDataTransformer implements OrderDataTransformerContract
             'billingData.zipCode' => 'required|string|max:255',
             'billingData.city' => 'required|string|max:255',
             'billingData.street' => 'required|string|max:255',
-            'billingData.taxNumber' => 'required|string|max:255',
+            'billingData.taxNumber' => 'nullable|string|max:255',
 
             'cartData' => 'required|array|min:1',
             'cartData.*.item.id' => 'required|exists:products,id',
