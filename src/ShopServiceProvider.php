@@ -36,10 +36,7 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerTransformers();
-
-        $this->registerCartService();
-        $this->registerCheckoutService();
+        $this->registerBindings();
 
         $this->registerApiRoutes();
 
@@ -55,62 +52,37 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerObservers();
+        $this->mountObservers();
 
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
+
+        $this->loadTranslationsFrom($this->getPath('resources/lang'), 'shop');
 
         View::composer('shop::partials.productList', ProductListComposer::class);
     }
 
-    protected function registerTransformers(): void
+    protected function registerBindings(): void
     {
-        App::bind(
-            OrderDataTransformerContract::class,
-            fn () => new OrderDataTransformer()
-        );
+        App::bind(OrderDataTransformerContract::class, fn () => new OrderDataTransformer());
 
-        App::bind(
-            OrderItemDataTransformerContract::class,
-            fn () => new OrderItemDataTransformer()
-        );
-    }
+        App::bind(OrderItemDataTransformerContract::class, fn () => new OrderItemDataTransformer());
 
-    protected function registerCartService(): void
-    {
-        App::bind(
-            CouponServiceContract::class,
-            fn () => new CouponService()
-        );
+        App::bind(CouponServiceContract::class, fn () => new CouponService());
 
-        App::bind(
-            ShippingModeServiceContract::class,
-            fn () => new ShippingModeService()
-        );
+        App::bind(ShippingModeServiceContract::class, fn () => new ShippingModeService());
 
-        App::bind(
-            PaymentModeServiceContract::class,
-            fn () => new PaymentModeService()
-        );
+        App::bind(PaymentModeServiceContract::class, fn () => new PaymentModeService());
 
-        App::bind(
-            CartServiceContract::class,
-            fn () => new CartService(
-                app(CouponServiceContract::class),
-                app(ShippingModeServiceContract::class),
-                app(PaymentModeServiceContract::class),
-            )
-        );
-    }
+        App::bind(CartServiceContract::class, fn () => new CartService(
+            app(CouponServiceContract::class),
+            app(ShippingModeServiceContract::class),
+            app(PaymentModeServiceContract::class),
+        ));
 
-    protected function registerCheckoutService(): void
-    {
-        App::bind(
-            CheckoutServiceContract::class,
-            fn () => new CheckoutService(
-                app(OrderDataTransformerContract::class),
-                app(OrderItemDataTransformerContract::class)
-            )
-        );
+        App::bind(CheckoutServiceContract::class, fn () => new CheckoutService(
+            app(OrderDataTransformerContract::class),
+            app(OrderItemDataTransformerContract::class),
+        ));
     }
 
     protected function registerApiRoutes(): void
@@ -125,7 +97,7 @@ class ShopServiceProvider extends ServiceProvider
             ->group($this->getPath('routes/shop.php'));
     }
 
-    protected function registerObservers(): void
+    protected function mountObservers(): void
     {
         Discount::observe(DeleteDiscountObserver::class);
         Coupon::observe(DeleteCouponObserver::class);
