@@ -3,11 +3,11 @@
 namespace DV5150\Shop\Models\Deals\Discounts;
 
 use DV5150\Shop\Concerns\HasBaseDiscount;
-use DV5150\Shop\Contracts\Deals\DiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
 use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
-use Illuminate\Database\Eloquent\Model;
+use DV5150\Shop\Models\Deals\Discount;
 
-class ProductValueDiscount extends Model implements DiscountContract
+class ProductValueDiscount extends Discount implements DiscountContract
 {
     use HasBaseDiscount;
 
@@ -37,10 +37,5 @@ class ProductValueDiscount extends Model implements DiscountContract
     public function getUnit(): string
     {
         return config('shop.currency.code');
-    }
-
-    public function getShortName(): ?string
-    {
-        return "[DISCOUNT] {$this->getValue()} {$this->getUnit()}";
     }
 }

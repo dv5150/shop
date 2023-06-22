@@ -2,14 +2,13 @@
 
 namespace DV5150\Shop\Models\Deals;
 
-use DV5150\Shop\Contracts\Deals\BaseDealContract;
-use DV5150\Shop\Contracts\Deals\DiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Discount extends Model implements BaseDealContract
+class Discount extends BaseDeal implements BaseDiscountContract
 {
     public $timestamps = false;
 
@@ -41,12 +40,6 @@ class Discount extends Model implements BaseDealContract
             ->getDiscountedPriceGross($capsule);
     }
 
-    public function getShortName(): ?string
-    {
-        return $this->getDiscount()
-            ->getShortName();
-    }
-
     public function getName(): ?string
     {
         return $this->getDiscount()
@@ -68,7 +61,6 @@ class Discount extends Model implements BaseDealContract
     public function toArray(): array
     {
         return [
-            'shortName' => $this->getShortName(),
             'name' => $this->getName(),
             'value' => $this->getValue(),
             'unit' => $this->getUnit(),

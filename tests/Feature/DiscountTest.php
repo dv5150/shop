@@ -296,7 +296,7 @@ class DiscountTest extends TestCase
             product: $this->productC,
             order: $order,
             quantity: 2,
-            info: $discountA->getShortName(),
+            info: $discountA->getName(),
             overwriteGrossPrice: 3300.0,
         );
 
@@ -304,7 +304,7 @@ class DiscountTest extends TestCase
             product: $this->productD,
             order: $order,
             quantity: 2,
-            info: $discountB->getShortName(),
+            info: $discountB->getName(),
             overwriteGrossPrice: 6675.0,
         );
 

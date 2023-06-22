@@ -58,7 +58,7 @@ class CouponResource extends Resource
             ->columns([
                 TextColumn::make('coupon')
                     ->formatStateUsing(
-                        fn (CouponContract $state) => $state->getShortName()
+                        fn (CouponContract $state) => $state->getName()
                     ),
                 TextColumn::make('code'),
             ])

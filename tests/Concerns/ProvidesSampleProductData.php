@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Tests\Concerns;
 
-use DV5150\Shop\Contracts\Deals\DiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use DV5150\Shop\Contracts\OrderContract;
 use DV5150\Shop\Contracts\ProductContract;
 use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
@@ -98,7 +98,7 @@ trait ProvidesSampleProductData
         $this->assertDatabaseHas('order_items', [
             'order_id' => $order->getKey(),
             'product_id' => null,
-            'name' => $coupon->getShortName(),
+            'name' => $coupon->getName(),
             'quantity' => 1,
             'price_gross' => $priceGross,
             'info' => $info,
@@ -106,13 +106,13 @@ trait ProvidesSampleProductData
     }
 
     protected function expectedProductCartitem(
-        string $id,
-        string $name,
-        string $priceGross,
-        string $priceGrossOriginal,
-        int $quantity,
-        float $subtotal,
-        DiscountContract $discount = null,
+        string               $id,
+        string               $name,
+        string               $priceGross,
+        string               $priceGrossOriginal,
+        int                  $quantity,
+        float                $subtotal,
+        BaseDiscountContract $discount = null,
     ): array {
         return [
             'item' => [
@@ -129,10 +129,9 @@ trait ProvidesSampleProductData
         ];
     }
 
-    protected function expectedProductCartItemDiscount(DiscountContract $discount): array {
+    protected function expectedProductCartItemDiscount(BaseDiscountContract $discount): array {
         return [
             'name' => $discount->getName(),
-            'shortName' => $discount->getShortName(),
             'unit' => $discount->getUnit(),
             'value' => $discount->getValue(),
         ];
