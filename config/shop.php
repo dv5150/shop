@@ -11,6 +11,8 @@ return [
         'shippingMode' => \DV5150\Shop\Models\Default\ShippingMode::class,
         'billingAddress' => \DV5150\Shop\Models\Default\BillingAddress::class,
         'shippingAddress' => \DV5150\Shop\Models\Default\ShippingAddress::class,
+        'coupon' => \DV5150\Shop\Models\Deals\Coupon::class,
+        'discount' => \DV5150\Shop\Models\Deals\Discount::class,
     ],
     'resources' => [
         'shippingMode' => \DV5150\Shop\Http\Resources\ShippingModeResource::class,

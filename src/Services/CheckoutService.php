@@ -2,13 +2,13 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Contracts\OrderContract;
-use DV5150\Shop\Contracts\OrderDataTransformerContract;
-use DV5150\Shop\Contracts\OrderItemContract;
-use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
+use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
+use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Facades\Cart;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;

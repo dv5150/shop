@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Contracts\OrderContract;
-use DV5150\Shop\Contracts\OrderItemContract;
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;

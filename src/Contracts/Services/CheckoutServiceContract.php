@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Services;
 
-use DV5150\Shop\Contracts\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
 
 interface CheckoutServiceContract
 {

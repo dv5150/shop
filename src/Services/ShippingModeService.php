@@ -2,10 +2,10 @@
 
 namespace DV5150\Shop\Services;
 
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 
 class ShippingModeService implements ShippingModeServiceContract
 {

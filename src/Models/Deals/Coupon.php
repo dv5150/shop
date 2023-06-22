@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Models\Deals;
 
+use DV5150\Shop\Concerns\Deals\DeletesConcreteCoupon;
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Deals\Coupons\CouponContract;
 use DV5150\Shop\Support\CartCollection;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Coupon extends BaseDeal implements BaseCouponContract
 {
+    use DeletesConcreteCoupon;
+
     public $timestamps = false;
 
     protected $guarded = [];

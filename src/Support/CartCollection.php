@@ -2,8 +2,8 @@
 
 namespace DV5150\Shop\Support;
 
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use Illuminate\Support\Collection;
 
 class CartCollection extends Collection

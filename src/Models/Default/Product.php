@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Default;
 
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +28,7 @@ class Product extends Model implements ProductContract
 
     public function discounts(): MorphMany
     {
-        return $this->morphMany(Discount::class, 'discountable');
+        return $this->morphMany(config('shop.models.discount'), 'discountable');
     }
 
     public function getSlugOptions(): SlugOptions

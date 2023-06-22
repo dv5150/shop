@@ -2,16 +2,16 @@
 
 namespace DV5150\Shop\Support;
 
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
-use DV5150\Shop\Models\Deals\Discount;
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 
 class CartItemCapsule implements CartItemCapsuleContract
 {
     public function __construct(
         protected ProductContract $product,
         protected int $quantity,
-        protected ?Discount $discount = null,
+        protected ?BaseDiscountContract $discount = null,
         protected ?float $discountedPriceGross = null
     ){}
 
@@ -53,7 +53,7 @@ class CartItemCapsule implements CartItemCapsuleContract
         ];
     }
 
-    public function getDiscount(): ?Discount
+    public function getDiscount(): ?BaseDiscountContract
     {
         return $this->discount;
     }
@@ -82,12 +82,12 @@ class CartItemCapsule implements CartItemCapsuleContract
         $this->getProduct()
             ->discounts()
             ->get()
-            ->each(fn (Discount $discount) => $this->tryDiscount($discount));
+            ->each(fn (BaseDiscountContract $discount) => $this->tryDiscount($discount));
 
         return $this;
     }
 
-    protected function tryDiscount(Discount $discount): self
+    protected function tryDiscount(BaseDiscountContract $discount): self
     {
         $newDiscountedPriceGross = $discount->getDiscountedPriceGross($this);
 

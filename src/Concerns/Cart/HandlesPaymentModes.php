@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Concerns\Cart;
 
-use DV5150\Shop\Contracts\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Support\CartCollection;
 
 trait HandlesPaymentModes

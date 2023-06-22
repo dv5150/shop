@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Models\Deals\Coupons;
 
-use DV5150\Shop\Concerns\HasBaseCoupon;
+use DV5150\Shop\Concerns\Deals\HasBaseCoupon;
 use DV5150\Shop\Contracts\Deals\Coupons\CouponContract;
-use DV5150\Shop\Contracts\OrderItemContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Collection;

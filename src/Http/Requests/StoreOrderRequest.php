@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Http\Requests;
 
-use DV5150\Shop\Contracts\OrderDataTransformerContract;
+use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOrderRequest extends FormRequest

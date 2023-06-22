@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Tests\Concerns;
 
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;

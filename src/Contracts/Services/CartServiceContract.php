@@ -2,11 +2,11 @@
 
 namespace DV5150\Shop\Contracts\Services;
 
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Support\CartCollection;
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
-use DV5150\Shop\Contracts\PaymentModeContract;
-use DV5150\Shop\Models\Deals\Coupon;
 
 interface CartServiceContract
 {
@@ -20,8 +20,8 @@ interface CartServiceContract
     public function getTotal(CartCollection $cartResults): float;
     public function hasDigitalItemsOnly(): bool;
 
-    public function setCoupon(?Coupon $coupon): CartCollection;
-    public function getCoupon(): ?Coupon;
+    public function setCoupon(?BaseCouponContract $coupon): CartCollection;
+    public function getCoupon(): ?BaseCouponContract;
     public function getCouponSummary(CartCollection $cartResults): ?array;
 
     public function setShippingMode(?ShippingModeContract $shippingMode): CartCollection;

@@ -1,9 +1,8 @@
 <?php
 
-namespace DV5150\Shop\Contracts\Services;
+namespace DV5150\Shop\Contracts\Models;
 
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\Deals\Discount;
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use Illuminate\Contracts\Support\Arrayable;
 
 interface CartItemCapsuleContract extends Arrayable
@@ -12,7 +11,7 @@ interface CartItemCapsuleContract extends Arrayable
     public function getQuantity(): int;
     public function setQuantity(int $quantity): self;
     public function getOriginalProductPriceGross(): float;
-    public function getDiscount(): ?Discount;
+    public function getDiscount(): ?BaseDiscountContract;
     public function getPriceGross(): ?float;
     public function getSubtotalGrossPrice(): float;
     public function removeDiscount(): self;

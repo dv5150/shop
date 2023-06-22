@@ -2,10 +2,10 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
-use DV5150\Shop\Contracts\PaymentModeContract;
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Collection;
@@ -152,7 +152,7 @@ class CartAPIController
 
     private function resolveCoupon(string $couponCode): ?Coupon
     {
-        return Coupon::firstWhere('code', $couponCode);
+        return config('shop.models.coupon')::firstWhere('code', $couponCode);
     }
 
     private function resolveShippingMode(string $shippingModeProvider): ?ShippingModeContract

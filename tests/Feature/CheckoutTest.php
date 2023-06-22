@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Contracts\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;

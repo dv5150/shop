@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Models\Default;
 
-use DV5150\Shop\Contracts\OrderContract;
-use DV5150\Shop\Contracts\OrderItemContract;
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

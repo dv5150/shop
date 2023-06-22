@@ -2,10 +2,10 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Contracts\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 
 class PaymentModeService implements PaymentModeServiceContract
 {

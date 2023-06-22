@@ -3,17 +3,13 @@
 namespace DV5150\Shop;
 
 use DV5150\Shop\Console\Commands\InstallCommand;
-use DV5150\Shop\Contracts\OrderDataTransformerContract;
-use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
-use DV5150\Shop\Models\Deals\Coupon;
-use DV5150\Shop\Models\Deals\Discount;
-use DV5150\Shop\Observers\DeleteCouponObserver;
-use DV5150\Shop\Observers\DeleteDiscountObserver;
+use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
+use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
@@ -52,8 +48,6 @@ class ShopServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mountObservers();
-
         $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
 
         $this->loadTranslationsFrom($this->getPath('resources/lang'), 'shop');
@@ -95,12 +89,6 @@ class ShopServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->as('shop.')
             ->group($this->getPath('routes/shop.php'));
-    }
-
-    protected function mountObservers(): void
-    {
-        Discount::observe(DeleteDiscountObserver::class);
-        Coupon::observe(DeleteCouponObserver::class);
     }
 
     protected function getPath(?string $target = null): string

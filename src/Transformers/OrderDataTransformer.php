@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Transformers;
 
-use DV5150\Shop\Contracts\OrderDataTransformerContract;
+use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use Illuminate\Support\Arr;
 
 class OrderDataTransformer implements OrderDataTransformerContract

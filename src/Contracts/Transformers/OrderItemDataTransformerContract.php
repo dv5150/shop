@@ -1,8 +1,8 @@
 <?php
 
-namespace DV5150\Shop\Contracts;
+namespace DV5150\Shop\Contracts\Transformers;
 
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 
 interface OrderItemDataTransformerContract
 {

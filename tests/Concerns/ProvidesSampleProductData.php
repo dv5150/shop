@@ -3,9 +3,9 @@
 namespace DV5150\Shop\Tests\Concerns;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
-use DV5150\Shop\Contracts\OrderContract;
-use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Model;

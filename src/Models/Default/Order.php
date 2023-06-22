@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Default;
 
-use DV5150\Shop\Contracts\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

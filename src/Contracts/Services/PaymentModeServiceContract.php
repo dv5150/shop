@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Services;
 
-use DV5150\Shop\Contracts\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
 
 interface PaymentModeServiceContract
 {

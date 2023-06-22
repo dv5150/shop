@@ -2,8 +2,8 @@
 
 namespace DV5150\Shop\Models\Default;
 
-use DV5150\Shop\Contracts\OrderItemContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;

@@ -5,6 +5,8 @@ namespace DV5150\Shop\Tests;
 use DV5150\Shop\Http\Resources\PaymentModeResource;
 use DV5150\Shop\Http\Resources\ProductListResource;
 use DV5150\Shop\Http\Resources\ShippingModeResource;
+use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Models\Default\BillingAddress;
 use DV5150\Shop\Models\Default\Order;
 use DV5150\Shop\Models\Default\OrderItem;
@@ -40,6 +42,8 @@ class TestCase extends Orchestra
         /** Real models or extends real models */
         Config::set('shop.models.billingAddress', BillingAddress::class);
         Config::set('shop.models.category', Category::class);
+        Config::set('shop.models.coupon', Coupon::class);
+        Config::set('shop.models.discount', Discount::class);
         Config::set('shop.models.order', Order::class);
         Config::set('shop.models.orderItem', OrderItem::class);
         Config::set('shop.models.paymentMode', PaymentMode::class);

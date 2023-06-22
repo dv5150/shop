@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CouponResource\Pages\ListCoupons;
 use App\Filament\Resources\CouponResource\Pages\CreateCoupon;
 use App\Filament\Resources\CouponResource\Pages\EditCoupon;
-use DV5150\Shop\Contracts\Deals\CouponContract;
+use DV5150\Shop\Contracts\Deals\BaseCouponContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
 use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
@@ -22,8 +22,6 @@ use Filament\Tables\Columns\TextColumn;
 
 class CouponResource extends Resource
 {
-    protected static ?string $model = Coupon::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $slug = 'shop/coupons';
@@ -31,6 +29,11 @@ class CouponResource extends Resource
     protected static ?string $navigationGroup = 'Shop';
 
     protected static ?string $navigationLabel = 'Cart Coupon Codes';
+
+    public static function getModel(): string
+    {
+        return config('shop.models.coupon');
+    }
 
     public static function form(Form $form): Form
     {
@@ -58,7 +61,7 @@ class CouponResource extends Resource
             ->columns([
                 TextColumn::make('coupon')
                     ->formatStateUsing(
-                        fn (CouponContract $state) => $state->getName()
+                        fn (BaseCouponContract $state) => $state->getName()
                     ),
                 TextColumn::make('code'),
             ])

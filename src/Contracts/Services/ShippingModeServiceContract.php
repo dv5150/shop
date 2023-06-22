@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Services;
 
-use DV5150\Shop\Contracts\ShippingModeContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 
 interface ShippingModeServiceContract
 {

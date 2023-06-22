@@ -7,7 +7,6 @@ use App\Filament\Resources\DiscountResource\Pages\CreateDiscount;
 use App\Filament\Resources\DiscountResource\Pages\EditDiscount;
 use DV5150\Shop\Contracts\Deals\DiscountContract;
 use DV5150\Shop\Contracts\ProductContract;
-use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 use Filament\Forms\Components\Card;
@@ -25,8 +24,6 @@ use Filament\Tables\Columns\TextColumn;
 
 class DiscountResource extends Resource
 {
-    protected static ?string $model = Discount::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $slug = 'shop/discounts';
@@ -34,6 +31,11 @@ class DiscountResource extends Resource
     protected static ?string $navigationGroup = 'Shop';
 
     protected static ?string $navigationLabel = 'Discounts';
+
+    public static function getModel(): string
+    {
+        return config('shop.models.discount');
+    }
 
     public static function form(Form $form): Form
     {

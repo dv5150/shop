@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Contracts;
+namespace DV5150\Shop\Contracts\Transformers;
 
 interface OrderDataTransformerContract
 {

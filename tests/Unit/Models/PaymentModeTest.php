@@ -2,8 +2,8 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Contracts\PaymentModeContract;
-use DV5150\Shop\Contracts\ShippingModeContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;

@@ -2,8 +2,8 @@
 
 namespace DV5150\Shop\Transformers;
 
-use DV5150\Shop\Contracts\OrderItemDataTransformerContract;
-use DV5150\Shop\Contracts\Services\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 
 class OrderItemDataTransformer implements OrderItemDataTransformerContract
 {

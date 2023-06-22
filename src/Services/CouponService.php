@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Services;
 
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Support\Facades\Session;
@@ -22,7 +23,7 @@ class CouponService implements CouponServiceContract
         return $coupon;
     }
 
-    public function setCoupon(?Coupon $coupon): void
+    public function setCoupon(?BaseCouponContract $coupon): void
     {
         Session::put(
             self::SESSION_KEY,

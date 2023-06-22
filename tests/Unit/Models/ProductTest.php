@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Contracts\ProductContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Tests\Mock\Models\Category;
 use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
