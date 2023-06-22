@@ -1,5 +1,5 @@
 <template>
-    <table style="margin-bottom: 7rem;">
+    <table style="margin-bottom: 3rem;">
         <thead>
             <tr>
                 <th>Product name</th>
@@ -13,7 +13,7 @@
                 <td>
                     <p>{{ product.item.name }}</p>
                     <p v-if="product.item.discount" style="color: mediumseagreen;">
-                        {{ product.item.discount.shortName }}
+                        {{ product.item.discount.name }}
                     </p>
                 </td>
                 <td>
@@ -38,21 +38,26 @@
                 </td>
                 <td>{{ product.subtotal }} {{ cart.currency?.code }}</td>
             </tr>
-            <tr>
+            <tr v-if="!cart.products.length">
+                <td colspan="4">
+                    The cart is empty.
+                </td>
+            </tr>
+            <tr v-if="cart.products.length && cart.hasCartPriceModifiers">
                 <th colspan="3">
                     CART SUBTOTAL
                 </th>
                 <th>{{ cart.subtotal }} {{ cart.currency?.code }}</th>
             </tr>
-            <tr v-if="cart.coupon?.couponItem" style="color: mediumseagreen;">
+            <tr v-if="cart.coupon?.couponItem && cart.products.length" style="color: mediumseagreen;">
                 <td>
-                    {{ cart.coupon.couponItem.shortName }}
+                    {{ cart.coupon.couponItem.name }}
                 </td>
                 <td>{{ cart.coupon.couponDiscountAmount }} {{ cart.currency?.code }}</td>
                 <td>1x</td>
                 <td>{{ cart.coupon.couponDiscountAmount }} {{ cart.currency?.code }}</td>
             </tr>
-            <tr v-if="cart.selectedShippingMode">
+            <tr v-if="cart.selectedShippingMode && cart.products.length">
                 <td>
                     {{ cart.selectedShippingMode.name }}
                 </td>
@@ -60,7 +65,7 @@
                 <td>1x</td>
                 <td>{{ cart.selectedShippingMode.priceGross }} {{ cart.currency?.code }}</td>
             </tr>
-            <tr v-if="cart.selectedPaymentMode">
+            <tr v-if="cart.selectedPaymentMode && cart.products.length">
                 <td>
                     {{ cart.selectedPaymentMode.name }}
                 </td>
@@ -68,7 +73,7 @@
                 <td>1x</td>
                 <td>{{ cart.selectedPaymentMode.priceGross }} {{ cart.currency?.code }}</td>
             </tr>
-            <tr>
+            <tr v-if="cart.products.length">
                 <th colspan="3">
                     CART TOTAL
                 </th>

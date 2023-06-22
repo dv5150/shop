@@ -2,7 +2,7 @@
     <table style="margin-bottom: 7rem;">
         <thead>
             <tr>
-                <th colspan="2">Coupon</th>
+                <th colspan="3">Coupon</th>
             </tr>
         </thead>
         <tbody>
@@ -18,7 +18,7 @@
                 </td>
             </tr>
             <tr v-if="cart.coupon?.couponItem">
-                <td>
+                <td colspan="2">
                     {{ cart.coupon.couponItem.name }}
                 </td>
                 <td>

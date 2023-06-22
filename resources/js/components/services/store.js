@@ -24,6 +24,11 @@ export const useCartStore = defineStore('cart', {
         disableShippingModeFields: (state) => {
             return state.selectedShippingMode?.provider && (state.selectedShippingMode?.provider !== 'default')
         },
+        hasCartPriceModifiers: (state) => {
+            return state.selectedShippingMode
+                || state.selectedPaymentMode
+                || state.coupon?.couponItem
+        }
     },
     actions: {
         init() {

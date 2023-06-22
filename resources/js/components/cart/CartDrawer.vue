@@ -1,12 +1,12 @@
 <template>
-    <div :style="{ display: cart.isOpen ? 'block' : 'none' }">
+    <div :style="[{ display: cart.isOpen ? 'block' : 'none' }, { marginBottom: '4rem'}]">
         <button type="button" class="button button-outline" @click.prevent="cart.$patch({ isOpen: false })">
             [ CLOSE ]
         </button>
         <div>
             <cart-item-list></cart-item-list>
         </div>
-        <a v-if="cart.products.length > 0 && checkoutUrl" :href="checkoutUrl">
+        <a v-if="cart.products.length > 0 && checkoutUrl" :href="checkoutUrl" class="button">
             [ CHECKOUT ]
         </a>
     </div>
