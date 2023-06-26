@@ -7,7 +7,6 @@ use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Models\Deals\Coupon;
-use DV5150\Shop\Models\Deals\Discount;
 use Illuminate\Database\Eloquent\Model;
 
 trait ProvidesSampleProductData
@@ -44,7 +43,7 @@ trait ProvidesSampleProductData
     public function expectProductInCart(
         ProductContract $product,
         int $quantity = 1,
-        Discount $discount = null,
+        BaseDiscountContract $discount = null,
         float $overwriteGrossPrice = null,
     ): array {
         /** @var CartItemCapsuleContract $capsule */

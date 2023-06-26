@@ -332,15 +332,11 @@ class DiscountTest extends TestCase
         );
 
         $this->assertDatabaseHas('discounts', [
-            'discountable_type' => config('shop.models.product'),
-            'discountable_id' => $this->productC->getKey(),
             'discount_type' => ProductValueDiscount::class,
             'discount_id' => 1,
         ]);
 
         $this->assertDatabaseHas('discounts', [
-            'discountable_type' => config('shop.models.product'),
-            'discountable_id' => $this->productD->getKey(),
             'discount_type' => ProductPercentDiscount::class,
             'discount_id' => 1,
         ]);

@@ -20,8 +20,18 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->morphs('discountable');
             $table->morphs('discount');
+        });
+
+        Schema::create('discountables', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('discountable');
+            $table->unsignedBigInteger('discount_id');
+
+            $table->foreign('discount_id')
+                ->references('id')
+                ->on('discounts')
+                ->cascadeOnDelete();
         });
 
         foreach ($this->tables as $tableName) {
@@ -45,6 +55,8 @@ return new class extends Migration
         foreach (array_reverse($this->tables) as $tableName) {
             Schema::dropIfExists($tableName);
         }
+
+        Schema::dropIfExists('discountables');
 
         Schema::dropIfExists('discounts');
     }
