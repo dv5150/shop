@@ -64,64 +64,65 @@ class CouponTest extends TestCase
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => $couponA->getCode(),
-        ]));
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 25200.0,
+                'coupon' => [
+                    'couponItem' => $couponA->toArray(),
+                    'couponDiscountAmount' => -2800.0,
+                ],
+            ]
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 25200.0,
-                    'coupon' => [
-                        'couponItem' => $couponA->toArray(),
-                        'couponDiscountAmount' => -2800.0,
-                    ],
-                ]
-            ]);
-
+        // expect no change compared to previous one when non-existent code is tried
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => 'non-existent-code'
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 25200.0,
+                'coupon' => [
+                    'couponItem' => $couponA->toArray(),
+                    'couponDiscountAmount' => -2800.0,
+                ],
+                'messages' => [
+                    'coupon' => [
+                        '404' => [
+                            'text' => __('Coupon not found.'),
+                            'type' => 'negative',
+                        ],
+                    ]
                 ]
-            ]);
+            ],
+        ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => $couponB->getCode(),
-        ]));
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 21000.0,
+                'coupon' => [
+                    'couponItem' => $couponB->toArray(),
+                    'couponDiscountAmount' => -7000.0,
+                ],
+            ]
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 21000.0,
-                    'coupon' => [
-                        'couponItem' => $couponB->toArray(),
-                        'couponDiscountAmount' => -7000.0,
-                    ],
-                ]
-            ]);
-
-        $this->delete(route('api.shop.cart.coupon.erase'));
-
-        $this->get(route('api.shop.cart.index'))
+        $this->delete(route('api.shop.cart.coupon.erase'))
             ->assertJson([
                 'cart' => [
                     'items' => [
@@ -169,75 +170,75 @@ class CouponTest extends TestCase
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => $couponA->getCode()
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 27300.0,
-                    'coupon' => [
-                        'couponItem' => $couponA->toArray(),
-                        'couponDiscountAmount' => -700.0,
-                    ],
-                ]
-            ]);
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 27300.0,
+                'coupon' => [
+                    'couponItem' => $couponA->toArray(),
+                    'couponDiscountAmount' => -700.0,
+                ],
+            ]
+        ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => 'non-existent-code'
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 27300.0,
+                'coupon' => [
+                    'couponItem' => $couponA->toArray(),
+                    'couponDiscountAmount' => -700.0,
+                ],
+                'messages' => [
+                    'coupon' => [
+                        '404' => [
+                            'text' => __('Coupon not found.'),
+                            'type' => 'negative',
+                        ],
+                    ]
                 ]
-            ]);
+            ]
+        ]);
 
         $this->post(route('api.shop.cart.coupon.store', [
             'code' => $couponB->getCode(),
-        ]));
+        ]))->assertJson([
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 26100.0,
+                'coupon' => [
+                    'couponItem' => $couponB->toArray(),
+                    'couponDiscountAmount' => -1900.0,
+                ],
+            ]
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
+        $this->delete(route('api.shop.cart.coupon.erase'))
             ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 26100.0,
-                    'coupon' => [
-                        'couponItem' => $couponB->toArray(),
-                        'couponDiscountAmount' => -1900.0,
-                    ],
-                ]
-            ]);
-
-        $this->delete(route('api.shop.cart.coupon.erase'));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
-                ]
-            ]);
+            'cart' => [
+                'items' => [
+                    $this->expectProductInCart($this->productA),
+                    $this->expectProductInCart($this->productB),
+                    $this->expectProductInCart($this->productC),
+                ],
+                'total' => 28000.0,
+                'coupon' => null,
+            ]
+        ]);
     }
 
     /** @test */

@@ -16,6 +16,8 @@ export const useCartStore = defineStore('cart', {
             availableShippingModes: [],
             subtotal: 0,
             total: 0,
+
+            messages: null,
         }
     },
     getters: {
@@ -72,6 +74,7 @@ export const useCartStore = defineStore('cart', {
             this.availableShippingModes = response.data.cart.availableShippingModes
             this.selectedShippingMode = response.data.cart.shippingMode
             this.selectedPaymentMode = response.data.cart.paymentMode
+            this.messages = response.data.cart.messages
         }
     }
 })

@@ -25,12 +25,21 @@
                     <a href="#" class="button button-clear" @click="cart.eraseCoupon()">[ REMOVE COUPON ]</a>
                 </td>
             </tr>
+            <tr v-if="cart.messages?.coupon">
+                <td colspan="3">
+                    <ul style="font-size: small; list-style: none;">
+                        <li v-for="message in cart.messages.coupon" :class="message.type+'Message'">
+                            {{ message.text }}
+                        </li>
+                    </ul>
+                </td>
+            </tr>
         </tbody>
     </table>
 </template>
 
 <script setup>
-import { useCartStore } from '../services/store'
+import {useCartStore} from '../services/store'
 
 let cart = useCartStore()
 
@@ -42,3 +51,17 @@ let applyCoupon = () => {
     codeInputField.value = ''
 }
 </script>
+
+<style scoped>
+.positiveMessage {
+    color: mediumpurple;
+}
+
+.neutralMessage {
+    color: black;
+}
+
+.negativeMessage {
+    color: red;
+}
+</style>

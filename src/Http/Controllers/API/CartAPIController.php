@@ -2,11 +2,12 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
-use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Contracts\Services\MessageServiceContract;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,8 @@ use Illuminate\Http\JsonResponse;
 class CartAPIController
 {
     public function __construct(
-        protected CartServiceContract $cart
+        protected CartServiceContract $cart,
+        protected MessageServiceContract $messages,
     ){}
 
     /** GET /api/shop/cart */
@@ -61,10 +63,16 @@ class CartAPIController
     /** POST /api/shop/cart/coupon/{code} */
     public function setCoupon(string $couponCode): JsonResponse
     {
+        $coupon = $this->resolveCoupon($couponCode);
+
+        if (! $coupon) {
+            $this->messages->addNegativeMessage('coupon.404', __('Coupon not found.'));
+
+            return $this->index();
+        }
+
         return $this->getCartResponse(
-            $this->cart->setCoupon(
-                $this->resolveCoupon($couponCode)
-            )
+            $this->cart->setCoupon($coupon)
         );
     }
 
@@ -134,6 +142,7 @@ class CartAPIController
                 'paymentMode' => $selectedPaymentMode
                     ? config('shop.resources.paymentMode')::make($selectedPaymentMode)
                     : null,
+                'messages' => $this->messages->all(),
             ],
         ]);
     }
@@ -150,7 +159,7 @@ class CartAPIController
         return $product;
     }
 
-    private function resolveCoupon(string $couponCode): ?Coupon
+    private function resolveCoupon(string $couponCode): ?BaseCouponContract
     {
         return config('shop.models.coupon')::firstWhere('code', $couponCode);
     }
