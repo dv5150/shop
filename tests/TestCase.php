@@ -32,8 +32,6 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
-        $this->withoutMix();
-
         $this->loadMigrationsFrom('database/migrations');
 
         /** Mock models */

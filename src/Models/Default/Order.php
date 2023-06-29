@@ -33,8 +33,10 @@ class Order extends Model implements OrderContract
 
     public function getThankYouUrl(): string
     {
-        return route('shop.order.thankYou', [
-            'uuid' => $this->uuid
-        ]);
+        return route('home');
+
+//        return route('shop.order.thankYou', [
+//            'uuid' => $this->uuid
+//        ]);
     }
 }

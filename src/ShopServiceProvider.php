@@ -19,42 +19,49 @@ use DV5150\Shop\Services\PaymentModeService;
 use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
-use DV5150\Shop\View\Composers\ProductListComposer;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class ShopServiceProvider extends ServiceProvider
+class ShopServiceProvider extends PackageServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
+    public function configurePackage(Package $package): void
+    {
+        $package->name('shop')
+            ->hasConfigFile('shop')
+            ->hasTranslations()
+            ->hasMigrations([
+                '01_create_billing_addresses_table',
+                '02_create_shipping_addresses_table',
+                '03_create_products_table',
+                '04_create_categories_table',
+                '05_create_category_product_table',
+                '06_create_shipping_modes_table',
+                '07_create_payment_modes_table',
+                '08_create_payment_mode_shipping_mode_table',
+                '09_create_orders_table',
+                '10_create_order_items_table',
+                '11_create_discount_tables',
+                '12_create_coupon_tables',
+            ])
+            ->hasCommand(InstallCommand::class);
+    }
+
     public function register()
     {
+        parent::register();
+
         $this->registerBindings();
 
         $this->registerApiRoutes();
-
-        $this->commands([
-            InstallCommand::class,
-        ]);
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
     public function boot()
     {
-        $this->loadViewsFrom($this->getPath('resources/views'), 'shop');
+        parent::boot();
 
-        $this->loadTranslationsFrom($this->getPath('resources/lang'), 'shop');
-
-        View::composer('shop::partials.productList', ProductListComposer::class);
+        //
     }
 
     protected function registerBindings(): void
@@ -89,10 +96,6 @@ class ShopServiceProvider extends ServiceProvider
             ->prefix('api/shop')
             ->as('api.shop.')
             ->group($this->getPath('routes/shop-api.php'));
-
-        Route::middleware('web')
-            ->as('shop.')
-            ->group($this->getPath('routes/shop.php'));
     }
 
     protected function getPath(?string $target = null): string

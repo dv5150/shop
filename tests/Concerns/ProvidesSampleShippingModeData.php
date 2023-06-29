@@ -65,9 +65,4 @@ trait ProvidesSampleShippingModeData
             paymentModes: $shippingMode->paymentModes,
         );
     }
-
-    public function expectShippingModeOrderItem()
-    {
-
-    }
 }

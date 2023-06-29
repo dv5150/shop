@@ -12,7 +12,6 @@ class CheckoutAPIController
         protected CheckoutServiceContract $checkout
     ){}
 
-    #[Route("/api/shop/checkout", methods: ["POST"])]
     public function store(StoreOrderRequest $request): JsonResponse
     {
         $orderData = $request->validated();

@@ -2,12 +2,10 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
 use DV5150\Shop\Tests\TestCase;
-use Illuminate\Testing\TestResponse;
 
 class CheckoutTest extends TestCase
 {
@@ -53,8 +51,6 @@ class CheckoutTest extends TestCase
 
         $this->assertDatabaseHasProductOrderItem($this->productA, $order, 2);
         $this->assertDatabaseHasProductOrderItem($this->productB, $order, 4);
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -88,8 +84,6 @@ class CheckoutTest extends TestCase
 
         $this->assertDatabaseHasProductOrderItem($this->productA, $order, 5);
         $this->assertDatabaseHasProductOrderItem($this->productB, $order, 3);
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -119,8 +113,6 @@ class CheckoutTest extends TestCase
         ]));
 
         $this->assertDatabaseHasProductOrderItem($this->productA, $order);
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
     }
 
     /** @test */
@@ -128,7 +120,7 @@ class CheckoutTest extends TestCase
     {
         $this->be($this->testUser);
 
-        $response = $this->post(
+        $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
@@ -152,29 +144,5 @@ class CheckoutTest extends TestCase
         $order = config('shop.models.order')::first();
 
         $this->assertDatabaseHasProductOrderItem($this->productB, $order, 2);
-
-        $this->checkThankYouPageAccessWithOrderAvailable($response, $order);
-    }
-
-    /** @test */
-    public function thank_you_page_throws_404_when_no_order_was_found(): void
-    {
-        $this->get(route('shop.order.thankYou', [
-            'uuid' => 'a-b-c-d-e-f-not-found'
-        ]))->assertStatus(404);
-    }
-
-    protected function checkThankYouPageAccessWithOrderAvailable(
-        TestResponse $response,
-        OrderContract $order
-    ): void {
-        $response->assertStatus(201)
-            ->assertJson([
-                'redirectUrl' => $order->getThankYouUrl()
-            ]);
-
-        $this->get($order->getThankYouUrl())
-            ->assertStatus(200)
-            ->assertViewIs('shop::thankYou');
     }
 }
