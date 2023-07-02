@@ -8,6 +8,7 @@ use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\MessageServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
+use DV5150\Shop\Contracts\Services\ProductListComposerServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
@@ -16,9 +17,11 @@ use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
 use DV5150\Shop\Services\MessageService;
 use DV5150\Shop\Services\PaymentModeService;
+use DV5150\Shop\Services\ProductListComposerService;
 use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
+use DV5150\Shop\View\Composers\ProductListComposer;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
@@ -45,6 +48,10 @@ class ShopServiceProvider extends PackageServiceProvider
                 '11_create_discount_tables',
                 '12_create_coupon_tables',
             ])
+            ->hasViewComposer(
+                'shop::partials.productList',
+                ProductListComposer::class,
+            )
             ->hasCommand(InstallCommand::class);
     }
 
@@ -88,6 +95,8 @@ class ShopServiceProvider extends PackageServiceProvider
             app(OrderDataTransformerContract::class),
             app(OrderItemDataTransformerContract::class),
         ));
+
+        App::bind(ProductListComposerServiceContract::class, fn () => new ProductListComposerService());
     }
 
     protected function registerApiRoutes(): void

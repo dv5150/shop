@@ -15,5 +15,5 @@ interface CartItemCapsuleContract extends Arrayable
     public function getPriceGross(): ?float;
     public function getSubtotalGrossPrice(): float;
     public function removeDiscount(): self;
-    public function applyDiscount(): self;
+    public function applyBestDiscount(): self;
 }

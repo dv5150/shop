@@ -58,7 +58,7 @@ class CartCollection extends Collection
         $capsules = $products->map(fn (ProductContract $product) => (new (config('shop.support.cartItemCapsule'))(
             product: $product,
             quantity: $productKeys[$product->getKey()]
-        ))->applyDiscount());
+        ))->applyBestDiscount());
 
         return new static($capsules->all());
     }

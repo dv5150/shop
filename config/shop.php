@@ -17,8 +17,9 @@ return [
     'resources' => [
         'shippingMode' => \DV5150\Shop\Http\Resources\ShippingModeResource::class,
         'paymentMode' => \DV5150\Shop\Http\Resources\PaymentModeResource::class,
-        'productList' => \DV5150\Shop\Http\Resources\ProductListResource::class,
+        'product' => \DV5150\Shop\Http\Resources\ProductResource::class,
         'shippingAddress' => \DV5150\Shop\Http\Resources\ShippingAddressResource::class,
+        'category' => \DV5150\Shop\Http\Resources\CategoryResource::class,
     ],
     'support' => [
         'cartItemCapsule' => \DV5150\Shop\Support\CartItemCapsule::class,

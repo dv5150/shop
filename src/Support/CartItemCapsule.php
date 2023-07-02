@@ -5,6 +5,7 @@ namespace DV5150\Shop\Support;
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
+use Illuminate\Support\Collection;
 
 class CartItemCapsule implements CartItemCapsuleContract
 {
@@ -77,12 +78,13 @@ class CartItemCapsule implements CartItemCapsuleContract
         return $this;
     }
 
-    public function applyDiscount(): self
+    public function applyBestDiscount(Collection $preLoadedDiscounts = null): self
     {
-        $this->getProduct()
+        $discounts = $preLoadedDiscounts ?? $this->getProduct()
             ->discounts()
-            ->get()
-            ->each(fn (BaseDiscountContract $discount) => $this->tryDiscount($discount));
+            ->get();
+
+        $discounts->each(fn (BaseDiscountContract $discount) => $this->tryDiscount($discount));
 
         return $this;
     }

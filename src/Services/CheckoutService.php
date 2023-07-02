@@ -66,7 +66,7 @@ class CheckoutService implements CheckoutServiceContract
                 (new (config('shop.support.cartItemCapsule'))(
                     product: $product,
                     quantity: $quantities[$product->getKey()]
-                ))->applyDiscount()
+                ))->applyBestDiscount()
             ));
 
         if ($coupon = Cart::getCoupon()) {
