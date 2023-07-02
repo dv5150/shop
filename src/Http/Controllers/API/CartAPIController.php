@@ -6,6 +6,7 @@ use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
+use DV5150\Shop\Contracts\Models\ShopUserContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\MessageServiceContract;
 use DV5150\Shop\Http\Resources\ShippingAddressResource;
@@ -144,9 +145,8 @@ class CartAPIController
                 'paymentMode' => $selectedPaymentMode
                     ? config('shop.resources.paymentMode')::make($selectedPaymentMode)
                     : null,
-                'preSavedShippingAddresses' => ShippingAddressResource::collection(
-                    Auth::user()?->shippingAddresses
-                ),
+                'preSavedShippingAddresses' => Auth::user() instanceof ShopUserContract
+                    ? Auth::user()->getShippingAddresses() : [],
                 'messages' => $this->messages->all(),
             ],
         ]);
