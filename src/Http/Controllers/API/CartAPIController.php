@@ -8,10 +8,12 @@ use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\MessageServiceContract;
+use DV5150\Shop\Http\Resources\ShippingAddressResource;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class CartAPIController
 {
@@ -142,6 +144,9 @@ class CartAPIController
                 'paymentMode' => $selectedPaymentMode
                     ? config('shop.resources.paymentMode')::make($selectedPaymentMode)
                     : null,
+                'preSavedShippingAddresses' => ShippingAddressResource::collection(
+                    Auth::user()?->shippingAddresses
+                ),
                 'messages' => $this->messages->all(),
             ],
         ]);
