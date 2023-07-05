@@ -18,6 +18,7 @@ class ProductResource extends JsonResource
         /** @var CartItemCapsuleContract $this */
 
         return [
+            'id' => $this->getProduct()->getKey(),
             'name' => $this->getProduct()->getName(),
             'price_gross' => $this->getPriceGross(),
             'price_gross_original' => $this->getOriginalProductPriceGross(),

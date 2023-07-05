@@ -35,7 +35,7 @@ class OrderItem extends Model implements OrderItemContract
         return $this->order;
     }
 
-    public function getProduct(): ProductContract
+    public function getProduct(): ?ProductContract
     {
         return $this->product;
     }

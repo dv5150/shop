@@ -4,14 +4,13 @@ namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
-use DV5150\Shop\Models\Deals\Coupon;
 use Illuminate\Support\Facades\Session;
 
 class CouponService implements CouponServiceContract
 {
     protected const SESSION_KEY = 'coupon';
 
-    public function getCoupon(): ?Coupon
+    public function getCoupon(): ?BaseCouponContract
     {
         if ($coupon = Session::get(self::SESSION_KEY)) {
             $coupon = !is_null($coupon) ? unserialize($coupon) : null;
