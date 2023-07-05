@@ -10,12 +10,12 @@ class ShopService implements ShopServiceContract
 {
     protected static array $paymentProviders = [];
 
-    public static function addPaymentProvider(string $key, PaymentProviderContract $paymentProvider): void
+    public static function addPaymentProvider(string $key, string $paymentProvider): void
     {
-        Arr::set(self::$paymentProviders, $key, $paymentProvider);
+        Arr::set(self::$paymentProviders, $key, self::checkPaymentProvider($paymentProvider));
     }
 
-    public static function getPaymentProvider(string $key)
+    public static function getPaymentProvider(string $key): string
     {
         return Arr::get(self::$paymentProviders, $key);
     }
@@ -23,5 +23,14 @@ class ShopService implements ShopServiceContract
     public static function getAllPaymentProviders(): array
     {
         return self::$paymentProviders;
+    }
+
+    protected static function checkPaymentProvider(string $paymentProvider): string
+    {
+        if (! in_array(PaymentProviderContract::class, class_implements($paymentProvider))) {
+            throw new \Exception("Invalid payment provider.");
+        }
+
+        return $paymentProvider;
     }
 }
