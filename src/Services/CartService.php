@@ -5,12 +5,12 @@ namespace DV5150\Shop\Services;
 use DV5150\Shop\Concerns\Cart\HandlesCoupons;
 use DV5150\Shop\Concerns\Cart\HandlesPaymentModes;
 use DV5150\Shop\Concerns\Cart\HandlesShippingModes;
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Facades\Session;
 

@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Http\Resources;
 
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource

@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Transformers;
 
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 
 interface OrderItemDataTransformerContract
 {

@@ -3,7 +3,6 @@
 namespace DV5150\Shop\Tests;
 
 use DV5150\Shop\Http\Resources\CategoryResource;
-use DV5150\Shop\Http\Resources\DiscountResource;
 use DV5150\Shop\Http\Resources\PaymentModeResource;
 use DV5150\Shop\Http\Resources\ProductResource;
 use DV5150\Shop\Http\Resources\ShippingAddressResource;
@@ -61,7 +60,6 @@ class TestCase extends Orchestra
         Config::set('shop.resources.product', ProductResource::class);
         Config::set('shop.resources.shippingAddress', ShippingAddressResource::class);
         Config::set('shop.resources.category', CategoryResource::class);
-        Config::set('shop.resources.discount', DiscountResource::class);
 
         /** Currency setup */
         Config::set('shop.currency.code', 'HUF');

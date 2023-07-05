@@ -1,8 +1,9 @@
 <?php
 
-namespace DV5150\Shop\Contracts\Models;
+namespace DV5150\Shop\Contracts\Support;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
+use DV5150\Shop\Contracts\Models\ProductContract;
 use Illuminate\Contracts\Support\Arrayable;
 
 interface CartItemCapsuleContract extends Arrayable

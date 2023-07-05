@@ -3,8 +3,8 @@
 namespace DV5150\Shop\Support;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 use Illuminate\Support\Collection;
 
 class CartItemCapsule implements CartItemCapsuleContract

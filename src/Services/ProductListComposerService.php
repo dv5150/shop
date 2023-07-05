@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Services\ProductListComposerServiceContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 
 class ProductListComposerService implements ProductListComposerServiceContract
 {

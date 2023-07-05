@@ -2,11 +2,11 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Contracts\Models\ProductContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Facades\Cart;

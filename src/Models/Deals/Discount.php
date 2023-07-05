@@ -5,7 +5,7 @@ namespace DV5150\Shop\Models\Deals;
 use DV5150\Shop\Concerns\Deals\DeletesConcreteDiscount;
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
-use DV5150\Shop\Contracts\Models\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
