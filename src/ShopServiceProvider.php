@@ -10,6 +10,7 @@ use DV5150\Shop\Contracts\Services\MessageServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ProductListComposerServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
+use DV5150\Shop\Contracts\Services\ShopServiceContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Services\CartService;
@@ -19,6 +20,7 @@ use DV5150\Shop\Services\MessageService;
 use DV5150\Shop\Services\PaymentModeService;
 use DV5150\Shop\Services\ProductListComposerService;
 use DV5150\Shop\Services\ShippingModeService;
+use DV5150\Shop\Services\ShopService;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
 use DV5150\Shop\View\Composers\ProductListComposer;
@@ -73,6 +75,8 @@ class ShopServiceProvider extends PackageServiceProvider
 
     protected function registerBindings(): void
     {
+        App::bind(ShopServiceContract::class, fn () => new ShopService());
+
         App::bind(OrderDataTransformerContract::class, fn () => new OrderDataTransformer());
 
         App::bind(OrderItemDataTransformerContract::class, fn () => new OrderItemDataTransformer());
