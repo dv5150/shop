@@ -145,7 +145,7 @@ class CartTest extends TestCase
     /** @test */
     public function cart_can_be_recognized_as_digital_cart()
     {
-        $this->productC->update(['is_digital_product' => true]);
+        $this->productC->update(['is_digital_item' => true]);
 
         $this->post(route('api.shop.cart.store', [
             'product' => $this->productA,

@@ -3,19 +3,21 @@
 namespace DV5150\Shop\Tests\Concerns;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
 use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
 
 trait CreatesDiscountsForProducts
 {
     protected function createPercentDiscountForProduct(
-        ProductContract $product, string $name, float $value
+        SellableItemContract $sellableItem,
+        string $name,
+        float $value
     ): BaseDiscountContract
     {
         $discount = tap(
             new (config('shop.models.discount'))(),
-            function (BaseDiscountContract $discount) use ($name, $value, $product) {
+            function (BaseDiscountContract $discount) use ($name, $value) {
                 $percentDiscount = ProductPercentDiscount::create([
                     'name' => $name,
                     'value' => $value,
@@ -26,18 +28,20 @@ trait CreatesDiscountsForProducts
 
         $discount->save();
 
-        $product->discounts()->attach($discount);
+        $sellableItem->discounts()->attach($discount);
 
         return $discount;
     }
 
     protected function createValueDiscountForProduct(
-        ProductContract $product, string $name, float $value
+        SellableItemContract $sellableItem,
+        string $name,
+        float $value
     ): BaseDiscountContract
     {
         $discount = tap(
             new (config('shop.models.discount'))(),
-            function (BaseDiscountContract $discount) use ($name, $value, $product) {
+            function (BaseDiscountContract $discount) use ($name, $value) {
                 $percentDiscount = ProductValueDiscount::create([
                     'name' => $name,
                     'value' => $value,
@@ -48,7 +52,7 @@ trait CreatesDiscountsForProducts
 
         $discount->save();
 
-        $product->discounts()->attach($discount);
+        $sellableItem->discounts()->attach($discount);
 
         return $discount;
     }

@@ -25,12 +25,12 @@ class CheckoutTest extends TestCase
     /** @test */
     public function an_order_with_multiple_items_can_be_stored_as_guest()
     {
-        $response = $this->post(
+        $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 2),
-                    $this->makeProductCartDataItem($this->productB, 4),
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingModeProvider,
@@ -49,8 +49,8 @@ class CheckoutTest extends TestCase
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 2);
-        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 4);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 2);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 4);
     }
 
     /** @test */
@@ -58,12 +58,12 @@ class CheckoutTest extends TestCase
     {
         $this->be($this->testUser);
 
-        $response = $this->post(
+        $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 5),
-                    $this->makeProductCartDataItem($this->productB, 3),
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 5),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 3),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingModeProvider,
@@ -82,18 +82,18 @@ class CheckoutTest extends TestCase
             'user_id' => $this->testUser->getKey(),
         ]));
 
-        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 5);
-        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 3);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 5);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 3);
     }
 
     /** @test */
     public function an_order_with_a_single_item_can_be_stored_as_guest()
     {
-        $response = $this->post(
+        $this->post(
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA),
+                    $this->makeProductCartDataItem(sellableItem: $this->productA),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingModeProvider,
@@ -112,7 +112,7 @@ class CheckoutTest extends TestCase
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHasProductOrderItem($this->productA, $order);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order);
     }
 
     /** @test */
@@ -124,7 +124,7 @@ class CheckoutTest extends TestCase
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productB, 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 2),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingModeProvider,
@@ -143,6 +143,6 @@ class CheckoutTest extends TestCase
 
         $order = config('shop.models.order')::first();
 
-        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 2);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 2);
     }
 }

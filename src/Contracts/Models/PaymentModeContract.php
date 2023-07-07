@@ -8,7 +8,6 @@ interface PaymentModeContract
 {
     public function shippingModes(): BelongsToMany;
     public function getName(): string;
-    public function getShortName(): string;
     public function getProvider(): string;
     public function getPriceGross(): float;
     public function toOrderItem(): OrderItemContract;

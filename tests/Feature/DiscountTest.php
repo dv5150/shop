@@ -52,17 +52,17 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             discount: $discountA,
                             overwriteGrossPrice: 2000.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             discount: $discountB,
                             overwriteGrossPrice: 6525.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productE,
+                            sellableItem: $this->productE,
                             overwriteGrossPrice: 12300.0,
                         ),
                     ],
@@ -78,11 +78,15 @@ class DiscountTest extends TestCase
         Cart::addItem($this->productE);
 
         $discountA = $this->createValueDiscountForProduct(
-            $this->productC, '1000 OFF discount', 1000.0
+            sellableItem: $this->productC,
+            name: '1000 OFF discount',
+            value: 1000.0
         );
 
         $discountB = $this->createValueDiscountForProduct(
-            $this->productD, '4400 OFF discount', 4400.0
+            sellableItem: $this->productD,
+            name: '4400 OFF discount',
+            value: 4400.0
         );
 
         $this->get(route('api.shop.cart.index'))
@@ -90,17 +94,17 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             discount: $discountA,
                             overwriteGrossPrice: 4000.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             discount: $discountB,
                             overwriteGrossPrice: 3100.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productE,
+                            sellableItem: $this->productE,
                             overwriteGrossPrice: 12300.0,
                         ),
                     ],
@@ -116,39 +120,39 @@ class DiscountTest extends TestCase
         Cart::addItem($this->productE);
 
         $this->createValueDiscountForProduct(
-            $this->productC,
-            '1000 OFF discount',
-            1000.0
+            sellableItem: $this->productC,
+            name: '1000 OFF discount',
+            value: 1000.0
         );
 
         $discountAB = $this->createValueDiscountForProduct(
-            $this->productC,
-            '3000 OFF discount',
-            3000.0
+            sellableItem: $this->productC,
+            name: '3000 OFF discount',
+            value: 3000.0
         );
 
         $this->createPercentDiscountForProduct(
-            $this->productD,
-            '20% OFF discount',
-            20.0
+            sellableItem: $this->productD,
+            name: '20% OFF discount',
+            value: 20.0
         );
 
         $discountBB = $this->createPercentDiscountForProduct(
-            $this->productD,
-            '70% OFF discount',
-            70.0
+            sellableItem: $this->productD,
+            name: '70% OFF discount',
+            value: 70.0
         );
 
         $this->createPercentDiscountForProduct(
-            $this->productE,
-            '3% OFF discount',
-            3.0
+            sellableItem: $this->productE,
+            name: '3% OFF discount',
+            value: 3.0
         );
 
         $discountCB = $this->createValueDiscountForProduct(
-            $this->productE,
-            '1000 OFF discount',
-            1000.0
+            sellableItem: $this->productE,
+            name: '1000 OFF discount',
+            value: 1000.0
         );
 
         $this->get(route('api.shop.cart.index'))
@@ -156,17 +160,17 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             discount: $discountAB,
                             overwriteGrossPrice: 2000.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             discount: $discountBB,
                             overwriteGrossPrice: 2250.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productE,
+                            sellableItem: $this->productE,
                             discount: $discountCB,
                             overwriteGrossPrice: 11300.0,
                         ),
@@ -182,19 +186,27 @@ class DiscountTest extends TestCase
         Cart::addItem($this->productD);
 
         $discountAA = $this->createPercentDiscountForProduct(
-            $this->productC, '55% OFF discount', 55.0
+            sellableItem: $this->productC,
+            name: '55% OFF discount',
+            value: 55.0
         );
 
         $discountAB = $this->createPercentDiscountForProduct(
-            $this->productC, '88% OFF discount', 88.0
+            sellableItem: $this->productC,
+            name: '88% OFF discount',
+            value: 88.0
         );
 
         $discountBA = $this->createValueDiscountForProduct(
-            $this->productD, '510 OFF discount', 510.0
+            sellableItem: $this->productD,
+            name: '510 OFF discount',
+            value: 510.0
         );
 
         $discountBB = $this->createValueDiscountForProduct(
-            $this->productD, '1510 OFF discount', 1510.0
+            sellableItem: $this->productD,
+            name: '1510 OFF discount',
+            value: 1510.0
         );
 
         $this->get(route('api.shop.cart.index'))
@@ -202,12 +214,12 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             discount: $discountAB,
                             overwriteGrossPrice: 600.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             discount: $discountBB,
                             overwriteGrossPrice: 5990.0,
                         ),
@@ -223,12 +235,12 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             discount: $discountAA,
                             overwriteGrossPrice: 2250.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             discount: $discountBA,
                             overwriteGrossPrice: 6990.0,
                         ),
@@ -244,11 +256,11 @@ class DiscountTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             overwriteGrossPrice: $this->productC->getPriceGross(),
                         ),
                         $this->expectProductInCart(
-                            product: $this->productD,
+                            sellableItem: $this->productD,
                             overwriteGrossPrice: $this->productD->getPriceGross(),
                         ),
                     ],
@@ -260,11 +272,15 @@ class DiscountTest extends TestCase
     public function discounted_order_items_are_saved_properly_as_guest()
     {
         $discountA = $this->createValueDiscountForProduct(
-            $this->productC, '1700 OFF discount', 1700.0
+            sellableItem: $this->productC,
+            name: '1700 OFF discount',
+            value: 1700.0
         );
 
         $discountB = $this->createPercentDiscountForProduct(
-            $this->productD, '11% OFF discount', 11.0
+            sellableItem: $this->productD,
+            name: '11% OFF discount',
+            value: 11.0
         );
 
         $this->post(
@@ -293,7 +309,7 @@ class DiscountTest extends TestCase
         ]));
 
         $this->assertDatabaseHasProductOrderItem(
-            product: $this->productC,
+            sellableItem: $this->productC,
             order: $order,
             quantity: 2,
             info: $discountA->getName(),
@@ -301,7 +317,7 @@ class DiscountTest extends TestCase
         );
 
         $this->assertDatabaseHasProductOrderItem(
-            product: $this->productD,
+            sellableItem: $this->productD,
             order: $order,
             quantity: 2,
             info: $discountB->getName(),
@@ -309,7 +325,7 @@ class DiscountTest extends TestCase
         );
 
         $this->assertDatabaseHasProductOrderItem(
-            product: $this->productE,
+            sellableItem: $this->productE,
             order: $order,
             quantity: 2,
             overwriteGrossPrice: 12300.0,
@@ -320,15 +336,15 @@ class DiscountTest extends TestCase
     public function discounts_get_deleted_when_base_product_discounts_are_deleted()
     {
         $baseDiscountA = $this->createValueDiscountForProduct(
-            $this->productC,
-            '1700 OFF discount',
-            1700.0
+            sellableItem: $this->productC,
+            name: '1700 OFF discount',
+            value: 1700.0
         );
 
         $baseDiscountB = $this->createPercentDiscountForProduct(
-            $this->productD,
-            '11% OFF discount',
-            11.0
+            sellableItem: $this->productD,
+            name: '11% OFF discount',
+            value: 11.0
         );
 
         $this->assertDatabaseHas('discounts', [

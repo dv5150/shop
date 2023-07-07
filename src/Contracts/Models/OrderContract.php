@@ -12,4 +12,5 @@ interface OrderContract
     public function shippingMode(): BelongsTo;
     public function paymentMode(): BelongsTo;
     public function getThankYouUrl(): string;
+    public function getTotalGrossPrice(): float;
 }

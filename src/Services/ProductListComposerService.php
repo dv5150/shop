@@ -2,9 +2,9 @@
 
 namespace DV5150\Shop\Services;
 
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Services\ProductListComposerServiceContract;
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 
 class ProductListComposerService implements ProductListComposerServiceContract
 {
@@ -16,14 +16,14 @@ class ProductListComposerService implements ProductListComposerServiceContract
                     'categories', 'discounts.discount'
                 ])
                 ->get()
-                ->map(function (ProductContract $product) {
-                    /** @var CartItemCapsuleContract $cartItemCapsule */
-                    $cartItemCapsule = (new (config('shop.support.cartItemCapsule'))(
-                        product: $product,
+                ->map(function (SellableItemContract $sellableItem) {
+                    /** @var ShopItemCapsuleContract $shopItemCapsule */
+                    $shopItemCapsule = (new (config('shop.support.shopItemCapsule'))(
+                        sellableItem: $sellableItem,
                         quantity: 1
                     ));
 
-                    return $cartItemCapsule->applyBestDiscount($product->discounts);
+                    return $shopItemCapsule->applyBestDiscount($sellableItem->discounts);
                 })
             )->toJson()
         ];

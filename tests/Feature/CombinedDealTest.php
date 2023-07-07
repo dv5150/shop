@@ -18,15 +18,21 @@ class CombinedDealTest extends TestCase
         Cart::addItem($this->productC, 3);
 
         $couponA = $this->createCartPercentCoupon(
-            '10% OFF discount', 10.0, 'CART10PERCENTOFF'
+            name: '10% OFF discount',
+            value: 10.0,
+            code: 'CART10PERCENTOFF'
         );
 
         $discountA = $this->createPercentDiscountForProduct(
-            $this->productA, '20% OFF discount', 20.0
+            sellableItem: $this->productA,
+            name: '20% OFF discount',
+            value: 20.0
         );
 
         $discountB = $this->createValueDiscountForProduct(
-            $this->productB, '440 OFF discount', 440.0
+            sellableItem: $this->productB,
+            name: '440 OFF discount',
+            value: 440.0
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
@@ -38,19 +44,19 @@ class CombinedDealTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productA,
+                            sellableItem: $this->productA,
                             quantity: 2,
                             discount: $discountA,
                             overwriteGrossPrice: 400.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productB,
+                            sellableItem: $this->productB,
                             quantity: 5,
                             discount: $discountB,
                             overwriteGrossPrice: 1060.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             quantity: 3,
                             overwriteGrossPrice: 1800.0
                         ),
@@ -73,15 +79,21 @@ class CombinedDealTest extends TestCase
         Cart::addItem($this->productC, 3);
 
         $couponA = $this->createCartValueCoupon(
-            '4100 OFF discount', 4100.0, 'CART4100OFF'
+            name: '4100 OFF discount',
+            value: 4100.0,
+            code: 'CART4100OFF'
         );
 
         $discountA = $this->createPercentDiscountForProduct(
-            $this->productA, '20% OFF discount', 20.0
+            sellableItem: $this->productA,
+            name: '20% OFF discount',
+            value: 20.0
         );
 
         $discountB = $this->createValueDiscountForProduct(
-            $this->productB, '440 OFF discount', 440.0
+            sellableItem: $this->productB,
+            name: '440 OFF discount',
+            value: 440.0
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
@@ -93,19 +105,19 @@ class CombinedDealTest extends TestCase
                 'cart' => [
                     'items' => [
                         $this->expectProductInCart(
-                            product: $this->productA,
+                            sellableItem: $this->productA,
                             quantity: 2,
                             discount: $discountA,
                             overwriteGrossPrice: 400.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productB,
+                            sellableItem: $this->productB,
                             quantity: 5,
                             discount: $discountB,
                             overwriteGrossPrice: 1060.0,
                         ),
                         $this->expectProductInCart(
-                            product: $this->productC,
+                            sellableItem: $this->productC,
                             quantity: 3,
                             overwriteGrossPrice: 1800.0
                         ),

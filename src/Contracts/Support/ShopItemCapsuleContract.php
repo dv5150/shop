@@ -3,18 +3,21 @@
 namespace DV5150\Shop\Contracts\Support;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use Illuminate\Contracts\Support\Arrayable;
 
-interface CartItemCapsuleContract extends Arrayable
+interface ShopItemCapsuleContract extends Arrayable
 {
-    public function getProduct(): ProductContract;
+    public function getSellableItem(): SellableItemContract;
+
     public function getQuantity(): int;
     public function setQuantity(int $quantity): self;
-    public function getOriginalProductPriceGross(): float;
-    public function getDiscount(): ?BaseDiscountContract;
+
+    public function getOriginalPriceGross(): float;
     public function getPriceGross(): ?float;
     public function getSubtotalGrossPrice(): float;
-    public function removeDiscount(): self;
+
+    public function getDiscount(): ?BaseDiscountContract;
     public function applyBestDiscount(): self;
+    public function removeDiscount(): self;
 }

@@ -3,22 +3,22 @@
 namespace DV5150\Shop\Support;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Support\Collection;
 
-class CartItemCapsule implements CartItemCapsuleContract
+class ShopItemCapsule implements ShopItemCapsuleContract
 {
     public function __construct(
-        protected ProductContract $product,
+        protected SellableItemContract $sellableItem,
         protected int $quantity,
         protected ?BaseDiscountContract $discount = null,
         protected ?float $discountedPriceGross = null
     ){}
 
-    public function getProduct(): ProductContract
+    public function getSellableItem(): SellableItemContract
     {
-        return $this->product;
+        return $this->sellableItem;
     }
 
     public function getQuantity(): int
@@ -33,21 +33,21 @@ class CartItemCapsule implements CartItemCapsuleContract
         return $this;
     }
 
-    public function getOriginalProductPriceGross(): float
+    public function getOriginalPriceGross(): float
     {
-        return $this->getProduct()->getPriceGross();
+        return $this->getSellableItem()->getPriceGross();
     }
 
     public function toArray()
     {
         return [
             'item' => [
-                'id' => $this->getProduct()->getKey(),
-                'name' => $this->getProduct()->getName(),
+                'id' => $this->getSellableItem()->getKey(),
+                'name' => $this->getSellableItem()->getName(),
                 'price_gross' => $this->getPriceGross(),
-                'price_gross_original' => $this->getOriginalProductPriceGross(),
+                'price_gross_original' => $this->getOriginalPriceGross(),
                 'discount' => $this->getDiscount()?->toArray(),
-                'is_digital' => $this->getProduct()->isDigitalProduct(),
+                'is_digital' => $this->getSellableItem()->isDigitalItem(),
             ],
             'quantity' => $this->getQuantity(),
             'subtotal' => $this->getSubtotalGrossPrice(),
@@ -62,7 +62,7 @@ class CartItemCapsule implements CartItemCapsuleContract
     public function getPriceGross(): ?float
     {
         return $this->getDiscountedPriceGross()
-            ?? $this->getOriginalProductPriceGross();
+            ?? $this->getOriginalPriceGross();
     }
 
     public function getSubtotalGrossPrice(): float
@@ -80,7 +80,7 @@ class CartItemCapsule implements CartItemCapsuleContract
 
     public function applyBestDiscount(Collection $preLoadedDiscounts = null): self
     {
-        $discounts = $preLoadedDiscounts ?? $this->getProduct()
+        $discounts = $preLoadedDiscounts ?? $this->getSellableItem()
             ->discounts()
             ->get();
 

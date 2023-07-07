@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Http\Resources;
 
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
@@ -15,15 +15,15 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        /** @var CartItemCapsuleContract $this */
+        /** @var ShopItemCapsuleContract $this */
 
         return [
-            'id' => $this->getProduct()->getKey(),
-            'name' => $this->getProduct()->getName(),
+            'id' => $this->getSellableItem()->getKey(),
+            'name' => $this->getSellableItem()->getName(),
             'price_gross' => $this->getPriceGross(),
-            'price_gross_original' => $this->getOriginalProductPriceGross(),
+            'price_gross_original' => $this->getOriginalPriceGross(),
             'categories' => config('shop.resources.category')::collection(
-                $this->getProduct()->categories
+                $this->getSellableItem()->categories
             ),
             'discount' => $this->getDiscount(),
         ];

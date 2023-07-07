@@ -4,10 +4,11 @@ namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class OrderItem extends Model implements OrderItemContract
 {
@@ -25,9 +26,9 @@ class OrderItem extends Model implements OrderItemContract
         return $this->belongsTo(config('shop.models.order'));
     }
 
-    public function product(): BelongsTo
+    public function sellable(): MorphTo
     {
-        return $this->belongsTo(config('shop.models.product'));
+        return $this->morphTo();
     }
 
     public function getOrder(): OrderContract
@@ -35,9 +36,9 @@ class OrderItem extends Model implements OrderItemContract
         return $this->order;
     }
 
-    public function getProduct(): ?ProductContract
+    public function getSellable(): ?SellableItemContract
     {
-        return $this->product;
+        return $this->sellable;
     }
 
     public function getPriceGross(): float
@@ -48,5 +49,10 @@ class OrderItem extends Model implements OrderItemContract
     public function getQuantity(): int
     {
         return $this->quantity;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
     }
 }

@@ -4,7 +4,7 @@ namespace DV5150\Shop\Models\Deals\Discounts;
 
 use DV5150\Shop\Concerns\Deals\HasBaseDiscount;
 use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Models\Deals\Discount;
 
 class ProductValueDiscount extends Discount implements DiscountContract
@@ -17,10 +17,10 @@ class ProductValueDiscount extends Discount implements DiscountContract
         'value' => 'float'
     ];
 
-    public function getDiscountedPriceGross(CartItemCapsuleContract $capsule): float
+    public function getDiscountedPriceGross(ShopItemCapsuleContract $capsule): float
     {
         return max([
-            $capsule->getOriginalProductPriceGross() - $this->getValue(), 0.0
+            $capsule->getOriginalPriceGross() - $this->getValue(), 0.0
         ]);
     }
 

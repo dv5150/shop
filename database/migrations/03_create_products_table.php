@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->float('price_gross')
                 ->default(0.0);
-            $table->boolean('is_digital_product')
+            $table->boolean('is_digital_item')
                 ->default(0);
 
             $table->timestamps();

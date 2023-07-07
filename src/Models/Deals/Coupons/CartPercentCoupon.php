@@ -8,6 +8,7 @@ use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class CartPercentCoupon extends Coupon implements CouponContract
 {
@@ -30,12 +31,18 @@ class CartPercentCoupon extends Coupon implements CouponContract
 
     public function toOrderItem(Collection $orderItems): OrderItemContract
     {
-        return new (config('shop.models.orderItem'))([
+        /** @var OrderItemContract $orderItem */
+        $orderItem = new (config('shop.models.orderItem'))([
             'name' => $this->getName(),
             'quantity' => 1,
             'price_gross' => $this->calculateDiscountValue($orderItems),
-            'info' => "[COUPON] [Code: {$this->getCode()}]",
+            'type' => Str::kebab(class_basename($this)),
+            'info' => "Code: {$this->getCode()}",
         ]);
+
+        $orderItem->sellable()->associate($this->getBaseCoupon());
+
+        return $orderItem;
     }
 
     protected function calculateDiscountValue(Collection $orderItems): float

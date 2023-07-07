@@ -22,7 +22,7 @@ return [
         'category' => \DV5150\Shop\Http\Resources\CategoryResource::class,
     ],
     'support' => [
-        'cartItemCapsule' => \DV5150\Shop\Support\CartItemCapsule::class,
+        'cartItemCapsule' => \DV5150\Shop\Support\ShopItemCapsule::class,
     ],
     'currency' => [
         'code' => 'HUF',

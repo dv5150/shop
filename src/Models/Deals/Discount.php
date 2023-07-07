@@ -5,7 +5,7 @@ namespace DV5150\Shop\Models\Deals;
 use DV5150\Shop\Concerns\Deals\DeletesConcreteDiscount;
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -32,7 +32,7 @@ class Discount extends BaseDeal implements BaseDiscountContract
         return $this->morphedByMany(config('shop.models.product'), 'discountable');
     }
 
-    public function getDiscountedPriceGross(CartItemCapsuleContract $capsule): float
+    public function getDiscountedPriceGross(ShopItemCapsuleContract $capsule): float
     {
         return $this->getDiscount()
             ->getDiscountedPriceGross($capsule);

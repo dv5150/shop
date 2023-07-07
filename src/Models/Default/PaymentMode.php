@@ -7,6 +7,7 @@ use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class PaymentMode extends Model implements PaymentModeContract
 {
@@ -28,11 +29,6 @@ class PaymentMode extends Model implements PaymentModeContract
         return $this->name;
     }
 
-    public function getShortName(): string
-    {
-        return "[PAYMENT]";
-    }
-
     public function getProvider(): string
     {
         return $this->provider;
@@ -45,11 +41,16 @@ class PaymentMode extends Model implements PaymentModeContract
 
     public function toOrderItem(): OrderItemContract
     {
-        return new (config('shop.models.orderItem'))([
+        /** @var OrderItemContract $orderItem */
+        $orderItem = new (config('shop.models.orderItem'))([
             'name' => $this->getName(),
             'quantity' => 1,
             'price_gross' => $this->getPriceGross(),
-            'info' => $this->getShortName(),
+            'type' => Str::kebab(class_basename($this)),
         ]);
+
+        $orderItem->sellable()->associate($this);
+
+        return $orderItem;
     }
 }

@@ -38,19 +38,13 @@ class PaymentModeTest extends TestCase
     }
 
     /** @test */
-    public function payment_mode_has_a_fixed_prefix()
-    {
-        $this->assertSame('[PAYMENT]', $this->paymentMode->getShortName());
-    }
-
-    /** @test */
     public function payment_mode_can_be_converted_to_order_item()
     {
         $expected = new (config('shop.models.orderItem'))([
             'name' => $this->paymentMode->getName(),
             'quantity' => 1,
             'price_gross' => $this->paymentMode->getPriceGross(),
-            'info' => $this->paymentMode->getShortName(),
+            'info' => null,
         ]);
 
         $actual = $this->paymentMode->toOrderItem();

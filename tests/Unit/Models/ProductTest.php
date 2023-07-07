@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Tests\Mock\Models\Category;
 use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
@@ -48,11 +48,11 @@ class ProductTest extends TestCase
         $this->assertInstanceOf(Collection::class, $this->categoryB->products);
 
         $this->categoryA->products->each(function ($product) {
-            $this->assertInstanceOf(ProductContract::class, $product);
+            $this->assertInstanceOf(SellableItemContract::class, $product);
         });
 
         $this->categoryB->products->each(function ($product) {
-            $this->assertInstanceOf(ProductContract::class, $product);
+            $this->assertInstanceOf(SellableItemContract::class, $product);
         });
     }
 }

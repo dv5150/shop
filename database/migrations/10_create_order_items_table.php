@@ -17,14 +17,13 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('product_id')
-                ->nullable();
-
             $table->string('name');
             $table->integer('quantity')
                 ->default(1);
             $table->float('price_gross')
                 ->default(0.0);
+            $table->string('type');
+            $table->nullableMorphs('sellable');
             $table->text('info')
                 ->nullable();
 
@@ -34,11 +33,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('orders')
                 ->cascadeOnDelete();
-
-            $table->foreign('product_id')
-                ->references('id')
-                ->on('products')
-                ->nullOnDelete();
         });
     }
 

@@ -3,6 +3,7 @@
 namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\OrderItemContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,6 +30,13 @@ class Order extends Model implements OrderContract
     public function paymentMode(): BelongsTo
     {
         return $this->belongsTo(config('shop.models.paymentMode'));
+    }
+
+    public function getTotalGrossPrice(): float
+    {
+        return $this->items->map(function (OrderItemContract $orderItem) {
+            return $orderItem->getQuantity() * $orderItem->getPriceGross();
+        })->sum();
     }
 
     public function getThankYouUrl(): string

@@ -38,24 +38,24 @@ class CouponTest extends TestCase
         Cart::addItem($this->productC);
 
         $couponA = $this->createCartPercentCoupon(
-            '10% OFF discount',
-            10.0,
-            'CART10PERCENTOFF'
+            name: '10% OFF discount',
+            value: 10.0,
+            code: 'CART10PERCENTOFF'
         );
 
         $couponB = $this->createCartPercentCoupon(
-            '25% OFF discount',
-            25.0,
-            'CART25PERCENTOFF'
+            name: '25% OFF discount',
+            value: 25.0,
+            code: 'CART25PERCENTOFF'
         );
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
                     'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
+                        $this->expectProductInCart(sellableItem: $this->productA),
+                        $this->expectProductInCart(sellableItem: $this->productB),
+                        $this->expectProductInCart(sellableItem: $this->productC),
                     ],
                     'total' => 28000.0,
                     'coupon' => null,
@@ -67,9 +67,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 25200.0,
                 'coupon' => [
@@ -85,9 +85,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 25200.0,
                 'coupon' => [
@@ -110,9 +110,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 21000.0,
                 'coupon' => [
@@ -126,9 +126,9 @@ class CouponTest extends TestCase
             ->assertJson([
                 'cart' => [
                     'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
+                        $this->expectProductInCart(sellableItem: $this->productA),
+                        $this->expectProductInCart(sellableItem: $this->productB),
+                        $this->expectProductInCart(sellableItem: $this->productC),
                     ],
                     'total' => 28000.0,
                     'coupon' => null,
@@ -144,24 +144,24 @@ class CouponTest extends TestCase
         Cart::addItem($this->productC);
 
         $couponA = $this->createCartValueCoupon(
-            '700 OFF discount',
-            700.0,
-            'CART700OFF'
+            name: '700 OFF discount',
+            value: 700.0,
+            code: 'CART700OFF'
         );
 
         $couponB = $this->createCartValueCoupon(
-            '1900 OFF discount',
-            1900.0,
-            'CART1900FF'
+            name: '1900 OFF discount',
+            value: 1900.0,
+            code: 'CART1900FF'
         );
 
         $this->get(route('api.shop.cart.index'))
             ->assertJson([
                 'cart' => [
                     'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                        $this->expectProductInCart($this->productC),
+                        $this->expectProductInCart(sellableItem: $this->productA),
+                        $this->expectProductInCart(sellableItem: $this->productB),
+                        $this->expectProductInCart(sellableItem: $this->productC),
                     ],
                     'total' => 28000.0,
                     'coupon' => null,
@@ -173,9 +173,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 27300.0,
                 'coupon' => [
@@ -190,9 +190,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 27300.0,
                 'coupon' => [
@@ -215,9 +215,9 @@ class CouponTest extends TestCase
         ]))->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 26100.0,
                 'coupon' => [
@@ -231,9 +231,9 @@ class CouponTest extends TestCase
             ->assertJson([
             'cart' => [
                 'items' => [
-                    $this->expectProductInCart($this->productA),
-                    $this->expectProductInCart($this->productB),
-                    $this->expectProductInCart($this->productC),
+                    $this->expectProductInCart(sellableItem: $this->productA),
+                    $this->expectProductInCart(sellableItem: $this->productB),
+                    $this->expectProductInCart(sellableItem: $this->productC),
                 ],
                 'total' => 28000.0,
                 'coupon' => null,
@@ -245,9 +245,9 @@ class CouponTest extends TestCase
     public function cart_value_coupons_are_saved_properly_as_order_items_as_guest()
     {
         $coupon = $this->createCartValueCoupon(
-            '1100 OFF discount',
-            1100.0,
-            'CART1100OFF'
+            name: '1100 OFF discount',
+            value: 1100.0,
+            code: 'CART1100OFF'
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
@@ -258,8 +258,8 @@ class CouponTest extends TestCase
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 7),
-                    $this->makeProductCartDataItem($this->productB, 7),
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 7),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 7),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingMode->getProvider(),
@@ -282,11 +282,14 @@ class CouponTest extends TestCase
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 7);
-        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 7);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 7);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 7);
 
         $this->assertDatabaseHasCouponOrderItem(
-            $coupon, $order, -1100.0, "[COUPON] [Code: {$coupon->getCode()}]"
+            coupon: $coupon,
+            order: $order,
+            priceGross: -1100.0,
+            info: "Code: {$coupon->getCode()}"
         );
     }
 
@@ -294,9 +297,9 @@ class CouponTest extends TestCase
     public function cart_percent_coupons_are_saved_properly_as_order_items_as_guest()
     {
         $coupon = $this->createCartPercentCoupon(
-            '25% OFF discount',
-            25.0,
-            'CART25OFF'
+            name: '25% OFF discount',
+            value: 25.0,
+            code: 'CART25OFF'
         );
 
         $this->post(route('api.shop.cart.coupon.store', [
@@ -307,8 +310,8 @@ class CouponTest extends TestCase
             route('api.shop.checkout.store'),
             array_merge($this->testOrderData, [
                 'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 8),
-                    $this->makeProductCartDataItem($this->productB, 8),
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 8),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 8),
                 ],
                 'shippingMode' => [
                     'provider' => $this->shippingMode->getProvider(),
@@ -331,8 +334,8 @@ class CouponTest extends TestCase
             'user_id' => null,
         ]));
 
-        $this->assertDatabaseHasProductOrderItem($this->productA, $order, 8);
-        $this->assertDatabaseHasProductOrderItem($this->productB, $order, 8);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 8);
+        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 8);
 
         $itemsTotal = array_sum([
             $this->productA->getPriceGross() * 8,
@@ -340,7 +343,10 @@ class CouponTest extends TestCase
         ]);
 
         $this->assertDatabaseHasCouponOrderItem(
-            $coupon, $order, 0 - ($itemsTotal * 0.25), "[COUPON] [Code: {$coupon->getCode()}]"
+            coupon: $coupon,
+            order: $order,
+            priceGross: 0 - ($itemsTotal * 0.25),
+            info: "Code: {$coupon->getCode()}"
         );
     }
 
@@ -348,15 +354,15 @@ class CouponTest extends TestCase
     public function coupons_get_deleted_when_base_coupons_are_deleted()
     {
         $baseCouponA = $this->createCartValueCoupon(
-            '100 OFF discount',
-            100.0,
-            'CART100'
+            name: '100 OFF discount',
+            value: 100.0,
+            code: 'CART100'
         );
 
         $baseCouponB = $this->createCartPercentCoupon(
-            '40% OFF discount',
-            40.0,
-            'CART40'
+            name: '40% OFF discount',
+            value: 40.0,
+            code: 'CART40'
         );
 
         $this->assertDatabaseHas('coupons', [

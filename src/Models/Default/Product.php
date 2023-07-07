@@ -3,7 +3,7 @@
 namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Concerns\Models\Product\DetachesAllDiscounts;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Product extends Model implements ProductContract
+class Product extends Model implements SellableItemContract
 {
     use HasFactory, HasSlug, DetachesAllDiscounts;
 
     protected $guarded = [];
 
     public $casts = [
-        'is_digital_product' => 'boolean',
+        'is_digital_item' => 'boolean',
     ];
 
     public function categories(): BelongsToMany
@@ -43,13 +43,18 @@ class Product extends Model implements ProductContract
         return $this->name;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->name;
+    }
+
     public function getPriceGross(): float
     {
         return $this->price_gross;
     }
 
-    public function isDigitalProduct(): bool
+    public function isDigitalItem(): bool
     {
-        return $this->is_digital_product;
+        return $this->is_digital_item;
     }
 }

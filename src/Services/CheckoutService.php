@@ -4,9 +4,9 @@ namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
-use DV5150\Shop\Contracts\Support\CartItemCapsuleContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Facades\Cart;
@@ -62,9 +62,9 @@ class CheckoutService implements CheckoutServiceContract
 
         $orderItems = config('shop.models.product')::with('discounts.discount')
             ->find($IDs)
-            ->map(fn (ProductContract $product) => $this->makeOrderItem(
-                (new (config('shop.support.cartItemCapsule'))(
-                    product: $product,
+            ->map(fn (SellableItemContract $product) => $this->makeOrderItem(
+                (new (config('shop.support.shopItemCapsule'))(
+                    sellableItem: $product,
                     quantity: $quantities[$product->getKey()]
                 ))->applyBestDiscount()
             ));
@@ -96,13 +96,14 @@ class CheckoutService implements CheckoutServiceContract
         return $uuid;
     }
 
-    protected function makeOrderItem(CartItemCapsuleContract $capsule): OrderItemContract
+    protected function makeOrderItem(ShopItemCapsuleContract $capsule): OrderItemContract
     {
+        /** @var OrderItemContract $orderItem */
         $orderItem = new (config('shop.models.orderItem'))(
             $this->orderItemDataTransformer->transform($capsule)
         );
 
-        $orderItem->product()->associate($capsule->getProduct());
+        $orderItem->sellable()->associate($capsule->getSellableItem());
 
         return $orderItem;
     }

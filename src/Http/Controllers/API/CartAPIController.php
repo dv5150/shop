@@ -4,7 +4,7 @@ namespace DV5150\Shop\Http\Controllers\API;
 
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Models\ShopUserContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
@@ -152,12 +152,12 @@ class CartAPIController
         ]);
     }
 
-    private function resolveProduct($productID): ProductContract
+    private function resolveProduct($productID): SellableItemContract
     {
         /** @var Model $product */
         $product = config('shop.models.product')::findOrFail($productID);
 
-        if (!$product instanceof ProductContract) {
+        if (!$product instanceof SellableItemContract) {
             abort(422, __('The selected item is not a valid product.'));
         }
 

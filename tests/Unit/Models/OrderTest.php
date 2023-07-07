@@ -4,7 +4,7 @@ namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
-use DV5150\Shop\Contracts\Models\ProductContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
@@ -57,7 +57,7 @@ class OrderTest extends TestCase
         });
 
         $order->items->each(function (OrderItemContract $orderItem) {
-            $this->assertInstanceOf(ProductContract::class, $orderItem->getProduct());
+            $this->assertInstanceOf(SellableItemContract::class, $orderItem->getSellable());
         });
     }
 }

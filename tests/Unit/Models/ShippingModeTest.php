@@ -17,19 +17,13 @@ class ShippingModeTest extends TestCase
     }
 
     /** @test */
-    public function shipping_mode_has_a_fixed_prefix()
-    {
-        $this->assertSame('[SHIPPING]', $this->shippingMode->getShortName());
-    }
-
-    /** @test */
     public function shipping_mode_can_be_converted_to_order_item()
     {
         $expected = new (config('shop.models.orderItem'))([
             'name' => $this->shippingMode->getName(),
             'quantity' => 1,
             'price_gross' => $this->shippingMode->getPriceGross(),
-            'info' => $this->shippingMode->getShortName(),
+            'info' => null,
         ]);
 
         $actual = $this->shippingMode->toOrderItem();
