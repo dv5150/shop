@@ -3,6 +3,8 @@
 namespace DV5150\Shop;
 
 use DV5150\Shop\Console\Commands\InstallCommand;
+use DV5150\Shop\Contracts\Controllers\CartAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\CheckoutAPIControllerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
@@ -11,8 +13,11 @@ use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ProductListComposerServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShopServiceContract;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
+use DV5150\Shop\Http\Controllers\API\CartAPIController;
+use DV5150\Shop\Http\Controllers\API\CheckoutAPIController;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
@@ -21,6 +26,7 @@ use DV5150\Shop\Services\PaymentModeService;
 use DV5150\Shop\Services\ProductListComposerService;
 use DV5150\Shop\Services\ShippingModeService;
 use DV5150\Shop\Services\ShopService;
+use DV5150\Shop\Support\CartCollection;
 use DV5150\Shop\Transformers\OrderDataTransformer;
 use DV5150\Shop\Transformers\OrderItemDataTransformer;
 use DV5150\Shop\View\Composers\ProductListComposer;
@@ -89,6 +95,8 @@ class ShopServiceProvider extends PackageServiceProvider
 
         App::bind(MessageServiceContract::class, fn () => new MessageService());
 
+        App::bind(CartCollectionContract::class, fn () => new CartCollection());
+
         App::bind(CartServiceContract::class, fn () => new CartService(
             app(CouponServiceContract::class),
             app(ShippingModeServiceContract::class),
@@ -101,6 +109,10 @@ class ShopServiceProvider extends PackageServiceProvider
         ));
 
         App::bind(ProductListComposerServiceContract::class, fn () => new ProductListComposerService());
+
+        App::bind(CartAPIControllerContract::class, fn () => CartAPIController::class);
+
+        App::bind(CheckoutAPIControllerContract::class, fn () => CheckoutAPIController::class);
     }
 
     protected function registerApiRoutes(): void

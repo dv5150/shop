@@ -2,11 +2,12 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
+use DV5150\Shop\Contracts\Controllers\CheckoutAPIControllerContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Http\Requests\StoreOrderRequest;
 use Illuminate\Http\JsonResponse;
 
-class CheckoutAPIController
+class CheckoutAPIController implements CheckoutAPIControllerContract
 {
     public function __construct(
         protected CheckoutServiceContract $checkout

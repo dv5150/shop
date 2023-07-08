@@ -3,11 +3,11 @@
 namespace DV5150\Shop\Concerns\Cart;
 
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
-use DV5150\Shop\Support\CartCollection;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 
 trait HandlesCoupons
 {
-    public function setCoupon(?BaseCouponContract $coupon): CartCollection
+    public function setCoupon(?BaseCouponContract $coupon): CartCollectionContract
     {
         $this->couponService->setCoupon($coupon);
 
@@ -19,7 +19,7 @@ trait HandlesCoupons
         return $this->couponService->getCoupon();
     }
 
-    public function getCouponSummary(CartCollection $cartResults): ?array
+    public function getCouponSummary(CartCollectionContract $cartResults): ?array
     {
         $cart = $this->all();
 

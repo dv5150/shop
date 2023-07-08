@@ -3,10 +3,11 @@
 namespace DV5150\Shop\Support;
 
 use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Support\Collection;
 
-class CartCollection extends Collection
+class CartCollection extends Collection implements CartCollectionContract
 {
     public function hasItem(SellableItemContract $item): bool
     {

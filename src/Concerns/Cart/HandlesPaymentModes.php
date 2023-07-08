@@ -3,11 +3,11 @@
 namespace DV5150\Shop\Concerns\Cart;
 
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
-use DV5150\Shop\Support\CartCollection;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 
 trait HandlesPaymentModes
 {
-    public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollection
+    public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollectionContract
     {
         $this->paymentModeService->setPaymentMode($paymentMode);
 

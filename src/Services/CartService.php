@@ -10,6 +10,7 @@ use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
 use DV5150\Shop\Contracts\Services\PaymentModeServiceContract;
 use DV5150\Shop\Contracts\Services\ShippingModeServiceContract;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Facades\Session;
@@ -28,7 +29,7 @@ class CartService implements CartServiceContract
         protected PaymentModeServiceContract $paymentModeService,
     ){}
 
-    public function all(): CartCollection
+    public function all(): CartCollectionContract
     {
         if ($cart = Session::get(self::SESSION_KEY)) {
             /** @var CartCollection $cart */
@@ -41,16 +42,16 @@ class CartService implements CartServiceContract
         return $this->reset();
     }
 
-    public function reset(): CartCollection
+    public function reset(): CartCollectionContract
     {
-        $cart = new CartCollection();
+        $cart = app(CartCollectionContract::class);
 
         $this->saveCart($cart);
 
         return $cart;
     }
 
-    public function addItem(SellableItemContract $item, int $quantity = 1): CartCollection
+    public function addItem(SellableItemContract $item, int $quantity = 1): CartCollectionContract
     {
         $cart = $this->all();
 
@@ -68,7 +69,7 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
-    public function removeItem(SellableItemContract $item, int $quantity = 1): CartCollection
+    public function removeItem(SellableItemContract $item, int $quantity = 1): CartCollectionContract
     {
         $cart = $this->all();
 
@@ -81,7 +82,7 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
-    public function eraseItem(SellableItemContract $item): CartCollection
+    public function eraseItem(SellableItemContract $item): CartCollectionContract
     {
         $cart = $this->all();
 
@@ -94,12 +95,12 @@ class CartService implements CartServiceContract
         return $this->all();
     }
 
-    public function getSubTotal(CartCollection $cartResults): float
+    public function getSubTotal(CartCollectionContract $cartResults): float
     {
         return $cartResults->getTotalGrossPrice();
     }
 
-    public function getTotal(CartCollection $cartResults): float
+    public function getTotal(CartCollectionContract $cartResults): float
     {
         $coupon = $this->getCoupon();
 
@@ -118,7 +119,7 @@ class CartService implements CartServiceContract
             ->hasDigitalItemsOnly();
     }
 
-    public function saveCart(CartCollection $cart): CartCollection
+    public function saveCart(CartCollectionContract $cart): CartCollectionContract
     {
         Session::put(self::SESSION_KEY, serialize($cart));
 

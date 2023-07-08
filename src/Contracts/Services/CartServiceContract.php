@@ -6,29 +6,29 @@ use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
-use DV5150\Shop\Support\CartCollection;
+use DV5150\Shop\Contracts\Support\CartCollectionContract;
 
 interface CartServiceContract
 {
-    public function all(): CartCollection;
-    public function reset(): CartCollection;
-    public function addItem(SellableItemContract $item, int $quantity = 1): CartCollection;
-    public function removeItem(SellableItemContract $item, int $quantity = 1): CartCollection;
-    public function eraseItem(SellableItemContract $item): CartCollection;
+    public function all(): CartCollectionContract;
+    public function reset(): CartCollectionContract;
+    public function addItem(SellableItemContract $item, int $quantity = 1): CartCollectionContract;
+    public function removeItem(SellableItemContract $item, int $quantity = 1): CartCollectionContract;
+    public function eraseItem(SellableItemContract $item): CartCollectionContract;
 
-    public function getSubtotal(CartCollection $cartResults): float;
-    public function getTotal(CartCollection $cartResults): float;
+    public function getSubtotal(CartCollectionContract $cartResults): float;
+    public function getTotal(CartCollectionContract $cartResults): float;
     public function hasDigitalItemsOnly(): bool;
 
-    public function setCoupon(?BaseCouponContract $coupon): CartCollection;
+    public function setCoupon(?BaseCouponContract $coupon): CartCollectionContract;
     public function getCoupon(): ?BaseCouponContract;
-    public function getCouponSummary(CartCollection $cartResults): ?array;
+    public function getCouponSummary(CartCollectionContract $cartResults): ?array;
 
-    public function setShippingMode(?ShippingModeContract $shippingMode): CartCollection;
+    public function setShippingMode(?ShippingModeContract $shippingMode): CartCollectionContract;
     public function getShippingMode(): ?ShippingModeContract;
 
-    public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollection;
+    public function setPaymentMode(?PaymentModeContract $paymentMode): CartCollectionContract;
     public function getPaymentMode(): ?PaymentModeContract;
 
-    public function saveCart(CartCollection $cart): CartCollection;
+    public function saveCart(CartCollectionContract $cart): CartCollectionContract;
 }

@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
+use DV5150\Shop\Contracts\Controllers\CartAPIControllerContract;
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
-class CartAPIController
+class CartAPIController implements CartAPIControllerContract
 {
     public function __construct(
         protected CartServiceContract $cart,
@@ -151,7 +152,7 @@ class CartAPIController
         ]);
     }
 
-    private function resolveProduct($productID): SellableItemContract
+    protected function resolveProduct($productID): SellableItemContract
     {
         /** @var Model $product */
         $product = config('shop.models.product')::findOrFail($productID);
@@ -163,18 +164,18 @@ class CartAPIController
         return $product;
     }
 
-    private function resolveCoupon(string $couponCode): ?BaseCouponContract
+    protected function resolveCoupon(string $couponCode): ?BaseCouponContract
     {
         return config('shop.models.coupon')::firstWhere('code', $couponCode);
     }
 
-    private function resolveShippingMode(string $shippingModeProvider): ?ShippingModeContract
+    protected function resolveShippingMode(string $shippingModeProvider): ?ShippingModeContract
     {
         return config('shop.models.shippingMode')::with('paymentModes')
             ->firstWhere('provider', $shippingModeProvider);
     }
 
-    private function resolvePaymentMode(string $paymentModeProvider): ?PaymentModeContract
+    protected function resolvePaymentMode(string $paymentModeProvider): ?PaymentModeContract
     {
         if ($shippingMode = $this->cart->getShippingMode()) {
             return $shippingMode->paymentModes()

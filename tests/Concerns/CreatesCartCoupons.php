@@ -2,38 +2,35 @@
 
 namespace DV5150\Shop\Tests\Concerns;
 
-use DV5150\Shop\Models\Deals\Coupon;
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
 use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
 
 trait CreatesCartCoupons
 {
-    protected function createCartPercentCoupon(string $name, float $value, string $code): Coupon
+    protected function createCartPercentCoupon(string $name, float $value, string $code): BaseCouponContract
     {
-        $coupon = tap(new Coupon(['code' => $code]), function (Coupon $coupon) use ($name, $value) {
-            $percentCoupon = CartPercentCoupon::create([
-                'name' => $name,
-                'value' => $value,
-            ]);
-
-            $coupon->coupon()->associate($percentCoupon);
-        });
-
-        $coupon->save();
-
-        return $coupon;
+        return $this->createCoupon(type: CartPercentCoupon::class, name: $name, value: $value, code: $code);
     }
 
-    protected function createCartValueCoupon(string $name, float $value, string $code): Coupon
+    protected function createCartValueCoupon(string $name, float $value, string $code): BaseCouponContract
     {
-        $coupon = tap(new Coupon(['code' => $code]), function (Coupon $coupon) use ($name, $value) {
-            $valueCoupon = CartValueCoupon::create([
-                'name' => $name,
-                'value' => $value,
-            ]);
+        return $this->createCoupon(type: CartValueCoupon::class, name: $name, value: $value, code: $code);
+    }
 
-            $coupon->coupon()->associate($valueCoupon);
-        });
+    protected function createCoupon(string $type, string $name, float $value, string $code): BaseCouponContract
+    {
+        $coupon = tap(
+            new (config('shop.models.coupon'))(['code' => $code]),
+            function (BaseCouponContract $coupon) use ($type, $name, $value) {
+                $concreteCoupon = $type::create([
+                    'name' => $name,
+                    'value' => $value,
+                ]);
+
+                $coupon->coupon()->associate($concreteCoupon);
+            }
+        );
 
         $coupon->save();
 
