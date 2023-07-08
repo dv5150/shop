@@ -11,4 +11,7 @@ interface SellableItemContract
     public function getDescription(): ?string;
     public function getPriceGross(): float;
     public function isDigitalItem(): bool;
+
+    public static function bootDetachesAllDiscounts();
+    public static function bootDetachesFromOrderItems();
 }

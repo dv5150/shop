@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Default;
 
-use DV5150\Shop\Concerns\Models\Product\DetachesAllDiscounts;
+use DV5150\Shop\Concerns\Models\SellableItemTrait;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Product extends Model implements SellableItemContract
 {
-    use HasFactory, HasSlug, DetachesAllDiscounts;
+    use HasFactory, HasSlug, SellableItemTrait;
 
     protected $guarded = [];
 

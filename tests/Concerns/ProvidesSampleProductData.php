@@ -92,6 +92,26 @@ trait ProvidesSampleProductData
         ]);
     }
 
+    public function assertDatabaseHasProductOrderItemWithMissingRelation(
+        SellableItemContract $sellableItem,
+        OrderContract $order,
+        int $quantity = 1,
+        string $info = null,
+        float $overwriteGrossPrice = null,
+    ): void
+    {
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->getKey(),
+            'sellable_type' => null,
+            'sellable_id' => null,
+            'name' => $sellableItem->getName(),
+            'quantity' => $quantity,
+            'price_gross' => $overwriteGrossPrice ?? $sellableItem->getPriceGross(),
+            'info' => $info,
+            'type' => 'product',
+        ]);
+    }
+
     public function assertDatabaseHasCouponOrderItem(
         BaseCouponContract $coupon,
         OrderContract $order,

@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Concerns\Models\Product;
+namespace DV5150\Shop\Concerns\Models\SellableItem;
 
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 

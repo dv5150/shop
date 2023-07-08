@@ -145,4 +145,42 @@ class CheckoutTest extends TestCase
 
         $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 2);
     }
+
+    /** @test */
+    public function order_items_lose_their_sellable_relation_when_the_attached_item_is_deleted()
+    {
+        $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
+                ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
+            ])
+        );
+
+        $this->productB->delete();
+
+        $order = config('shop.models.order')::first();
+
+        $this->assertDatabaseHasProductOrderItem(
+            sellableItem: $this->productA,
+            order: $order,
+            quantity: 2
+        );
+
+        $this->assertDatabaseHasProductOrderItemWithMissingRelation(
+            sellableItem: $this->productB,
+            order: $order,
+            quantity: 4
+        );
+    }
 }
