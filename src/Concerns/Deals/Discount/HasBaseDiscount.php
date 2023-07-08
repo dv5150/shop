@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Concerns\Deals;
+namespace DV5150\Shop\Concerns\Deals\Discount;
 
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use Illuminate\Database\Eloquent\Relations\MorphOne;

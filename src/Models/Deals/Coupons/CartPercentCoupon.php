@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Deals\Coupons;
 
-use DV5150\Shop\Concerns\Deals\HasBaseCoupon;
+use DV5150\Shop\Concerns\Deals\CouponTrait;
 use DV5150\Shop\Contracts\Deals\Coupons\CouponContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Models\Deals\Coupon;
@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class CartPercentCoupon extends Coupon implements CouponContract
 {
-    use HasBaseCoupon;
+    use CouponTrait;
 
     protected $guarded = [];
 

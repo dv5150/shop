@@ -2,19 +2,25 @@
 
 namespace DV5150\Shop\Models\Deals;
 
-use DV5150\Shop\Concerns\Deals\DeletesConcreteCoupon;
+use DV5150\Shop\Concerns\Deals\BaseCouponTrait;
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Deals\Coupons\CouponContract;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Str;
 
 class Coupon extends BaseDeal implements BaseCouponContract
 {
-    use DeletesConcreteCoupon;
+    use BaseCouponTrait;
 
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public function setCodeAttribute(string $value): void
+    {
+        $this->attributes['code'] = Str::of($value)->upper();
+    }
 
     public function coupon(): MorphTo
     {

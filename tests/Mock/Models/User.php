@@ -2,14 +2,15 @@
 
 namespace DV5150\Shop\Tests\Mock\Models;
 
+use DV5150\Shop\Concerns\Models\ShopUserTrait;
+use DV5150\Shop\Contracts\Models\ShopUserContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements ShopUserContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, ShopUserTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -36,9 +37,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(config('shop.models.order'));
-    }
 }

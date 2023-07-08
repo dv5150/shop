@@ -393,4 +393,19 @@ class CouponTest extends TestCase
 
         $this->assertDatabaseCount('coupons', 0);
     }
+
+    /** @test */
+    public function coupon_code_attribute_being_saved_as_uppercase_text()
+    {
+        $coupon = $this->createCartPercentCoupon(
+            name: '10% OFF discount',
+            value: 10.0,
+            code: 'cartdiscount'
+        );
+
+        $savedCode = $coupon->refresh()->getCode();
+
+        $this->assertSame('CARTDISCOUNT', $savedCode);
+        $this->assertNotSame('cartdiscount', $savedCode);
+    }
 }

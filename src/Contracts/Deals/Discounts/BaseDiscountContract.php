@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 interface BaseDiscountContract
 {
+    public static function bootDeletesConcreteDiscount(): void;
+
     public function discount(): MorphTo;
     public function getDiscount(): DiscountContract;
     public function getDiscountedPriceGross(ShopItemCapsuleContract $capsule): float;

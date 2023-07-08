@@ -2,14 +2,14 @@
 
 namespace DV5150\Shop\Models\Deals\Discounts;
 
-use DV5150\Shop\Concerns\Deals\HasBaseDiscount;
+use DV5150\Shop\Concerns\Deals\DiscountTrait;
 use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
 use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Models\Deals\Discount;
 
 class ProductPercentDiscount extends Discount implements DiscountContract
 {
-    use HasBaseDiscount;
+    use DiscountTrait;
 
     protected $guarded = [];
 

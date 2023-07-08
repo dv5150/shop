@@ -9,7 +9,6 @@ use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Models\ShopUserContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\MessageServiceContract;
-use DV5150\Shop\Http\Resources\ShippingAddressResource;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;

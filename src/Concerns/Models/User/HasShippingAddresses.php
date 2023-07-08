@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Concerns\User;
+namespace DV5150\Shop\Concerns\Models\User;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

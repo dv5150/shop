@@ -6,7 +6,7 @@ use DV5150\Shop\Contracts\Models\SellableItemContract;
 
 trait DetachesFromOrderItems
 {
-    public static function bootDetachesFromOrderItems()
+    public static function bootDetachesFromOrderItems(): void
     {
         static::deleting(function (SellableItemContract $sellableItem) {
             config('shop.models.orderItem')::whereMorphedTo('sellable', $sellableItem)

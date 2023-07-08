@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Models\Deals;
 
-use DV5150\Shop\Concerns\Deals\DeletesConcreteDiscount;
+use DV5150\Shop\Concerns\Deals\BaseDiscountTrait;
 use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
 use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
 use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Discount extends BaseDeal implements BaseDiscountContract
 {
-    use DeletesConcreteDiscount;
+    use BaseDiscountTrait;
 
     public $timestamps = false;
 
