@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
-use DV5150\Shop\Contracts\Controllers\CheckoutAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CheckoutAPIControllerContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Http\Requests\StoreOrderRequest;
 use Illuminate\Http\JsonResponse;
@@ -21,8 +21,12 @@ class CheckoutAPIController implements CheckoutAPIControllerContract
 
         $this->checkout->saveItems($order, $orderData['cartData']);
 
+        $redirectUrl = $order->requiresOnlinePayment()
+            ? $order->getOnlinePaymentUrl()
+            : $order->getThankYouUrl();
+
         return new JsonResponse(data: [
-            'redirectUrl' => $order->getThankYouUrl()
+            'redirectUrl' => $redirectUrl
         ], status: 201);
     }
 }

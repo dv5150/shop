@@ -2,10 +2,20 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
+use DV5150\Shop\Concerns\Shop\HandlesPaymentProviderRegistration;
+use DV5150\Shop\Contracts\Models\OrderContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
+use DV5150\Shop\Contracts\Services\ShopServiceContract;
+use DV5150\Shop\Facades\Shop;
+use DV5150\Shop\Models\Default\Order;
+use DV5150\Shop\Services\ShopService;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
+use DV5150\Shop\Tests\Mock\PaymentProviders\TestPaymentProvider;
 use DV5150\Shop\Tests\TestCase;
+use Illuminate\Support\Facades\App;
+use Mockery;
 
 class CheckoutTest extends TestCase
 {
@@ -182,5 +192,136 @@ class CheckoutTest extends TestCase
             order: $order,
             quantity: 4
         );
+    }
+
+    /** @test */
+    public function saving_and_order_returns_the_correct_redirect_url_without_online_payment_or_frontend_installed()
+    {
+        $this->assertFalse(Shop::isFrontendInstalled());
+
+        $response = $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
+                ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
+            ])
+        );
+
+        /** @var OrderContract $order */
+        $order = config('shop.models.order')::first();
+
+        $this->assertFalse($order->requiresOnlinePayment());
+
+        $response->assertJson([
+            'redirectUrl' => route('home'),
+        ]);
+    }
+
+    /** @test */
+    public function saving_and_order_returns_the_correct_redirect_url_with_frontend_installed()
+    {
+        $this->instance(ShopServiceContract::class, $this->getTestShopService());
+
+        $this->assertTrue(Shop::isFrontendInstalled());
+
+        $response = $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
+                ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
+            ])
+        );
+
+        /** @var OrderContract $order */
+        $order = config('shop.models.order')::first();
+
+        $this->assertFalse($order->requiresOnlinePayment());
+
+        $response->assertJson([
+            'redirectUrl' => route('shop.order.thankYou', [
+                'order' => $order->getUuid(),
+            ]),
+        ]);
+    }
+
+    /** @test */
+    public function saving_and_order_returns_the_correct_redirect_url_with_online_payment_provider_installed()
+    {
+        $this->instance(ShopServiceContract::class, $this->getTestShopService());
+
+        $this->assertTrue(Shop::isFrontendInstalled());
+
+        Shop::registerPaymentProviders([
+            TestPaymentProvider::class,
+        ]);
+
+        /** @var PaymentModeContract $paymentMode */
+        $paymentMode = config('shop.models.paymentMode')::first();
+
+        $this->assertTrue($paymentMode->getProvider() === 'test');
+
+        $paymentMode->update(['is_online_payment' => true]);
+
+        $response = $this->post(
+            route('api.shop.checkout.store'),
+            array_merge($this->testOrderData, [
+                'cartData' => [
+                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
+                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
+                ],
+                'shippingMode' => [
+                    'provider' => $this->shippingModeProvider,
+                ],
+                'paymentMode' => [
+                    'provider' => $this->paymentModeProvider,
+                ],
+                'shipping_mode_provider' => $this->shippingModeProvider,
+                'payment_mode_provider' => $this->paymentModeProvider,
+            ])
+        );
+
+        /** @var OrderContract $order */
+        $order = config('shop.models.order')::first();
+
+        $this->assertTrue($order->requiresOnlinePayment());
+
+        $response->assertJson([
+            'redirectUrl' => route('pay', [
+                'paymentProvider' => 'test',
+                'order' => $order->getUuid(),
+            ]),
+        ]);
+    }
+
+    protected function getTestShopService(): object
+    {
+        return new class {
+            use HandlesPaymentProviderRegistration;
+
+            public static function isFrontendInstalled(): bool
+            {
+                return true;
+            }
+        };
     }
 }

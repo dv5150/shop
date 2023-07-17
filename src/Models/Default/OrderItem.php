@@ -41,6 +41,16 @@ class OrderItem extends Model implements OrderItemContract
         return $this->sellable;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getInfo(): string
+    {
+        return $this->info;
+    }
+
     public function getPriceGross(): float
     {
         return $this->price_gross;
@@ -49,6 +59,11 @@ class OrderItem extends Model implements OrderItemContract
     public function getQuantity(): int
     {
         return $this->quantity;
+    }
+
+    public function getSubtotal(): float
+    {
+        return $this->getPriceGross() * $this->getQuantity();
     }
 
     public function getType(): string

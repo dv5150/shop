@@ -1,7 +1,9 @@
 <?php
 
-use DV5150\Shop\Contracts\Controllers\CartAPIControllerContract;
-use DV5150\Shop\Contracts\Controllers\CheckoutAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CartAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CheckoutAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\PaymentControllerContract;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
@@ -35,4 +37,10 @@ Route::group(['prefix' => 'cart', 'as' => 'cart.'], function () {
 Route::group(['prefix' => 'checkout', 'as' => 'checkout.'], function () {
     Route::post('/', [app(CheckoutAPIControllerContract::class), 'store'])
         ->name('store');
+});
+
+Route::group(['prefix' => 'payment', 'as' => 'payment.'], function () {
+    Route::post('{paymentProvider}/webhook', [app(PaymentControllerContract::class), 'webhook'])
+        ->name('webhook')
+        ->withoutMiddleware([VerifyCsrfToken::class]);
 });

@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 interface PaymentProviderContract
 {
+    public static function getProvider(): string;
+    public static function getName(): string;
+    public static function isOnlinePayment(): bool;
     public function pay(OrderContract $order);
-    public function callback(Request $request);
+    public function webhook(Request $request);
 }

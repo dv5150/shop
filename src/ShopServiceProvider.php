@@ -3,8 +3,9 @@
 namespace DV5150\Shop;
 
 use DV5150\Shop\Console\Commands\InstallCommand;
-use DV5150\Shop\Contracts\Controllers\CartAPIControllerContract;
-use DV5150\Shop\Contracts\Controllers\CheckoutAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CartAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CheckoutAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\PaymentControllerContract;
 use DV5150\Shop\Contracts\Services\CartServiceContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Services\CouponServiceContract;
@@ -18,6 +19,7 @@ use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
 use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Http\Controllers\API\CartAPIController;
 use DV5150\Shop\Http\Controllers\API\CheckoutAPIController;
+use DV5150\Shop\Http\Controllers\PaymentController;
 use DV5150\Shop\Services\CartService;
 use DV5150\Shop\Services\CheckoutService;
 use DV5150\Shop\Services\CouponService;
@@ -55,6 +57,7 @@ class ShopServiceProvider extends PackageServiceProvider
                 '10_create_order_items_table',
                 '11_create_discount_tables',
                 '12_create_coupon_tables',
+                '13_create_payments_table',
             ])
             ->hasViewComposer(
                 'shop::partials.productList',
@@ -69,14 +72,17 @@ class ShopServiceProvider extends PackageServiceProvider
 
         $this->registerBindings();
 
-        $this->registerApiRoutes();
+        $this->registerShopRoutes();
+        $this->registerShopApiRoutes();
     }
 
     public function boot()
     {
         parent::boot();
 
-        //
+        Route::bind('order', function (string $uuid) {
+            return config('shop.models.order')::whereUuid($uuid)->firstOrFail();
+        });
     }
 
     protected function registerBindings(): void
@@ -113,9 +119,18 @@ class ShopServiceProvider extends PackageServiceProvider
         App::bind(CartAPIControllerContract::class, fn () => CartAPIController::class);
 
         App::bind(CheckoutAPIControllerContract::class, fn () => CheckoutAPIController::class);
+
+        App::bind(PaymentControllerContract::class, fn () => PaymentController::class);
     }
 
-    protected function registerApiRoutes(): void
+    protected function registerShopRoutes(): void
+    {
+        Route::middleware('web')
+            ->as('shop.')
+            ->group($this->getPath('routes/shop.php'));
+    }
+
+    protected function registerShopApiRoutes(): void
     {
         Route::middleware('web')
             ->prefix('api/shop')

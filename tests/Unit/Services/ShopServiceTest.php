@@ -13,7 +13,9 @@ class ShopServiceTest extends TestCase
     {
         $this->assertSame(Shop::getAllPaymentProviders(), []);
 
-        Shop::addPaymentProvider('test', TestPaymentProvider::class);
+        Shop::registerPaymentProviders([
+            TestPaymentProvider::class
+        ]);
 
         $this->assertSame(Shop::getAllPaymentProviders(), [
             'test' => TestPaymentProvider::class

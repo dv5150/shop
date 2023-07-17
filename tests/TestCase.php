@@ -2,6 +2,8 @@
 
 namespace DV5150\Shop\Tests;
 
+use DV5150\Shop\Contracts\Controllers\PaymentControllerContract;
+use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Http\Resources\CategoryResource;
 use DV5150\Shop\Http\Resources\PaymentModeResource;
 use DV5150\Shop\Http\Resources\ProductResource;
@@ -12,6 +14,7 @@ use DV5150\Shop\Models\Deals\Discount;
 use DV5150\Shop\Models\Default\BillingAddress;
 use DV5150\Shop\Models\Default\Order;
 use DV5150\Shop\Models\Default\OrderItem;
+use DV5150\Shop\Models\Default\Payment;
 use DV5150\Shop\Models\Default\ShippingAddress;
 use DV5150\Shop\ShopServiceProvider;
 use DV5150\Shop\Support\ShopItemCapsule;
@@ -46,6 +49,7 @@ class TestCase extends Orchestra
         Config::set('shop.models.discount', Discount::class);
         Config::set('shop.models.order', Order::class);
         Config::set('shop.models.orderItem', OrderItem::class);
+        Config::set('shop.models.payment', Payment::class);
         Config::set('shop.models.paymentMode', PaymentMode::class);
         Config::set('shop.models.product', Product::class);
         Config::set('shop.models.shippingMode', ShippingMode::class);
@@ -78,5 +82,11 @@ class TestCase extends Orchestra
     {
         $router->get('home', fn () => 'Welcome')
             ->name('home');
+
+        $router->get('order/{order:uuid}/thank-you', fn (OrderContract $order) => $order->getUuid())
+            ->name('shop.order.thankYou');
+
+        $router->get('payment/{paymentProvider}/pay/{order:uuid}', [app(PaymentControllerContract::class), 'pay'])
+            ->name('pay');
     }
 }

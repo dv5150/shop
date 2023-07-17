@@ -1,6 +1,6 @@
 <?php
 
-namespace DV5150\Shop\Contracts\Controllers;
+namespace DV5150\Shop\Contracts\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
 

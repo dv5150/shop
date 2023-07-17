@@ -39,13 +39,9 @@ return new class extends Migration
             $table->string('billing_tax_number')
                 ->nullable();
 
-            $table->string('shipping_mode_provider')
-                ->nullable();
             $table->unsignedBigInteger('shipping_mode_id')
                 ->nullable();
 
-            $table->string('payment_mode_provider')
-                ->nullable();
             $table->unsignedBigInteger('payment_mode_id')
                 ->nullable();
 
@@ -55,16 +51,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->cascadeOnDelete();
-
-            $table->foreign('payment_mode_id')
-                ->references('id')
-                ->on('payment_modes')
-                ->nullOnDelete();
-
-            $table->foreign('shipping_mode_id')
-                ->references('id')
-                ->on('shipping_modes')
-                ->nullOnDelete();
         });
     }
 

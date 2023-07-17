@@ -9,9 +9,15 @@ interface OrderItemContract
 {
     public function order(): BelongsTo;
     public function sellable(): MorphTo;
+
+    public function getName(): string;
+    public function getInfo(): string;
     public function getOrder(): OrderContract;
     public function getSellable(): ?SellableItemContract;
+
     public function getPriceGross(): float;
     public function getQuantity(): int;
+    public function getSubtotal(): float;
+
     public function getType(): string;
 }

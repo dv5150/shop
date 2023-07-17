@@ -5,6 +5,7 @@ namespace DV5150\Shop\Tests\Unit\Models;
 use DV5150\Shop\Contracts\Models\ShopUserContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
 use DV5150\Shop\Tests\TestCase;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ShopUserTest extends TestCase
 {
@@ -54,5 +55,14 @@ class ShopUserTest extends TestCase
                 ]
             ]), $user->getShippingAddresses()->toJson()
         );
+    }
+
+    /** @test */
+    public function user_has_many_orders()
+    {
+        /** @var ShopUserContract $user */
+        $user = config('shop.models.user')::first();
+
+        $this->assertInstanceOf(HasMany::class, $user->orders());
     }
 }

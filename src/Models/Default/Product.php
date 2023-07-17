@@ -45,7 +45,7 @@ class Product extends Model implements SellableItemContract
 
     public function getDescription(): ?string
     {
-        return $this->name;
+        return $this->description;
     }
 
     public function getPriceGross(): float

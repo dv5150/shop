@@ -3,7 +3,6 @@
 namespace DV5150\Shop\Tests\Mock\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class PaymentModeFactory extends Factory
 {
@@ -19,12 +18,11 @@ class PaymentModeFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->words(5, true);
-
         return [
-            'name' => $name,
-            'provider' => Str::of($name)->replace(' ', '')->lower(),
+            'name' => 'test',
+            'provider' => 'test',
             'price_gross' => 190.0,
+            'is_online_payment' => false,
         ];
     }
 }

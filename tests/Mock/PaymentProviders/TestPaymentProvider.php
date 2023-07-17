@@ -8,12 +8,27 @@ use Illuminate\Http\Request;
 
 class TestPaymentProvider implements PaymentProviderContract
 {
+    public static function getProvider(): string
+    {
+        return 'test';
+    }
+
+    public static function getName(): string
+    {
+        return 'Test';
+    }
+
+    public static function isOnlinePayment(): bool
+    {
+        return false;
+    }
+
     public function pay(OrderContract $order)
     {
         //
     }
 
-    public function callback(Request $request)
+    public function webhook(Request $request)
     {
         //
     }

@@ -13,6 +13,7 @@ return [
         'shippingAddress' => \DV5150\Shop\Models\Default\ShippingAddress::class,
         'coupon' => \DV5150\Shop\Models\Deals\Coupon::class,
         'discount' => \DV5150\Shop\Models\Deals\Discount::class,
+        'payment' => \DV5150\Shop\Models\Default\Payment::class,
     ],
     'resources' => [
         'shippingMode' => \DV5150\Shop\Http\Resources\ShippingModeResource::class,

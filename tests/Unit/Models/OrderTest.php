@@ -4,11 +4,15 @@ namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
+use DV5150\Shop\Contracts\Models\ShopUserContract;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
 use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
 use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class OrderTest extends TestCase
 {
@@ -52,7 +56,7 @@ class OrderTest extends TestCase
             $this->assertInstanceOf(OrderItemContract::class, $orderItem);
         });
 
-        $order->items->each(function (OrderItemContract $orderItem) use ($order) {
+        $order->items->each(function (OrderItemContract $orderItem) {
             $this->assertInstanceOf(OrderContract::class, $orderItem->getOrder());
         });
 

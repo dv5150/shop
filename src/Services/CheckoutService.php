@@ -4,7 +4,9 @@ namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
+use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
 use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
@@ -26,28 +28,20 @@ class CheckoutService implements CheckoutServiceContract
     {
         $orderData = $this->orderDataTransformer->transform($orderData);
 
+        Arr::set($orderData, 'uuid', $this->generateUniqueUuid());
+
         /** @var Model|OrderContract $order */
-        $order = new (config('shop.models.order'))(
-            array_merge($orderData, [
-                'uuid' => $this->generateUniqueUuid()
-            ])
-        );
+        $order = new (config('shop.models.order'))(Arr::except($orderData, [
+            'shipping_mode_provider',
+            'payment_mode_provider',
+        ]));
 
         if ($user = Auth::user()) {
             $order->user()->associate($user);
         }
 
-        $order->shippingMode()->associate(
-            config('shop.models.shippingMode')::firstWhere(
-                'provider', $order->shipping_mode_provider
-            )
-        );
-
-        $order->paymentMode()->associate(
-            config('shop.models.paymentMode')::firstWhere(
-                'provider', $order->payment_mode_provider
-            )
-        );
+        $order->shippingMode()->associate($this->resolveShippingMode($orderData['shipping_mode_provider']));
+        $order->paymentMode()->associate($this->resolvePaymentMode($orderData['payment_mode_provider']));
 
         $order->save();
 
@@ -106,5 +100,15 @@ class CheckoutService implements CheckoutServiceContract
         $orderItem->sellable()->associate($capsule->getSellableItem());
 
         return $orderItem;
+    }
+
+    protected function resolveShippingMode(string $provider): ShippingModeContract
+    {
+        return config('shop.models.shippingMode')::firstWhere('provider', $provider);
+    }
+
+    protected function resolvePaymentMode(string $provider): PaymentModeContract
+    {
+        return config('shop.models.paymentMode')::firstWhere('provider', $provider);
     }
 }

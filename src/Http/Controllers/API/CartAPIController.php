@@ -2,7 +2,7 @@
 
 namespace DV5150\Shop\Http\Controllers\API;
 
-use DV5150\Shop\Contracts\Controllers\CartAPIControllerContract;
+use DV5150\Shop\Contracts\Controllers\API\CartAPIControllerContract;
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
