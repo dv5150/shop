@@ -12,4 +12,8 @@ interface CouponContract extends BaseCouponContract
     public function getBaseCoupon(): BaseCouponContract;
     public function getCode(): string;
     public function toOrderItem(Collection $orderItems): OrderItemContract;
+
+    public function getName(): string|null;
+    public function getValue(): float;
+    public function getUnit(): string;
 }

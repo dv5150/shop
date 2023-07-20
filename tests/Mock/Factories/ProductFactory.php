@@ -11,22 +11,27 @@ class ProductFactory extends Factory
 {
     protected $model = Product::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
-        $suffixes = ['Sweater', 'Pants', 'Shirt', 'Glasses', 'Hat', 'Socks'];
-
-        $name = $this->faker->company() . ' ' . Arr::random($suffixes);
+        $name = $this->faker->company() . ' ' . Arr::random([
+            'Sweater', 'Pants', 'Shirt', 'Glasses', 'Hat', 'Socks'
+        ]);
 
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'description' => $this->faker->realText(320),
+            'description' => $this->faker->realText(255),
             'price_gross' => $this->faker->numberBetween(1, 70) * 1000 - 10,
+            'is_digital_item' => false,
         ];
+    }
+
+    public function digital(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_digital_item' => true,
+            ];
+        });
     }
 }

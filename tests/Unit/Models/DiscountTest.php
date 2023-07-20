@@ -2,31 +2,39 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
-use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
-use DV5150\Shop\Tests\TestCase;
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discount;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discounts\ProductValueDiscount;
 
-class DiscountTest extends TestCase
-{
-    use CreatesDiscountsForProducts;
+test('discounts have a base discount', function () {
+    ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '10% OFF discount',
+            'value' => 10.0,
+        ])->getBaseDiscount();
 
-    /** @test */
-    public function discounts_have_a_base_discount()
-    {
-        $this->createPercentDiscountForProduct(
-            $this->productA,
-            '10% OFF discount',
-            10.0
-        );
+    ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '100 OFF discount',
+            'value' => 100.0,
+        ])->getBaseDiscount();
 
-        $this->createValueDiscountForProduct(
-            $this->productB,
-            '100 OFF discount',
-            100.0
-        );
-
-        $this->assertInstanceOf(config('shop.models.discount'), ProductPercentDiscount::first()->getBaseDiscount());
-        $this->assertInstanceOf(config('shop.models.discount'), ProductValueDiscount::first()->getBaseDiscount());
-    }
-}
+    expect(ProductPercentDiscount::first()->getBaseDiscount())
+        ->toBeInstanceOf(config('shop.models.discount'))
+        ->and(ProductValueDiscount::first()->getBaseDiscount())
+        ->toBeInstanceOf(config('shop.models.discount'));
+});

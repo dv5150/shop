@@ -3,69 +3,75 @@
 namespace DV5150\Shop\Tests\Feature;
 
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
-class ShippingModeTest extends TestCase
-{
-    use ProvidesSampleOrderData,
-        ProvidesSampleShippingModeData;
+test('a shipping mode has its attached payment modes aswell', function () {
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
 
-        $this->setUpSampleOrderData();
-        $this->setUpSampleShippingModeData();
-    }
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->shippingMode
+        ->toBeNull();
 
-    /** @test */
-    public function shipping_mode_has_its_attached_payment_modes_aswell()
-    {
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'shippingMode' => null,
-                ],
-            ]);
+    post(route('api.shop.cart.shippingMode.store', [
+        'provider' => $shippingMode->getProvider(),
+    ]));
 
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => $this->shippingModeProvider,
-        ]));
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->shippingMode
+        ->toBe([
+            'provider' => $shippingMode->getProvider(),
+            'name' => $shippingMode->getName(),
+            'priceGross' => $shippingMode->getPriceGross(),
+            'componentName' => $shippingMode->getComponentName(),
+            'paymentModes' => $shippingMode
+                ->paymentModes()
+                ->get()
+                ->map(fn (PaymentModeContract $paymentMode) => [
+                    'provider' => $paymentMode->getProvider(),
+                    'name' => $paymentMode->getName(),
+                    'priceGross' => $paymentMode->getPriceGross(),
+                ])->all()
+        ]);
+});
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'shippingMode' => [
-                        'provider' => $this->shippingModeProvider,
-                        'name' => $this->shippingMode->getName(),
-                        'priceGross' => $this->shippingMode->getPriceGross(),
-                        'componentName' => $this->shippingMode->getComponentName(),
-                        'paymentModes' => $this->shippingMode
-                            ->paymentModes
-                            ->map(fn (PaymentModeContract $paymentMode) => [
-                                'provider' => $paymentMode->getProvider(),
-                                'name' => $paymentMode->getName(),
-                                'priceGross' => $paymentMode->getPriceGross(),
-                            ])->all()
-                    ],
-                ],
-            ]);
-    }
+test('payment mode not attached to any shipping modes cannot be selected', function () {
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe([
+            'items' => [],
+            'coupon' => null,
+            'subtotal' => 0.0,
+            'total' => 0.0,
+            'currency' => [
+                'code' => 'HUF',
+            ],
+            'availableShippingModes' => [],
+            'shippingMode' => null,
+            'paymentMode' => null,
+            'preSavedShippingAddresses' => [],
+            'messages' => null,
+        ]);
 
-    /** @test */
-    public function payment_mode_not_attached_to_shipping_mode_cannot_be_selected()
-    {
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'shippingMode' => null,
-                    'paymentMode' => null,
-                ],
-            ]);
-
-        $shippingModes = [
+    config('shop.models.shippingMode')::factory()
+        ->count(2)
+        ->state(new Sequence(
             [
                 'name' => 'ABC',
                 'price_gross' => 1.0,
@@ -76,196 +82,189 @@ class ShippingModeTest extends TestCase
                 'price_gross' => 1.0,
                 'provider' => 'def',
             ],
-        ];
+        ))->create();
 
-        foreach ($shippingModes as $shippingMode) {
-            config('shop.models.shippingMode')::create($shippingMode);
-        }
+    config('shop.models.shippingMode')::firstWhere('provider', 'abc')
+        ->paymentModes()
+        ->saveMany([
+            new (config('shop.models.paymentMode'))([
+                'name' => 'IJK',
+                'price_gross' => 1.0,
+                'provider' => 'ijk',
+            ]),
+            new (config('shop.models.paymentMode'))([
+                'name' => 'LMN',
+                'price_gross' => 1.0,
+                'provider' => 'lmn',
+            ]),
+        ]);
 
-        config('shop.models.shippingMode')::firstWhere('provider', 'abc')
-            ->paymentModes()
-            ->saveMany([
-                new (config('shop.models.paymentMode'))([
-                    'name' => 'IJK',
-                    'price_gross' => 1.0,
-                    'provider' => 'ijk',
-                ]),
-                new (config('shop.models.paymentMode'))([
-                    'name' => 'LMN',
-                    'price_gross' => 1.0,
-                    'provider' => 'lmn',
-                ]),
-            ]);
+    config('shop.models.shippingMode')::firstWhere('provider', 'def')
+        ->paymentModes()
+        ->saveMany([
+            new (config('shop.models.paymentMode'))([
+                'name' => 'OPQ',
+                'price_gross' => 1.0,
+                'provider' => 'opq',
+            ]),
+            new (config('shop.models.paymentMode'))([
+                'name' => 'RST',
+                'price_gross' => 1.0,
+                'provider' => 'rst',
+            ]),
+        ]);
 
-        config('shop.models.shippingMode')::firstWhere('provider', 'def')
-            ->paymentModes()
-            ->saveMany([
-                new (config('shop.models.paymentMode'))([
-                    'name' => 'OPQ',
-                    'price_gross' => 1.0,
-                    'provider' => 'opq',
-                ]),
-                new (config('shop.models.paymentMode'))([
-                    'name' => 'RST',
-                    'price_gross' => 1.0,
-                    'provider' => 'rst',
-                ]),
-            ]);
+    // shipping mode 1
 
-        // shipping mode 1
+    post(route('api.shop.cart.shippingMode.store', [
+        'provider' => 'abc',
+    ]));
 
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => 'abc',
-        ]));
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->shippingMode
+        ->paymentModes
+        ->toBe([
+            [
+                'provider' => 'ijk',
+                'name' => 'IJK',
+                'priceGross' => 1.0,
+            ],
+            [
+                'provider' => 'lmn',
+                'name' => 'LMN',
+                'priceGross' => 1.0,
+            ]
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'shippingMode' => [
-                        'paymentModes' => [
-                            [
-                                'provider' => 'ijk',
-                                'name' => 'IJK',
-                                'priceGross' => 1.0,
-                            ],
-                            [
-                                'provider' => 'lmn',
-                                'name' => 'LMN',
-                                'priceGross' => 1.0,
-                            ]
-                        ]
-                    ],
-                ],
-            ]);
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'ijk',
+    ]));
 
-        $this->post(route('api.shop.cart.paymentMode.store', [
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBe([
             'provider' => 'ijk',
-        ]));
+            'name' => 'IJK',
+            'priceGross' => 1.0,
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => [
-                        'provider' => 'ijk',
-                        'name' => 'IJK',
-                        'priceGross' => 1.0,
-                    ],
-                ],
-            ]);
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'lmn',
+    ]));
 
-        $this->post(route('api.shop.cart.paymentMode.store', [
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBe([
             'provider' => 'lmn',
-        ]));
+            'name' => 'LMN',
+            'priceGross' => 1.0,
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => [
-                        'provider' => 'lmn',
-                        'name' => 'LMN',
-                        'priceGross' => 1.0,
-                    ],
-                ],
-            ]);
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'opq',
+    ]));
 
-        $this->post(route('api.shop.cart.paymentMode.store', [
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBeNull();
+
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'rst',
+    ]));
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBeNull();
+
+    // shipping mode 2
+
+    post(route('api.shop.cart.shippingMode.store', [
+        'provider' => 'def',
+    ]));
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->shippingMode
+        ->paymentModes
+        ->toBe([
+            [
+                'provider' => 'opq',
+                'name' => 'OPQ',
+                'priceGross' => 1.0,
+            ],
+            [
+                'provider' => 'rst',
+                'name' => 'RST',
+                'priceGross' => 1.0,
+            ]
+        ]);
+
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'ijk',
+    ]));
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBeNull();
+
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'lmn',
+    ]));
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBeNull();
+
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'opq',
+    ]));
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBe([
             'provider' => 'opq',
-        ]));
+            'name' => 'OPQ',
+            'priceGross' => 1.0,
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => null,
-                ],
-            ]);
+    post(route('api.shop.cart.paymentMode.store', [
+        'provider' => 'rst',
+    ]));
 
-        $this->post(route('api.shop.cart.paymentMode.store', [
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->paymentMode
+        ->toBe([
             'provider' => 'rst',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => null,
-                ],
-            ]);
-
-        // shipping mode 2
-
-        $this->post(route('api.shop.cart.shippingMode.store', [
-            'provider' => 'def',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'shippingMode' => [
-                        'paymentModes' => [
-                            [
-                                'provider' => 'opq',
-                                'name' => 'OPQ',
-                                'priceGross' => 1.0,
-                            ],
-                            [
-                                'provider' => 'rst',
-                                'name' => 'RST',
-                                'priceGross' => 1.0,
-                            ]
-                        ]
-                    ],
-                ],
-            ]);
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => 'ijk',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => null,
-                ],
-            ]);
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => 'lmn',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => null,
-                ],
-            ]);
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => 'opq',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => [
-                        'provider' => 'opq',
-                        'name' => 'OPQ',
-                        'priceGross' => 1.0,
-                    ],
-                ],
-            ]);
-
-        $this->post(route('api.shop.cart.paymentMode.store', [
-            'provider' => 'rst',
-        ]));
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'paymentMode' => [
-                        'provider' => 'rst',
-                        'name' => 'RST',
-                        'priceGross' => 1.0,
-                    ],
-                ],
-            ]);
-    }
-}
+            'name' => 'RST',
+            'priceGross' => 1.0,
+        ]);
+});

@@ -2,15 +2,13 @@
 
 namespace DV5150\Shop\Tests\Mock\Factories;
 
+use DV5150\Shop\Tests\Mock\Models\ShippingMode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 class ShippingModeFactory extends Factory
 {
-    public function modelName(): string
-    {
-        return config('shop.models.shippingMode');
-    }
+    protected $model = ShippingMode::class;
 
     /**
      * Define the model's default state.

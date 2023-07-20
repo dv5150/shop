@@ -11,7 +11,7 @@ class ShopItemCapsule implements ShopItemCapsuleContract
 {
     public function __construct(
         protected SellableItemContract $sellableItem,
-        protected int $quantity,
+        protected int $quantity = 1,
         protected ?BaseDiscountContract $discount = null,
         protected ?float $discountedPriceGross = null
     ){}
@@ -44,8 +44,8 @@ class ShopItemCapsule implements ShopItemCapsuleContract
             'item' => [
                 'id' => $this->getSellableItem()->getKey(),
                 'name' => $this->getSellableItem()->getName(),
-                'price_gross' => $this->getPriceGross(),
-                'price_gross_original' => $this->getOriginalPriceGross(),
+                'price_gross' => (float) $this->getPriceGross(),
+                'price_gross_original' => (float) $this->getOriginalPriceGross(),
                 'discount' => $this->getDiscount()?->toArray(),
                 'is_digital' => $this->getSellableItem()->isDigitalItem(),
             ],

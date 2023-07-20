@@ -4,55 +4,28 @@ namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Tests\Mock\Models\Category;
-use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 
-class ProductTest extends TestCase
-{
-    protected Category $categoryA;
-    protected Category $categoryB;
+test('a product has multiple categories', function () {
+    list($productA, $productB) = $this->productClass::factory()
+        ->count(2)
+        ->create()
+        ->all();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    list($categoryA, $categoryB) = $this->categoryClass::factory()
+        ->count(2)
+        ->create()
+        ->all();
 
-        $this->categoryA = Category::factory()->create();
-        $this->categoryB = Category::factory()->create();
-    }
+    $productA->categories()->sync((new Collection([$categoryA, $categoryB]))->modelKeys());
+    $productB->categories()->sync((new Collection([$categoryA, $categoryB]))->modelKeys());
 
-    /** @test */
-    public function a_product_has_multiple_categories()
-    {
-        $this->productA->categories()->sync([
-            $this->categoryA->getKey(),
-            $this->categoryB->getKey(),
-        ]);
-
-        $this->productB->categories()->sync([
-            $this->categoryA->getKey(),
-            $this->categoryB->getKey(),
-        ]);
-
-        $this->assertInstanceOf(Collection::class, $this->productA->categories);
-        $this->assertInstanceOf(Collection::class, $this->productB->categories);
-
-        $this->productA->categories->each(function ($category) {
-            $this->assertInstanceOf(Category::class, $category);
-        });
-
-        $this->productB->categories->each(function ($category) {
-            $this->assertInstanceOf(Category::class, $category);
-        });
-
-        $this->assertInstanceOf(Collection::class, $this->categoryA->products);
-        $this->assertInstanceOf(Collection::class, $this->categoryB->products);
-
-        $this->categoryA->products->each(function ($product) {
-            $this->assertInstanceOf(SellableItemContract::class, $product);
-        });
-
-        $this->categoryB->products->each(function ($product) {
-            $this->assertInstanceOf(SellableItemContract::class, $product);
-        });
-    }
-}
+    expect($productA->categories)->toBeInstanceOf(Collection::class)
+        ->and($productB->categories)->toBeInstanceOf(Collection::class)
+        ->and($productA->categories)->each()->toBeInstanceOf(Category::class)
+        ->and($productB->categories)->each()->toBeInstanceOf(Category::class)
+        ->and($categoryA->products)->toBeInstanceOf(Collection::class)
+        ->and($categoryB->products)->toBeInstanceOf(Collection::class)
+        ->and($categoryA->products)->each()->toBeInstanceOf(SellableItemContract::class)
+        ->and($categoryB->products)->each()->toBeInstanceOf(SellableItemContract::class);
+});

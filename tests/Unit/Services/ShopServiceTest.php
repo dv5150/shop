@@ -1,26 +1,18 @@
 <?php
 
-namespace DV5150\Shop\Tests\Unit\Services;
+namespace DV5150\Shop\Tests\Concerns\Services;
 
 use DV5150\Shop\Facades\Shop;
 use DV5150\Shop\Tests\Mock\PaymentProviders\TestPaymentProvider;
-use DV5150\Shop\Tests\TestCase;
 
-class ShopServiceTest extends TestCase
-{
-    /** @test */
-    public function a_payment_provider_can_be_registered()
-    {
-        $this->assertSame(Shop::getAllPaymentProviders(), []);
+it('can register a payment provider', function () {
+    expect(Shop::getAllPaymentProviders())->toBe([]);
 
-        Shop::registerPaymentProviders([
-            TestPaymentProvider::class
-        ]);
+    Shop::registerPaymentProviders([TestPaymentProvider::class]);
 
-        $this->assertSame(Shop::getAllPaymentProviders(), [
-            'test' => TestPaymentProvider::class
-        ]);
+    expect(Shop::getAllPaymentProviders())
+        ->toBe(['test' => TestPaymentProvider::class])
+        ->and(Shop::getPaymentProvider('test'))
+        ->toBe(TestPaymentProvider::class);
 
-        $this->assertSame(Shop::getPaymentProvider('test'), TestPaymentProvider::class);
-    }
-}
+});

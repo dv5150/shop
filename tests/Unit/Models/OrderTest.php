@@ -4,64 +4,63 @@ namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
-use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
-use DV5150\Shop\Contracts\Models\ShopUserContract;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use function Pest\Laravel\post;
 
-class OrderTest extends TestCase
-{
-    use ProvidesSampleOrderData,
-        ProvidesSampleShippingModeData;
+test('an order has multiple order items', function () {
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     */
+    list($productA, $productB) = $this->productClass::factory()
+        ->count(2)
+        ->state(new Sequence(
+            ['price_gross' => 3000.0],
+            ['price_gross' => 8000.0],
+        ))
+        ->create()
+        ->all();
 
-        $this->setUpSampleOrderData();
-        $this->setUpSampleShippingModeData();
-    }
+    post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 7,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 7,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
 
-    /** @test */
-    public function an_order_has_multiple_order_items()
-    {
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem($this->productA, 2),
-                    $this->makeProductCartDataItem($this->productB, 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
+    $order = config('shop.models.order')::with('items')->first();
 
-        $order = config('shop.models.order')::with('items')->first();
+    expect($order)
+        ->toBeInstanceOf(OrderContract::class)
+        ->and($order->items)
+        ->toBeInstanceOf(Collection::class)
+        ->and($order->items)
+        ->each()
+        ->toBeInstanceOf(OrderItemContract::class);
 
-        $this->assertInstanceOf(Collection::class, $order->items);
-
-        $order->items->each(function ($orderItem) {
-            $this->assertInstanceOf(OrderItemContract::class, $orderItem);
-        });
-
-        $order->items->each(function (OrderItemContract $orderItem) {
-            $this->assertInstanceOf(OrderContract::class, $orderItem->getOrder());
-        });
-
-        $order->items->each(function (OrderItemContract $orderItem) {
-            $this->assertInstanceOf(SellableItemContract::class, $orderItem->getSellable());
-        });
-    }
-}
+    $order->items->each(function (OrderItemContract $orderItem) {
+        expect($orderItem->getSellable())->toBeInstanceOf(SellableItemContract::class);
+    });
+});

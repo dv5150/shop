@@ -2,32 +2,18 @@
 
 namespace DV5150\Shop\Tests\Unit\Models;
 
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 
-class ShippingModeTest extends TestCase
-{
-    use ProvidesSampleShippingModeData;
+test('shipping mode can be converted to order item', function () {
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()->create();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $expected = new (config('shop.models.orderItem'))([
+        'name' => $shippingMode->getName(),
+        'quantity' => 1,
+        'price_gross' => $shippingMode->getPriceGross(),
+        'info' => null,
+    ]);
 
-        $this->setUpSampleShippingModeData();
-    }
-
-    /** @test */
-    public function shipping_mode_can_be_converted_to_order_item()
-    {
-        $expected = new (config('shop.models.orderItem'))([
-            'name' => $this->shippingMode->getName(),
-            'quantity' => 1,
-            'price_gross' => $this->shippingMode->getPriceGross(),
-            'info' => null,
-        ]);
-
-        $actual = $this->shippingMode->toOrderItem();
-
-        $this->assertTrue($expected->is($actual));
-    }
-}
+    expect($shippingMode->toOrderItem()->is($expected))->toBeTrue();
+});

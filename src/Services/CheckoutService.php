@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Services;
 
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
@@ -63,6 +64,7 @@ class CheckoutService implements CheckoutServiceContract
                 ))->applyBestDiscount()
             ));
 
+        /** @var BaseCouponContract $coupon */
         if ($coupon = Cart::getCoupon()) {
             $orderItems->push(
                 $coupon->getCoupon()
@@ -70,10 +72,12 @@ class CheckoutService implements CheckoutServiceContract
             );
         }
 
+        /** @var ShippingModeContract $shippingMode */
         if ($shippingMode = Cart::getShippingMode()) {
             $orderItems->push($shippingMode->toOrderItem());
         }
 
+        /** @var PaymentModeContract $paymentMode */
         if ($paymentMode = Cart::getPaymentMode()) {
             $orderItems->push($paymentMode->toOrderItem());
         }

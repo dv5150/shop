@@ -3,175 +3,164 @@
 namespace DV5150\Shop\Tests\Feature;
 
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Tests\TestCase;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
-class CartTest extends TestCase
-{
-    /** @test */
-    public function items_can_be_added()
-    {
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productA,
-        ]));
+it('can add items to the cart', function (): void {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productB,
-        ]));
+    post(route('api.shop.cart.store', ['product' => $productA]))->assertOk();
+    post(route('api.shop.cart.store', ['product' => $productB]))->assertOk();
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA),
-                        $this->expectProductInCart($this->productB),
-                    ],
-                ]
-            ]);
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(2)
+        ->toBe([
+            (new ($this->shopItemCapsuleClass)($productA))->toArray(),
+            (new ($this->shopItemCapsuleClass)($productB))->toArray(),
+        ]);
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productA,
-            'quantity' => 5,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productA,
+        'quantity' => 5,
+    ]))->assertOk();
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productB,
-            'quantity' => 9,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productB,
+        'quantity' => 9,
+    ]))->assertOk();
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA, 6),
-                        $this->expectProductInCart($this->productB, 10),
-                    ],
-                ]
-            ]);
-    }
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(2)
+        ->toBe([
+            (new ($this->shopItemCapsuleClass)($productA, 6))->toArray(),
+            (new ($this->shopItemCapsuleClass)($productB, 10))->toArray(),
+        ]);
+});
 
-    /** @test */
-    public function items_can_be_removed()
-    {
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productA,
-            'quantity' => 15,
-        ]));
+it('can remove items from the cart', function (): void {
+    list($productA, $productB, $productC) = $this->productClass::factory()->count(3)->create()->all();
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productB,
-            'quantity' => 12,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productA,
+        'quantity' => 15,
+    ]));
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productC,
-            'quantity' => 6,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productB,
+        'quantity' => 12,
+    ]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productA,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productC,
+        'quantity' => 6,
+    ]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productB,
-        ]));
+    post(route('api.shop.cart.remove', ['product' => $productA]));
+    post(route('api.shop.cart.remove', ['product' => $productB]));
+    post(route('api.shop.cart.remove', ['product' => $productC]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productC,
-        ]));
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(3)
+        ->toBe([
+            (new ($this->shopItemCapsuleClass)($productA, 14))->toArray(),
+            (new ($this->shopItemCapsuleClass)($productB, 11))->toArray(),
+            (new ($this->shopItemCapsuleClass)($productC, 5))->toArray(),
+        ]);
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA, 14),
-                        $this->expectProductInCart($this->productB, 11),
-                        $this->expectProductInCart($this->productC, 5),
-                    ],
-                ]
-            ]);
+    post(route('api.shop.cart.remove', [
+        'product' => $productA,
+        'quantity' => 14,
+    ]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productA,
-            'quantity' => 14,
-        ]));
+    post(route('api.shop.cart.remove', [
+        'product' => $productB,
+        'quantity' => 11,
+    ]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productB,
-            'quantity' => 11,
-        ]));
+    post(route('api.shop.cart.remove', [
+        'product' => $productC,
+        'quantity' => 999,
+    ]));
 
-        $this->post(route('api.shop.cart.remove', [
-            'product' => $this->productC,
-            'quantity' => 999,
-        ]));
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(0);
+});
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [],
-                ]
-            ]);
-    }
+it('can erase items from cart', function () {
+    $productA = $this->productClass::factory()->create();
 
-    /** @test */
-    public function items_can_be_erased()
-    {
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productA,
-            'quantity' => 15,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productA,
+        'quantity' => 15,
+    ]));
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart($this->productA, 15),
-                    ],
-                ]
-            ]);
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(1)
+        ->toBe([
+            (new ($this->shopItemCapsuleClass)($productA, 15))->toArray(),
+        ]);
 
-        $this->delete(route('api.shop.cart.erase', [
-            'product' => $this->productA,
-        ]));
+    delete(route('api.shop.cart.erase', ['product' => $productA]));
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [],
-                ]
-            ]);
-    }
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(0);
+});
 
-    /** @test */
-    public function cart_can_be_recognized_as_digital_cart()
-    {
-        $this->productC->update(['is_digital_item' => true]);
+it('can be recognized as a digital cart', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productA,
-            'quantity' => 3,
-        ]));
+    $productC = $this->productClass::factory()->digital()->create();
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productB,
-            'quantity' => 6,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productA,
+        'quantity' => 3,
+    ]));
 
-        $this->post(route('api.shop.cart.store', [
-            'product' => $this->productC,
-            'quantity' => 2,
-        ]));
+    post(route('api.shop.cart.store', [
+        'product' => $productB,
+        'quantity' => 6,
+    ]));
 
-        $this->assertFalse(Cart::hasDigitalItemsOnly());
+    post(route('api.shop.cart.store', [
+        'product' => $productC,
+        'quantity' => 2,
+    ]));
 
-        $this->delete(route('api.shop.cart.erase', [
-            'product' => $this->productA,
-        ]));
+    expect(Cart::hasDigitalItemsOnly())->toBeFalse();
 
-        $this->delete(route('api.shop.cart.erase', [
-            'product' => $this->productB,
-        ]));
+    delete(route('api.shop.cart.erase', ['product' => $productA]));
+    delete(route('api.shop.cart.erase', ['product' => $productB]));
 
-        $this->assertTrue(Cart::hasDigitalItemsOnly());
-    }
-}
+    expect(Cart::hasDigitalItemsOnly())->toBeTrue();
+});

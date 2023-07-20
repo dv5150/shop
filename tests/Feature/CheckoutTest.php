@@ -2,326 +2,519 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
-use DV5150\Shop\Concerns\Shop\HandlesPaymentProviderRegistration;
 use DV5150\Shop\Contracts\Models\OrderContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
-use DV5150\Shop\Contracts\Services\ShopServiceContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Facades\Shop;
-use DV5150\Shop\Models\Default\Order;
-use DV5150\Shop\Services\ShopService;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
 use DV5150\Shop\Tests\Mock\PaymentProviders\TestPaymentProvider;
-use DV5150\Shop\Tests\TestCase;
-use Illuminate\Support\Facades\App;
-use Mockery;
+use function Pest\Laravel\be;
+use function Pest\Laravel\post;
 
-class CheckoutTest extends TestCase
-{
-    use ProvidesSampleUser,
-        ProvidesSampleOrderData,
-        ProvidesSampleShippingModeData;
+it('can store one item in an order as a guest', function (array $orderData) {
+    $productA = $this->productClass::factory()->create();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
 
-        $this->setUpSampleUser();
-        $this->setUpSampleOrderData();
-        $this->setUpSampleShippingModeData();
-    }
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
 
-    /** @test */
-    public function an_order_with_multiple_items_can_be_stored_as_guest()
-    {
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
+    post(route('api.shop.checkout.store'), array_merge($orderData['source'], [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
 
-        $order = config('shop.models.order')::first();
+    $this->assertDatabaseHas('orders', $orderData['expected']);
+    $this->assertDatabaseCount('orders', 1);
 
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
+    $order = config('shop.models.order')::first();
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 2,
+        'price_gross' => $productA->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+})->with([
+    // required fields only
+    fn () => [
+        'source' => $this->testOrderDataRequired,
+        'expected' => array_merge($this->expectedOrderDataRequired, ['user_id' => null]),
+    ],
+    // full form filled
+    fn () => [
+        'source' => array_merge_recursive($this->testOrderDataRequired, [
+            'personalData' => ['comment' => 'Test comment personal'],
+            'shippingData' => ['comment' => 'Test comment shipping'],
+            'billingData' => ['taxNumber' => '9000000'],
+        ]),
+        'expected' => array_merge_recursive($this->expectedOrderDataRequired, [
+            'comment' => 'Test comment personal',
+            'shipping_comment' => 'Test comment shipping',
+            'billing_tax_number' => '9000000',
             'user_id' => null,
-        ]));
+        ]),
+    ],
+]);
 
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 2);
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 4);
-    }
+it('can store multiple items in an order as a guest', function (array $orderData) {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
 
-    /** @test */
-    public function an_order_with_multiple_items_can_be_stored_as_user()
-    {
-        $this->be($this->testUser);
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
 
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 5),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 3),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
 
-        $order = config('shop.models.order')::first();
+    post(route('api.shop.checkout.store'), array_merge($orderData['source'], [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ]
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
 
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
-            'user_id' => $this->testUser->getKey(),
-        ]));
+    $this->assertDatabaseHas('orders', $orderData['expected']);
+    $this->assertDatabaseCount('orders', 1);
 
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 5);
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 3);
-    }
+    $order = config('shop.models.order')::first();
 
-    /** @test */
-    public function an_order_with_a_single_item_can_be_stored_as_guest()
-    {
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 2,
+        'price_gross' => $productA->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
 
-        $order = config('shop.models.order')::first();
-
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productB::class,
+        'sellable_id' => $productB->getKey(),
+        'name' => $productB->getName(),
+        'quantity' => 4,
+        'price_gross' => $productB->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+})->with([
+    // required fields only
+    fn () => [
+        'source' => $this->testOrderDataRequired,
+        'expected' => array_merge($this->expectedOrderDataRequired, ['user_id' => null]),
+    ],
+    // full form filled
+    fn () => [
+        'source' => array_merge_recursive($this->testOrderDataRequired, [
+            'personalData' => ['comment' => 'Test comment personal'],
+            'shippingData' => ['comment' => 'Test comment shipping'],
+            'billingData' => ['taxNumber' => '9000000'],
+        ]),
+        'expected' => array_merge_recursive($this->expectedOrderDataRequired, [
+            'comment' => 'Test comment personal',
+            'shipping_comment' => 'Test comment shipping',
+            'billing_tax_number' => '9000000',
             'user_id' => null,
+        ]),
+    ],
+]);
+
+it('can store one item in an order as a user', function (array $data) {
+    $productA = $this->productClass::factory()->create();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    be($data['user']);
+
+    post(route('api.shop.checkout.store'), array_merge($data['order']['source'], [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    $this->assertDatabaseHas('orders', array_merge($data['order']['expected'], [
+        'user_id' => $data['user']->getKey(),
+    ]));
+
+    $this->assertDatabaseCount('orders', 1);
+
+    $order = config('shop.models.order')::first();
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 2,
+        'price_gross' => $productA->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+})->with([
+    // required fields only
+    fn () => [
+        'order' => [
+            'source' => $this->testOrderDataRequired,
+            'expected' => $this->expectedOrderDataRequired,
+        ],
+        'user' => config('shop.models.user')::factory()->create()
+    ],
+    // full form filled
+    fn () => [
+        'order' => [
+            'source' => array_merge_recursive($this->testOrderDataRequired, [
+                'personalData' => ['comment' => 'Test comment personal'],
+                'shippingData' => ['comment' => 'Test comment shipping'],
+                'billingData' => ['taxNumber' => '9000000'],
+            ]),
+            'expected' => array_merge_recursive($this->expectedOrderDataRequired, [
+                'comment' => 'Test comment personal',
+                'shipping_comment' => 'Test comment shipping',
+                'billing_tax_number' => '9000000',
+            ]),
+        ],
+        'user' => config('shop.models.user')::factory()->create()
+    ],
+]);
+
+it('can store multiple items in an order as a user', function (array $data) {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    be($data['user']);
+
+    post(route('api.shop.checkout.store'), array_merge($data['order']['source'], [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 1,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 6,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    $this->assertDatabaseHas('orders', array_merge($data['order']['expected'], [
+        'user_id' => $data['user']->getKey(),
+    ]));
+
+    $this->assertDatabaseCount('orders', 1);
+
+    $order = config('shop.models.order')::first();
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 1,
+        'price_gross' => $productA->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productB::class,
+        'sellable_id' => $productB->getKey(),
+        'name' => $productB->getName(),
+        'quantity' => 6,
+        'price_gross' => $productB->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+})->with([
+    // required fields only
+    fn () => [
+        'order' => [
+            'source' => $this->testOrderDataRequired,
+            'expected' => $this->expectedOrderDataRequired,
+        ],
+        'user' => config('shop.models.user')::factory()->create()
+    ],
+    // full form filled
+    fn () => [
+        'order' => [
+            'source' => array_merge_recursive($this->testOrderDataRequired, [
+                'personalData' => ['comment' => 'Test comment personal'],
+                'shippingData' => ['comment' => 'Test comment shipping'],
+                'billingData' => ['taxNumber' => '9000000'],
+            ]),
+            'expected' => array_merge_recursive($this->expectedOrderDataRequired, [
+                'comment' => 'Test comment personal',
+                'shipping_comment' => 'Test comment shipping',
+                'billing_tax_number' => '9000000',
+            ]),
+        ],
+        'user' => config('shop.models.user')::factory()->create()
+    ],
+]);
+
+it('removes sellable relation from order items when the attached item is deleted', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    $productB->delete();
+
+    $order = config('shop.models.order')::first();
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 2,
+        'price_gross' => $productA->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'sellable_type' => null,
+        'sellable_id' => null,
+        'name' => $productB->getName(),
+        'quantity' => 4,
+        'price_gross' => $productB->getPriceGross(),
+        'info' => null,
+        'type' => 'product',
+    ]);
+});
+
+it('returns the correct redirect url on saving an order without the frontend package or any online payment modes installed', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    $response = post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    /** @var OrderContract $order */
+    $order = config('shop.models.order')::first();
+
+    expect(Shop::isFrontendInstalled())
+        ->toBeFalse()
+        ->and($order->requiresOnlinePayment())
+        ->toBeFalse()
+        ->and($response->getContent())
+        ->toBeJson()
+        ->json()
+        ->redirectUrl
+        ->toBe(route('home'));
+});
+
+it('returns the correct redirect url on saving an order with the frontend package installed', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    Shop::shouldReceive('isFrontendInstalled')
+        ->once()
+        ->andReturnTrue();
+
+    $response = post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    /** @var OrderContract $order */
+    $order = config('shop.models.order')::first();
+
+    expect($order->requiresOnlinePayment())
+        ->toBeFalse()
+        ->and($response->getContent())
+        ->toBeJson()
+        ->json()
+        ->redirectUrl
+        ->toBe(route('shop.order.thankYou', [
+            'order' => $order->getUuid(),
+        ]));
+});
+
+it('returns the correct redirect url on saving an order with an online payment provider installed', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    Shop::registerPaymentProviders([
+        TestPaymentProvider::class,
+    ]);
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->online()->create([
+            'provider' => 'test',
         ]));
 
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order);
-    }
+    /** @var PaymentModeContract $paymentMode */
+    $paymentMode = config('shop.models.paymentMode')::first();
 
-    /** @test */
-    public function an_order_with_a_single_item_can_be_stored_as_user()
-    {
-        $this->be($this->testUser);
+    expect($paymentMode->getProvider() === 'test')->toBeTrue();
 
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 2),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
+    Shop::shouldReceive('isFrontendInstalled')->never();
 
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
-            'user_id' => $this->testUser->getKey(),
+    $response = post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    /** @var OrderContract $order */
+    $order = config('shop.models.order')::first();
+
+    expect($order->requiresOnlinePayment())
+        ->toBeTrue()
+        ->and($response->getContent())
+        ->toBeJson()
+        ->json()
+        ->redirectUrl
+        ->toBe(route('shop.pay', [
+            'paymentProvider' => 'test',
+            'order' => $order->getUuid(),
         ]));
-
-        $order = config('shop.models.order')::first();
-
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 2);
-    }
-
-    /** @test */
-    public function order_items_lose_their_sellable_relation_when_the_attached_item_is_deleted()
-    {
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
-
-        $this->productB->delete();
-
-        $order = config('shop.models.order')::first();
-
-        $this->assertDatabaseHasProductOrderItem(
-            sellableItem: $this->productA,
-            order: $order,
-            quantity: 2
-        );
-
-        $this->assertDatabaseHasProductOrderItemWithMissingRelation(
-            sellableItem: $this->productB,
-            order: $order,
-            quantity: 4
-        );
-    }
-
-    /** @test */
-    public function saving_and_order_returns_the_correct_redirect_url_without_online_payment_or_frontend_installed()
-    {
-        $this->assertFalse(Shop::isFrontendInstalled());
-
-        $response = $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
-
-        /** @var OrderContract $order */
-        $order = config('shop.models.order')::first();
-
-        $this->assertFalse($order->requiresOnlinePayment());
-
-        $response->assertJson([
-            'redirectUrl' => route('home'),
-        ]);
-    }
-
-    /** @test */
-    public function saving_and_order_returns_the_correct_redirect_url_with_frontend_installed()
-    {
-        $this->instance(ShopServiceContract::class, $this->getTestShopService());
-
-        $this->assertTrue(Shop::isFrontendInstalled());
-
-        $response = $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
-
-        /** @var OrderContract $order */
-        $order = config('shop.models.order')::first();
-
-        $this->assertFalse($order->requiresOnlinePayment());
-
-        $response->assertJson([
-            'redirectUrl' => route('shop.order.thankYou', [
-                'order' => $order->getUuid(),
-            ]),
-        ]);
-    }
-
-    /** @test */
-    public function saving_and_order_returns_the_correct_redirect_url_with_online_payment_provider_installed()
-    {
-        $this->instance(ShopServiceContract::class, $this->getTestShopService());
-
-        $this->assertTrue(Shop::isFrontendInstalled());
-
-        Shop::registerPaymentProviders([
-            TestPaymentProvider::class,
-        ]);
-
-        /** @var PaymentModeContract $paymentMode */
-        $paymentMode = config('shop.models.paymentMode')::first();
-
-        $this->assertTrue($paymentMode->getProvider() === 'test');
-
-        $paymentMode->update(['is_online_payment' => true]);
-
-        $response = $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 2),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 4),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
-                ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
-                ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
-
-        /** @var OrderContract $order */
-        $order = config('shop.models.order')::first();
-
-        $this->assertTrue($order->requiresOnlinePayment());
-
-        $response->assertJson([
-            'redirectUrl' => route('pay', [
-                'paymentProvider' => 'test',
-                'order' => $order->getUuid(),
-            ]),
-        ]);
-    }
-
-    protected function getTestShopService(): object
-    {
-        return new class {
-            use HandlesPaymentProviderRegistration;
-
-            public static function isFrontendInstalled(): bool
-            {
-                return true;
-            }
-        };
-    }
-}
+});

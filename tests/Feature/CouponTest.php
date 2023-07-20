@@ -2,410 +2,394 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
+use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
+use DV5150\Shop\Contracts\Deals\Coupons\CouponContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Models\Deals\Coupons\CartPercentCoupon;
-use DV5150\Shop\Models\Deals\Coupons\CartValueCoupon;
-use DV5150\Shop\Tests\Concerns\CreatesCartCoupons;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSamplePaymentModeData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
+use DV5150\Shop\Tests\Mock\Models\Deals\Coupon;
+use DV5150\Shop\Tests\Mock\Models\Deals\Coupons\CartPercentCoupon;
+use DV5150\Shop\Tests\Mock\Models\Deals\Coupons\CartValueCoupon;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use function Pest\Laravel\delete;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
-class CouponTest extends TestCase
-{
-    use CreatesCartCoupons,
-        ProvidesSampleOrderData,
-        ProvidesSampleShippingModeData,
-        ProvidesSamplePaymentModeData;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('calculates coupon cart prices properly', function () {
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     * @var SellableItemContract $productC
+     */
+    list($productA, $productB, $productC) = $this->productClass::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['price_gross' => 3000.0],
+            ['price_gross' => 8000.0],
+            ['price_gross' => 17000.0],
+        ))
+        ->create()
+        ->all();
 
-        $this->setUpSampleOrderData();
-        $this->setUpSampleShippingModeData();
-
-        $this->productA->update(['price_gross' => 3000.0]);
-        $this->productB->update(['price_gross' => 8000.0]);
-        $this->productC->update(['price_gross' => 17000.0]);
-    }
-
-    /** @test */
-    public function cart_percent_coupon_is_working()
-    {
-        Cart::addItem($this->productA);
-        Cart::addItem($this->productB);
-        Cart::addItem($this->productC);
-
-        $couponA = $this->createCartPercentCoupon(
-            name: '10% OFF discount',
-            value: 10.0,
-            code: 'CART10PERCENTOFF'
-        );
-
-        $couponB = $this->createCartPercentCoupon(
-            name: '25% OFF discount',
-            value: 25.0,
-            code: 'CART25PERCENTOFF'
-        );
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(sellableItem: $this->productA),
-                        $this->expectProductInCart(sellableItem: $this->productB),
-                        $this->expectProductInCart(sellableItem: $this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
-                ]
-            ]);
-
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponA->getCode(),
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
+    $response = [
+        'items' => [
+            [
+                'item' => [
+                    'id' => $productA->getKey(),
+                    'name' => $productA->getName(),
+                    'price_gross' => 3000.0,
+                    'price_gross_original' => 3000.0,
+                    'discount' => null,
+                    'is_digital' => false,
                 ],
-                'total' => 25200.0,
-                'coupon' => [
-                    'couponItem' => $couponA->toArray(),
-                    'couponDiscountAmount' => -2800.0,
-                ],
-            ]
-        ]);
-
-        // expect no change compared to previous one when non-existent code is tried
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => 'non-existent-code'
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
-                ],
-                'total' => 25200.0,
-                'coupon' => [
-                    'couponItem' => $couponA->toArray(),
-                    'couponDiscountAmount' => -2800.0,
-                ],
-                'messages' => [
-                    'coupon' => [
-                        '404' => [
-                            'text' => __('Coupon not found.'),
-                            'type' => 'negative',
-                        ],
-                    ]
-                ]
+                'quantity' => 1,
+                'subtotal' => 3000.0,
             ],
-        ]);
-
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponB->getCode(),
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
+            [
+                'item' => [
+                    'id' => $productB->getKey(),
+                    'name' => $productB->getName(),
+                    'price_gross' => 8000.0,
+                    'price_gross_original' => 8000.0,
+                    'discount' => null,
+                    'is_digital' => false,
                 ],
-                'total' => 21000.0,
-                'coupon' => [
-                    'couponItem' => $couponB->toArray(),
-                    'couponDiscountAmount' => -7000.0,
+                'quantity' => 1,
+                'subtotal' => 8000.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productC->getKey(),
+                    'name' => $productC->getName(),
+                    'price_gross' => 17000.0,
+                    'price_gross_original' => 17000.0,
+                    'discount' => null,
+                    'is_digital' => false,
                 ],
-            ]
-        ]);
+                'quantity' => 1,
+                'subtotal' => 17000.0,
+            ],
+        ],
+        'coupon' => null,
+        'subtotal' => 28000.0,
+        'total' => 28000.0,
+        'currency' => [
+            'code' => 'HUF'
+        ],
+        'availableShippingModes' => [],
+        'shippingMode' => null,
+        'paymentMode' => null,
+        'preSavedShippingAddresses' => [],
+        'messages' => null,
+    ];
 
-        $this->delete(route('api.shop.cart.coupon.erase'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(sellableItem: $this->productA),
-                        $this->expectProductInCart(sellableItem: $this->productB),
-                        $this->expectProductInCart(sellableItem: $this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
-                ]
-            ]);
-    }
+    Cart::addItem($productA);
+    Cart::addItem($productB);
+    Cart::addItem($productC);
 
-    /** @test */
-    public function cart_value_coupon_is_working()
-    {
-        Cart::addItem($this->productA);
-        Cart::addItem($this->productB);
-        Cart::addItem($this->productC);
+    /** @var BaseCouponContract $couponA */
+    $couponA = CartPercentCoupon::factory()
+        ->afterCreating(function (CouponContract $coupon) {
+            /** @var BaseCouponContract $baseCoupon */
+            $baseCoupon = Coupon::factory()->make(['code' => 'CART10PERCENTOFF']);
+            $baseCoupon->coupon()->associate($coupon);
+            $baseCoupon->save();
+        })
+        ->create([
+            'name' => '10% OFF discount',
+            'value' => 10.0,
+        ])->getBaseCoupon();
 
-        $couponA = $this->createCartValueCoupon(
-            name: '700 OFF discount',
-            value: 700.0,
-            code: 'CART700OFF'
-        );
+    /** @var BaseCouponContract $couponA */
+    $couponB = CartPercentCoupon::factory()
+        ->afterCreating(function (CouponContract $coupon) {
+            /** @var BaseCouponContract $baseCoupon */
+            $baseCoupon = Coupon::factory()->make(['code' => 'CART25PERCENTOFF']);
+            $baseCoupon->coupon()->associate($coupon);
+            $baseCoupon->save();
+        })
+        ->create([
+            'name' => '25% OFF discount',
+            'value' => 25.0,
+        ])->getBaseCoupon();
 
-        $couponB = $this->createCartValueCoupon(
-            name: '1900 OFF discount',
-            value: 1900.0,
-            code: 'CART1900FF'
-        );
+    /** @var BaseCouponContract $couponA */
+    $couponC = CartValueCoupon::factory()
+        ->afterCreating(function (CouponContract $coupon) {
+            /** @var BaseCouponContract $baseCoupon */
+            $baseCoupon = Coupon::factory()->make(['code' => 'CART3777OFF']);
+            $baseCoupon->coupon()->associate($coupon);
+            $baseCoupon->save();
+        })
+        ->create([
+            'name' => '3777 OFF discount',
+            'value' => 3777.0,
+        ])->getBaseCoupon();
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(sellableItem: $this->productA),
-                        $this->expectProductInCart(sellableItem: $this->productB),
-                        $this->expectProductInCart(sellableItem: $this->productC),
-                    ],
-                    'total' => 28000.0,
-                    'coupon' => null,
-                ]
-            ]);
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
 
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponA->getCode()
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
-                ],
-                'total' => 27300.0,
-                'coupon' => [
-                    'couponItem' => $couponA->toArray(),
-                    'couponDiscountAmount' => -700.0,
-                ],
-            ]
-        ]);
+    // 1) 10% OFF
+    Arr::set($response, 'total', 25200.0);
+    Arr::set($response, 'coupon', [
+        'couponItem' => $couponA->toArray(),
+        'couponDiscountAmount' => -2800.0,
+    ]);
 
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => 'non-existent-code'
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
-                ],
-                'total' => 27300.0,
-                'coupon' => [
-                    'couponItem' => $couponA->toArray(),
-                    'couponDiscountAmount' => -700.0,
-                ],
-                'messages' => [
-                    'coupon' => [
-                        '404' => [
-                            'text' => __('Coupon not found.'),
-                            'type' => 'negative',
-                        ],
-                    ]
-                ]
-            ]
-        ]);
+    expect(post(route('api.shop.cart.coupon.store', [
+        'code' => $couponA->getCode(),
+    ]))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
 
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $couponB->getCode(),
-        ]))->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
-                ],
-                'total' => 26100.0,
-                'coupon' => [
-                    'couponItem' => $couponB->toArray(),
-                    'couponDiscountAmount' => -1900.0,
-                ],
-            ]
-        ]);
+    // 2) expect no change compared to previous one when non-existent code is tried
+    Arr::set($response, 'messages', [
+        'coupon' => [
+            '404' => [
+                'type' => 'negative',
+                'text' => __('Coupon not found.'),
+            ],
+        ]
+    ]);
 
-        $this->delete(route('api.shop.cart.coupon.erase'))
-            ->assertJson([
-            'cart' => [
-                'items' => [
-                    $this->expectProductInCart(sellableItem: $this->productA),
-                    $this->expectProductInCart(sellableItem: $this->productB),
-                    $this->expectProductInCart(sellableItem: $this->productC),
-                ],
-                'total' => 28000.0,
-                'coupon' => null,
-            ]
-        ]);
-    }
+    expect(post(route('api.shop.cart.coupon.store', [
+        'code' => 'non-existent-code',
+    ]))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
 
-    /** @test */
-    public function cart_value_coupons_are_saved_properly_as_order_items_as_guest()
-    {
-        $coupon = $this->createCartValueCoupon(
-            name: '1100 OFF discount',
-            value: 1100.0,
-            code: 'CART1100OFF'
-        );
+    // 3) 25% OFF
+    Arr::set($response, 'total', 21000.0);
+    Arr::set($response, 'coupon', [
+        'couponItem' => $couponB->toArray(),
+        'couponDiscountAmount' => -7000.0,
+    ]);
+    Arr::set($response, 'messages', null);
 
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $coupon->getCode(),
-        ]));
+    expect(post(route('api.shop.cart.coupon.store', [
+        'code' => $couponB->getCode(),
+    ]))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
 
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 7),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 7),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingMode->getProvider(),
-                ],
-                'paymentMode' => [
-                    'provider' => $this->shippingMode->paymentModes()
-                        ->first()
-                        ->getProvider(),
-                ],
-                'shipping_mode_provider' => $this->shippingMode->getProvider(),
-                'payment_mode_provider' => $this->shippingMode->paymentModes()
-                    ->first()
-                    ->getProvider(),
-            ])
-        );
+    // 4) remove coupon
+    Arr::set($response, 'total', 28000.0);
+    Arr::set($response, 'coupon', null);
+    Arr::set($response, 'messages', null);
 
-        $order = config('shop.models.order')::first();
+    expect(delete(route('api.shop.cart.coupon.erase'))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
 
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
-            'user_id' => null,
-        ]));
+    // 5) 3777 OFF
+    Arr::set($response, 'total', 24223.0);
+    Arr::set($response, 'coupon', [
+        'couponItem' => $couponC->toArray(),
+        'couponDiscountAmount' => -3777.0,
+    ]);
 
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 7);
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 7);
+    expect(post(route('api.shop.cart.coupon.store', [
+        'code' => $couponC->getCode(),
+    ]))->getContent())
+        ->toBeJson()
+        ->json()
+        ->cart
+        ->toBe($response);
+});
 
-        $this->assertDatabaseHasCouponOrderItem(
-            coupon: $coupon,
-            order: $order,
-            priceGross: -1100.0,
-            info: "Code: {$coupon->getCode()}"
-        );
-    }
+it('saves coupons properly as order items as a guest', function (array $data) {
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
 
-    /** @test */
-    public function cart_percent_coupons_are_saved_properly_as_order_items_as_guest()
-    {
-        $coupon = $this->createCartPercentCoupon(
-            name: '25% OFF discount',
-            value: 25.0,
-            code: 'CART25OFF'
-        );
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
 
-        $this->post(route('api.shop.cart.coupon.store', [
-            'code' => $coupon->getCode(),
-        ]));
+    /** @var CouponContract $coupon */
+    list($orderData, $coupon, $expectedDiscountValue) = array_values($data);
 
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem(sellableItem: $this->productA, quantity: 8),
-                    $this->makeProductCartDataItem(sellableItem: $this->productB, quantity: 8),
-                ],
-                'shippingMode' => [
-                    'provider' => $this->shippingMode->getProvider(),
-                ],
-                'paymentMode' => [
-                    'provider' => $this->shippingMode->paymentModes()
-                        ->first()
-                        ->getProvider(),
-                ],
-                'shipping_mode_provider' => $this->shippingMode->getProvider(),
-                'payment_mode_provider' => $this->shippingMode->paymentModes()
-                    ->first()
-                    ->getProvider(),
-            ])
-        );
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     */
+    list($productA, $productB) = $this->productClass::factory()
+        ->count(2)
+        ->state(new Sequence(
+            ['price_gross' => 3000.0],
+            ['price_gross' => 8000.0],
+        ))
+        ->create()
+        ->all();
 
-        $order = config('shop.models.order')::first();
+    post(route('api.shop.cart.coupon.store', [
+        'code' => $coupon->getCode(),
+    ]));
 
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
-            'user_id' => null,
-        ]));
+    post(route('api.shop.checkout.store'), array_merge($orderData, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 7,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 7,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
 
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productA, order: $order, quantity: 8);
-        $this->assertDatabaseHasProductOrderItem(sellableItem: $this->productB, order: $order, quantity: 8);
+    $order = config('shop.models.order')::first();
 
-        $itemsTotal = array_sum([
-            $this->productA->getPriceGross() * 8,
-            $this->productB->getPriceGross() * 8,
-        ]);
+    $this->assertDatabaseHas('orders', array_merge($this->expectedOrderDataRequired, [
+        'user_id' => null,
+    ]));
 
-        $this->assertDatabaseHasCouponOrderItem(
-            coupon: $coupon,
-            order: $order,
-            priceGross: 0 - ($itemsTotal * 0.25),
-            info: "Code: {$coupon->getCode()}"
-        );
-    }
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'name' => $coupon->getName(),
+        'quantity' => 1,
+        'price_gross' => $expectedDiscountValue,
+        'type' => 'coupon',
+        'sellable_type' => $coupon::class,
+        'sellable_id' => $coupon->getKey(),
+        'info' => "Code: {$coupon->getCode()}",
+    ]);
+})->with([
+    fn () => [
+        'orderData' => $this->testOrderDataRequired,
+        'coupon' => CartValueCoupon::factory()
+            ->afterCreating(function (CouponContract $coupon) {
+                /** @var BaseCouponContract $baseCoupon */
+                $baseCoupon = Coupon::factory()->make(['code' => 'CART1100OFF']);
+                $baseCoupon->coupon()->associate($coupon);
+                $baseCoupon->save();
+            })
+            ->create([
+                'name' => '1100 OFF discount',
+                'value' => 1100.0,
+            ])->getBaseCoupon(),
+        'expectedDiscountValue' => -1100.0,
+    ],
+    fn () => [
+        'orderData' => $this->testOrderDataRequired,
+        'coupon' => CartPercentCoupon::factory()
+            ->afterCreating(function (CouponContract $coupon) {
+                /** @var BaseCouponContract $baseCoupon */
+                $baseCoupon = Coupon::factory()->make(['code' => 'CART50PERCENTOFF']);
+                $baseCoupon->coupon()->associate($coupon);
+                $baseCoupon->save();
+            })
+            ->create([
+                'name' => '50% OFF discount',
+                'value' => 50.0,
+            ])->getBaseCoupon(),
+        'expectedDiscountValue' => -38500.0,
+    ],
+]);
 
-    /** @test */
-    public function coupons_get_deleted_when_base_coupons_are_deleted()
-    {
-        $baseCouponA = $this->createCartValueCoupon(
-            name: '100 OFF discount',
-            value: 100.0,
-            code: 'CART100'
-        );
+it('deletes child coupons when base coupons being deleted', function (BaseCouponContract $baseCoupon) {
+    $coupon = $baseCoupon->getCoupon();
 
-        $baseCouponB = $this->createCartPercentCoupon(
-            name: '40% OFF discount',
-            value: 40.0,
-            code: 'CART40'
-        );
+    $this->assertDatabaseHas('coupons', [
+        'coupon_type' => $coupon::class,
+        'coupon_id' => $coupon->getKey(),
+        'code' => $baseCoupon->getCode(),
+    ]);
 
-        $this->assertDatabaseHas('coupons', [
-            'coupon_type' => CartValueCoupon::class,
-            'coupon_id' => 1,
-        ]);
+    $this->assertDatabaseHas($coupon->getTable(), [
+        'name' => $coupon->getName(),
+        'value' => $coupon->getValue(),
+    ]);
 
-        $this->assertDatabaseHas('coupons', [
-            'coupon_type' => CartPercentCoupon::class,
-            'coupon_id' => 1,
-        ]);
+    $baseCoupon->delete();
 
-        $this->assertDatabaseHas('cart_value_coupons', [
+    $this->assertDatabaseCount($coupon->getTable(), 0);
+
+    $this->assertDatabaseCount('coupons', 0);
+})->with([
+    fn () => CartValueCoupon::factory()
+        ->afterCreating(function (CouponContract $coupon) {
+            /** @var BaseCouponContract $baseCoupon */
+            $baseCoupon = Coupon::factory()->make(['code' => 'CART100']);
+            $baseCoupon->coupon()->associate($coupon);
+            $baseCoupon->save();
+        })
+        ->create([
             'name' => '100 OFF discount',
             'value' => 100.0,
-        ]);
-
-        $this->assertDatabaseHas('cart_percent_coupons', [
+        ])->getBaseCoupon(),
+    fn () => CartPercentCoupon::factory()
+        ->afterCreating(function (CouponContract $coupon) {
+            /** @var BaseCouponContract $baseCoupon */
+            $baseCoupon = Coupon::factory()->make(['code' => 'CART40']);
+            $baseCoupon->coupon()->associate($coupon);
+            $baseCoupon->save();
+        })
+        ->create([
             'name' => '40% OFF discount',
             'value' => 40.0,
-        ]);
+        ])->getBaseCoupon(),
+]);
 
-        $baseCouponA->delete();
-        $baseCouponB->delete();
+it('saves coupon codes as uppercase text', function (array $data) {
+    /**
+     * @var BaseCouponContract $coupon
+     * @var string $code
+     */
+    list ($coupon, $code) = array_values($data);
 
-        $this->assertDatabaseCount('cart_value_coupons', 0);
-        $this->assertDatabaseCount('cart_percent_coupons', 0);
-
-        $this->assertDatabaseCount('coupons', 0);
-    }
-
-    /** @test */
-    public function coupon_code_attribute_being_saved_as_uppercase_text()
-    {
-        $coupon = $this->createCartPercentCoupon(
-            name: '10% OFF discount',
-            value: 10.0,
-            code: 'cartdiscount'
-        );
-
-        $savedCode = $coupon->refresh()->getCode();
-
-        $this->assertSame('CARTDISCOUNT', $savedCode);
-        $this->assertNotSame('cartdiscount', $savedCode);
-    }
-}
+    expect($coupon->refresh()->getCode())
+        ->toBe(Str::upper($code))
+        ->not()
+        ->toBe($code);
+})->with([
+    fn () => [
+        'coupon' => CartValueCoupon::factory()
+            ->afterCreating(function (CouponContract $coupon) {
+                /** @var BaseCouponContract $baseCoupon */
+                $baseCoupon = Coupon::factory()->make(['code' => 'lowercase100']);
+                $baseCoupon->coupon()->associate($coupon);
+                $baseCoupon->save();
+            })
+            ->create([
+                'name' => '100 OFF discount',
+                'value' => 100.0,
+            ])->getBaseCoupon(),
+        'code' => 'lowercase100',
+    ],
+    fn () => [
+        'coupon' => CartPercentCoupon::factory()
+            ->afterCreating(function (CouponContract $coupon) {
+                /** @var BaseCouponContract $baseCoupon */
+                $baseCoupon = Coupon::factory()->make(['code' => 'lowercase80']);
+                $baseCoupon->coupon()->associate($coupon);
+                $baseCoupon->save();
+            })
+            ->create([
+                'name' => '80% OFF discount',
+                'value' => 80.0,
+            ])->getBaseCoupon(),
+        'code' => 'lowercase80',
+    ],
+]);

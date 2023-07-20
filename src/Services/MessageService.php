@@ -24,6 +24,11 @@ class MessageService implements MessageServiceContract
         $this->addMessage('negative', $key, $message);
     }
 
+    public function reset(): void
+    {
+        $this->messages = [];
+    }
+
     public function all(): ?array
     {
         return empty($this->messages) ? null : $this->messages;

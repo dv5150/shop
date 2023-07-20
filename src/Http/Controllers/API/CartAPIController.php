@@ -74,6 +74,8 @@ class CartAPIController implements CartAPIControllerContract
             return $this->index();
         }
 
+        $this->messages->reset();
+
         return $this->getCartResponse(
             $this->cart->setCoupon($coupon)
         );
@@ -149,7 +151,7 @@ class CartAPIController implements CartAPIControllerContract
                     ? Auth::user()->getShippingAddresses() : [],
                 'messages' => $this->messages->all(),
             ],
-        ]);
+        ], options: JSON_PRESERVE_ZERO_FRACTION);
     }
 
     protected function resolveProduct($productID): SellableItemContract

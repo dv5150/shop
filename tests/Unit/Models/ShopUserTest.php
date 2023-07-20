@@ -3,66 +3,45 @@
 namespace DV5150\Shop\Tests\Unit\Models;
 
 use DV5150\Shop\Contracts\Models\ShopUserContract;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleUser;
-use DV5150\Shop\Tests\TestCase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Hash;
 
-class ShopUserTest extends TestCase
-{
-    use ProvidesSampleUser;
+test('user_has_many_shipping_addresses', function () {
+    /** @var ShopUserContract $user */
+    $user = config('shop.models.user')::create([
+        'name' => 'Johnny Jackson',
+        'email' => 'johnny+12345@jackson.com',
+        'password' => Hash::make('testing'),
+    ]);
 
-    protected array $sampleAddress = [
-        'display_name' => 'Test address',
-        'name' => 'Johnny',
-        'zip_code' => '1234',
-        'city' => 'Budapest',
-        'address' => 'Sample street 2',
-        'phone' => '+36301234567',
-        'comment' => 'Some comment goes here',
-    ];
+    $user->shippingAddresses()->create($this->sampleAddress);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $this->assertDatabaseHas('shipping_addresses', array_merge($this->sampleAddress, [
+        'user_id' => $user->getKey(),
+    ]));
 
-        $this->setUpSampleUser();
-    }
+    expect(json_encode([
+        [
+            'displayName' => $this->sampleAddress['display_name'].' ('
+                .$this->sampleAddress['zip_code'].' '
+                .$this->sampleAddress['city'].', '
+                .$this->sampleAddress['address'].')',
+            'name' => $this->sampleAddress['name'],
+            'zipCode' => $this->sampleAddress['zip_code'],
+            'city' => $this->sampleAddress['city'],
+            'street' => $this->sampleAddress['address'],
+            'comment' => $this->sampleAddress['comment'],
+        ]
+    ]))->toBe($user->getShippingAddresses()->toJson());
+});
 
-    /** @test */
-    public function user_has_many_shipping_addresses()
-    {
-        /** @var ShopUserContract $user */
-        $user = config('shop.models.user')::first();
+test('user_has_many_orders', function () {
+    /** @var ShopUserContract $user */
+    $user = config('shop.models.user')::create([
+        'name' => 'Johnny Jackson',
+        'email' => 'johnny+12345@jackson.com',
+        'password' => Hash::make('testing'),
+    ]);
 
-        $user->shippingAddresses()->create($this->sampleAddress);
-
-        $this->assertDatabaseHas('shipping_addresses', array_merge($this->sampleAddress, [
-            'user_id' => $this->testUser->getKey(),
-        ]));
-
-        $this->assertSame(
-            json_encode([
-                [
-                    'displayName' => $this->sampleAddress['display_name'].' ('
-                        .$this->sampleAddress['zip_code'].' '
-                        .$this->sampleAddress['city'].', '
-                        .$this->sampleAddress['address'].')',
-                    'name' => $this->sampleAddress['name'],
-                    'zipCode' => $this->sampleAddress['zip_code'],
-                    'city' => $this->sampleAddress['city'],
-                    'street' => $this->sampleAddress['address'],
-                    'comment' => $this->sampleAddress['comment'],
-                ]
-            ]), $user->getShippingAddresses()->toJson()
-        );
-    }
-
-    /** @test */
-    public function user_has_many_orders()
-    {
-        /** @var ShopUserContract $user */
-        $user = config('shop.models.user')::first();
-
-        $this->assertInstanceOf(HasMany::class, $user->orders());
-    }
-}
+    $this->assertInstanceOf(HasMany::class, $user->orders());
+});

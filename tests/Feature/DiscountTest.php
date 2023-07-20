@@ -2,377 +2,472 @@
 
 namespace DV5150\Shop\Tests\Feature;
 
+use DV5150\Shop\Contracts\Deals\Discounts\BaseDiscountContract;
+use DV5150\Shop\Contracts\Deals\Discounts\DiscountContract;
+use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Facades\Cart;
-use DV5150\Shop\Models\Deals\Discounts\ProductPercentDiscount;
-use DV5150\Shop\Models\Deals\Discounts\ProductValueDiscount;
-use DV5150\Shop\Tests\Concerns\CreatesDiscountsForProducts;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleOrderData;
-use DV5150\Shop\Tests\Concerns\ProvidesSampleShippingModeData;
-use DV5150\Shop\Tests\TestCase;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discount;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discounts\ProductPercentDiscount;
+use DV5150\Shop\Tests\Mock\Models\Deals\Discounts\ProductValueDiscount;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Sequence;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
 
-class DiscountTest extends TestCase
-{
-    use CreatesDiscountsForProducts,
-        ProvidesSampleOrderData,
-        ProvidesSampleShippingModeData;
+it('calculates the product discounts properly', function () {
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     * @var SellableItemContract $productC
+     */
+    list($productA, $productB, $productC) = $this->productClass::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['price_gross' => 5000.0],
+            ['price_gross' => 7500.0],
+            ['price_gross' => 12300.0],
+        ))
+        ->create()
+        ->all();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    Cart::addItem($productA);
+    Cart::addItem($productB);
+    Cart::addItem($productC);
 
-        $this->setUpSampleOrderData();
-        $this->setUpSampleShippingModeData();
+    $discountA = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '60% OFF discount',
+            'value' => 60.0,
+        ])->getBaseDiscount();
 
-        $this->productC->update(['price_gross' => 5000.0]);
-        $this->productD->update(['price_gross' => 7500.0]);
-        $this->productE->update(['price_gross' => 12300.0]);
-    }
+    $discountB = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '700 OFF discount',
+            'value' => 700.0,
+        ])->getBaseDiscount();
 
-    /** @test */
-    public function product_percent_discount_is_working()
-    {
-        Cart::addItem($this->productC);
-        Cart::addItem($this->productD);
-        Cart::addItem($this->productE);
+    $productA->discounts()->sync($discountA);
+    $productB->discounts()->sync($discountB);
 
-        $discountA = $this->createPercentDiscountForProduct(
-            $this->productC,
-            '60% OFF discount',
-            60.0
-        );
-
-        $discountB = $this->createPercentDiscountForProduct(
-            $this->productD,
-            '13% OFF discount',
-            13.0
-        );
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            discount: $discountA,
-                            overwriteGrossPrice: 2000.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            discount: $discountB,
-                            overwriteGrossPrice: 6525.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productE,
-                            overwriteGrossPrice: 12300.0,
-                        ),
-                    ],
+    expect($response = get(route('api.shop.cart.index')))
+        ->assertOk()
+        ->and($response->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(3)
+        ->toBe([
+            [
+                'item' => [
+                    'id' => $productA->getKey(),
+                    'name' => $productA->getName(),
+                    'price_gross' => 2000.0,
+                    'price_gross_original' => 5000.0,
+                    'discount' => $discountA->toArray(),
+                    'is_digital' => false,
                 ],
-            ]);
-    }
-
-    /** @test */
-    public function product_value_discount_is_working()
-    {
-        Cart::addItem($this->productC);
-        Cart::addItem($this->productD);
-        Cart::addItem($this->productE);
-
-        $discountA = $this->createValueDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '1000 OFF discount',
-            value: 1000.0
-        );
-
-        $discountB = $this->createValueDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '4400 OFF discount',
-            value: 4400.0
-        );
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            discount: $discountA,
-                            overwriteGrossPrice: 4000.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            discount: $discountB,
-                            overwriteGrossPrice: 3100.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productE,
-                            overwriteGrossPrice: 12300.0,
-                        ),
-                    ],
+                'quantity' => 1,
+                'subtotal' => 2000.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productB->getKey(),
+                    'name' => $productB->getName(),
+                    'price_gross' => 6800.0,
+                    'price_gross_original' => 7500.0,
+                    'discount' => $discountB->toArray(),
+                    'is_digital' => false,
                 ],
-            ]);
-    }
-
-    /** @test */
-    public function best_available_discount_is_applied()
-    {
-        Cart::addItem($this->productC);
-        Cart::addItem($this->productD);
-        Cart::addItem($this->productE);
-
-        $this->createValueDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '1000 OFF discount',
-            value: 1000.0
-        );
-
-        $discountAB = $this->createValueDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '3000 OFF discount',
-            value: 3000.0
-        );
-
-        $this->createPercentDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '20% OFF discount',
-            value: 20.0
-        );
-
-        $discountBB = $this->createPercentDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '70% OFF discount',
-            value: 70.0
-        );
-
-        $this->createPercentDiscountForProduct(
-            sellableItem: $this->productE,
-            name: '3% OFF discount',
-            value: 3.0
-        );
-
-        $discountCB = $this->createValueDiscountForProduct(
-            sellableItem: $this->productE,
-            name: '1000 OFF discount',
-            value: 1000.0
-        );
-
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            discount: $discountAB,
-                            overwriteGrossPrice: 2000.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            discount: $discountBB,
-                            overwriteGrossPrice: 2250.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productE,
-                            discount: $discountCB,
-                            overwriteGrossPrice: 11300.0,
-                        ),
-                    ],
+                'quantity' => 1,
+                'subtotal' => 6800.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productC->getKey(),
+                    'name' => $productC->getName(),
+                    'price_gross' => 12300.0,
+                    'price_gross_original' => 12300.0,
+                    'discount' => null,
+                    'is_digital' => false,
                 ],
-            ]);
-    }
+                'quantity' => 1,
+                'subtotal' => 12300.0,
+            ]
+        ]);
+});
 
-    /** @test */
-    public function best_available_price_is_applied_when_removing_a_discount()
-    {
-        Cart::addItem($this->productC);
-        Cart::addItem($this->productD);
+it('applies the best available discount on products', function () {
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     * @var SellableItemContract $productC
+     */
+    list($productA, $productB, $productC) = $this->productClass::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['price_gross' => 5000.0],
+            ['price_gross' => 7500.0],
+            ['price_gross' => 12300.0],
+        ))
+        ->create()
+        ->all();
 
-        $discountAA = $this->createPercentDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '55% OFF discount',
-            value: 55.0
-        );
+    Cart::addItem($productA);
+    Cart::addItem($productB);
+    Cart::addItem($productC);
 
-        $discountAB = $this->createPercentDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '88% OFF discount',
-            value: 88.0
-        );
+    $discountAA = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '1000 OFF discount',
+            'value' => 1000.0,
+        ])->getBaseDiscount();
 
-        $discountBA = $this->createValueDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '510 OFF discount',
-            value: 510.0
-        );
+    $discountAB = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '3000 OFF discount',
+            'value' => 3000.0,
+        ])->getBaseDiscount();
 
-        $discountBB = $this->createValueDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '1510 OFF discount',
-            value: 1510.0
-        );
+    $productA->discounts()->sync(new Collection([$discountAA, $discountAB]));
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            discount: $discountAB,
-                            overwriteGrossPrice: 600.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            discount: $discountBB,
-                            overwriteGrossPrice: 5990.0,
-                        ),
-                    ],
-                ]
-            ]);
+    $discountBA = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '70% OFF discount',
+            'value' => 70.0,
+        ])->getBaseDiscount();
 
-        $discountAB->delete();
-        $discountBB->delete();
+    $discountBB = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '20% OFF discount',
+            'value' => 20.0,
+        ])->getBaseDiscount();
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            discount: $discountAA,
-                            overwriteGrossPrice: 2250.0,
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            discount: $discountBA,
-                            overwriteGrossPrice: 6990.0,
-                        ),
-                    ],
-                ]
-            ]);
+    $productB->discounts()->sync(new Collection([$discountBA, $discountBB]));
 
-        $discountAA->delete();
-        $discountBA->delete();
+    $discountCA = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '3% OFF discount',
+            'value' => 3.0,
+        ])->getBaseDiscount();
 
-        $this->get(route('api.shop.cart.index'))
-            ->assertJson([
-                'cart' => [
-                    'items' => [
-                        $this->expectProductInCart(
-                            sellableItem: $this->productC,
-                            overwriteGrossPrice: $this->productC->getPriceGross(),
-                        ),
-                        $this->expectProductInCart(
-                            sellableItem: $this->productD,
-                            overwriteGrossPrice: $this->productD->getPriceGross(),
-                        ),
-                    ],
-                ]
-            ]);
-    }
+    $discountCB = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '1000 OFF discount',
+            'value' => 1000.0,
+        ])->getBaseDiscount();
 
-    /** @test */
-    public function discounted_order_items_are_saved_properly_as_guest()
-    {
-        $discountA = $this->createValueDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '1700 OFF discount',
-            value: 1700.0
-        );
+    $productC->discounts()->sync(new Collection([$discountCA, $discountCB]));
 
-        $discountB = $this->createPercentDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '11% OFF discount',
-            value: 11.0
-        );
-
-        $this->post(
-            route('api.shop.checkout.store'),
-            array_merge($this->testOrderData, [
-                'cartData' => [
-                    $this->makeProductCartDataItem($this->productC, 2),
-                    $this->makeProductCartDataItem($this->productD, 2),
-                    $this->makeProductCartDataItem($this->productE, 2),
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(3)
+        ->toBe([
+            [
+                'item' => [
+                    'id' => $productA->getKey(),
+                    'name' => $productA->getName(),
+                    'price_gross' => 2000.0,
+                    'price_gross_original' => 5000.0,
+                    'discount' => $discountAB->toArray(),
+                    'is_digital' => false,
                 ],
-                'shippingMode' => [
-                    'provider' => $this->shippingModeProvider,
+                'quantity' => 1,
+                'subtotal' => 2000.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productB->getKey(),
+                    'name' => $productB->getName(),
+                    'price_gross' => 2250.0,
+                    'price_gross_original' => 7500.0,
+                    'discount' => $discountBA->toArray(),
+                    'is_digital' => false,
                 ],
-                'paymentMode' => [
-                    'provider' => $this->paymentModeProvider,
+                'quantity' => 1,
+                'subtotal' => 2250.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productC->getKey(),
+                    'name' => $productC->getName(),
+                    'price_gross' => 11300.0,
+                    'price_gross_original' => 12300.0,
+                    'discount' => $discountCB->toArray(),
+                    'is_digital' => false,
                 ],
-                'shipping_mode_provider' => $this->shippingModeProvider,
-                'payment_mode_provider' => $this->paymentModeProvider,
-            ])
-        );
-
-        $order = config('shop.models.order')::first();
-
-        $this->assertDatabaseHas('orders', array_merge($this->expectedBaseOrderData, [
-            'user_id' => null,
-        ]));
-
-        $this->assertDatabaseHasProductOrderItem(
-            sellableItem: $this->productC,
-            order: $order,
-            quantity: 2,
-            info: $discountA->getName(),
-            overwriteGrossPrice: 3300.0,
-        );
-
-        $this->assertDatabaseHasProductOrderItem(
-            sellableItem: $this->productD,
-            order: $order,
-            quantity: 2,
-            info: $discountB->getName(),
-            overwriteGrossPrice: 6675.0,
-        );
-
-        $this->assertDatabaseHasProductOrderItem(
-            sellableItem: $this->productE,
-            order: $order,
-            quantity: 2,
-            overwriteGrossPrice: 12300.0,
-        );
-    }
-
-    /** @test */
-    public function discounts_get_deleted_when_base_product_discounts_are_deleted()
-    {
-        $baseDiscountA = $this->createValueDiscountForProduct(
-            sellableItem: $this->productC,
-            name: '1700 OFF discount',
-            value: 1700.0
-        );
-
-        $baseDiscountB = $this->createPercentDiscountForProduct(
-            sellableItem: $this->productD,
-            name: '11% OFF discount',
-            value: 11.0
-        );
-
-        $this->assertDatabaseHas('discounts', [
-            'discount_type' => ProductValueDiscount::class,
-            'discount_id' => 1,
+                'quantity' => 1,
+                'subtotal' => 11300.0,
+            ]
         ]);
 
-        $this->assertDatabaseHas('discounts', [
-            'discount_type' => ProductPercentDiscount::class,
-            'discount_id' => 1,
-        ]);
+    // Try removing a discount
 
-        $this->assertDatabaseHas('product_value_discounts', [
+    $discountCB->delete();
+
+    expect(get(route('api.shop.cart.index'))->getContent())
+        ->json()
+        ->cart
+        ->items
+        ->toHaveCount(3)
+        ->toBe([
+            [
+                'item' => [
+                    'id' => $productA->getKey(),
+                    'name' => $productA->getName(),
+                    'price_gross' => 2000.0,
+                    'price_gross_original' => 5000.0,
+                    'discount' => $discountAB->toArray(),
+                    'is_digital' => false,
+                ],
+                'quantity' => 1,
+                'subtotal' => 2000.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productB->getKey(),
+                    'name' => $productB->getName(),
+                    'price_gross' => 2250.0,
+                    'price_gross_original' => 7500.0,
+                    'discount' => $discountBA->toArray(),
+                    'is_digital' => false,
+                ],
+                'quantity' => 1,
+                'subtotal' => 2250.0,
+            ],
+            [
+                'item' => [
+                    'id' => $productC->getKey(),
+                    'name' => $productC->getName(),
+                    'price_gross' => 11931.0,
+                    'price_gross_original' => 12300.0,
+                    'discount' => $discountCA->toArray(),
+                    'is_digital' => false,
+                ],
+                'quantity' => 1,
+                'subtotal' => 11931.0,
+            ]
+        ]);
+});
+
+it('saves order items with discounts properly', function () {
+    /**
+     * @var SellableItemContract $productA
+     * @var SellableItemContract $productB
+     * @var SellableItemContract $productC
+     */
+    list($productA, $productB, $productC) = $this->productClass::factory()
+        ->count(3)
+        ->state(new Sequence(
+            ['price_gross' => 28990.0],
+            ['price_gross' => 9990.0],
+            ['price_gross' => 14370.0],
+        ))
+        ->create()
+        ->all();
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->create());
+
+    Cart::addItem($productA, 2);
+    Cart::addItem($productB, 2);
+    Cart::addItem($productC, 2);
+
+    $discountA = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
             'name' => '1700 OFF discount',
             'value' => 1700.0,
-        ]);
+        ])->getBaseDiscount();
 
-        $this->assertDatabaseHas('product_percent_discounts', [
+    $discountB = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
             'name' => '11% OFF discount',
             'value' => 11.0,
-        ]);
+        ])->getBaseDiscount();
 
-        $baseDiscountA->delete();
-        $baseDiscountB->delete();
+    $productA->discounts()->sync($discountA);
+    $productB->discounts()->sync($discountB);
 
-        $this->assertDatabaseCount('product_value_discounts', 0);
-        $this->assertDatabaseCount('product_percent_discounts', 0);
+    post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productC->getKey()],
+                'quantity' => 2,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
 
-        $this->assertDatabaseCount('discounts', 0);
-    }
-}
+    $order = config('shop.models.order')::first();
+
+    $this->assertDatabaseHas('orders', array_merge($this->expectedOrderDataRequired, [
+        'user_id' => null,
+    ]));
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'name' => $productA->getName(),
+        'quantity' => 2,
+        'price_gross' => 27290.0,
+        'type' => 'product',
+        'sellable_type' => $productA::class,
+        'sellable_id' => $productA->getKey(),
+        'info' => $discountA->getName(),
+    ]);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'name' => $productB->getName(),
+        'quantity' => 2,
+        'price_gross' => 8891.0,
+        'type' => 'product',
+        'sellable_type' => $productB::class,
+        'sellable_id' => $productB->getKey(),
+        'info' => $discountB->getName(),
+    ]);
+
+    $this->assertDatabaseHas('order_items', [
+        'order_id' => $order->getKey(),
+        'name' => $productC->getName(),
+        'quantity' => 2,
+        'price_gross' => 14370.0,
+        'type' => 'product',
+        'sellable_type' => $productC::class,
+        'sellable_id' => $productC->getKey(),
+        'info' => null,
+    ]);
+});
+
+it('deletes discounts when base discount is being deleted', function () {
+    $baseDiscountA = ProductValueDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '1700 OFF discount',
+            'value' => 1700.0,
+        ])->getBaseDiscount();
+
+    $baseDiscountB = ProductPercentDiscount::factory()
+        ->afterCreating(function (DiscountContract $discount) {
+            /** @var BaseDiscountContract $baseDiscount */
+            $baseDiscount = Discount::factory()->make();
+            $baseDiscount->discount()->associate($discount);
+            $baseDiscount->save();
+        })
+        ->create([
+            'name' => '11% OFF discount',
+            'value' => 11.0,
+        ])->getBaseDiscount();
+
+    $this->assertDatabaseHas('discounts', [
+        'discount_type' => ProductValueDiscount::class,
+        'discount_id' => 1,
+    ]);
+
+    $this->assertDatabaseHas('discounts', [
+        'discount_type' => ProductPercentDiscount::class,
+        'discount_id' => 1,
+    ]);
+
+    $this->assertDatabaseHas('product_value_discounts', [
+        'name' => '1700 OFF discount',
+        'value' => 1700.0,
+    ]);
+
+    $this->assertDatabaseHas('product_percent_discounts', [
+        'name' => '11% OFF discount',
+        'value' => 11.0,
+    ]);
+
+    $baseDiscountA->delete();
+    $baseDiscountB->delete();
+
+    $this->assertDatabaseCount('product_value_discounts', 0);
+    $this->assertDatabaseCount('product_percent_discounts', 0);
+
+    $this->assertDatabaseCount('discounts', 0);
+});

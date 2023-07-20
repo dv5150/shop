@@ -8,7 +8,6 @@ use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Models\Deals\Coupon;
 use DV5150\Shop\Support\CartCollection;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class CartValueCoupon extends Coupon implements CouponContract
 {
@@ -32,7 +31,7 @@ class CartValueCoupon extends Coupon implements CouponContract
             'name' => $this->getName(),
             'quantity' => 1,
             'price_gross' => 0 - $this->getValue(),
-            'type' => Str::kebab(class_basename($this)),
+            'type' => 'coupon',
             'info' => "Code: {$this->getCode()}",
         ]);
 
