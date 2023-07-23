@@ -2,6 +2,12 @@
     "name": "dv5150/shop",
     "description": "Laravel Webshop package",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "shop",
+        "laravel-shop",
+        "webshop"
+    ],
     "autoload": {
         "psr-4": {
             "DV5150\\Shop\\": "src/",
@@ -11,9 +17,12 @@
     "authors": [
         {
             "name": "David Szabados",
-            "email": "dv5150dev@gmail.com"
+            "email": "dv5150dev@gmail.com",
+            "homepage": "https://dv5150.github.io",
+            "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/dv5150/shop",
     "require": {
         "php": "^8.1",
         "spatie/laravel-sluggable": "^3.4",
