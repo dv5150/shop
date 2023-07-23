@@ -1,6 +1,6 @@
 {
     "name": "dv5150/shop",
-    "description": "Laravel shop package",
+    "description": "Laravel Webshop package",
     "license": "MIT",
     "autoload": {
         "psr-4": {
