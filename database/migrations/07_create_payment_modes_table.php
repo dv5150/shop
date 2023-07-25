@@ -15,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('payment_modes', function (Blueprint $table) {
             $table->id();
-            $table->string('provider');
+            $table->string('provider')
+                ->unique();
             $table->string('name');
             $table->float('price_gross')
                 ->default(0.0);

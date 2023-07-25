@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('shipping_modes', function (Blueprint $table) {
             $table->id();
+            $table->string('provider')
+                ->unique();
             $table->string('name');
             $table->float('price_gross')
                 ->default(0.0);
-            $table->string('provider')
-                ->unique();
             $table->string('component_name')
                 ->nullable();
             $table->timestamps();
