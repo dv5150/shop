@@ -45,7 +45,7 @@ class InstallCommand extends Command
         ]);
     }
 
-    protected function installTranslations()
+    protected function installTranslations(): void
     {
         $this->info('Publishing translations...');
 
