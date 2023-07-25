@@ -111,7 +111,6 @@ class ShopServiceProvider extends PackageServiceProvider
 
         App::bind(CheckoutServiceContract::class, fn () => new CheckoutService(
             app(OrderDataTransformerContract::class),
-            app(OrderItemDataTransformerContract::class),
         ));
 
         App::bind(ProductListComposerServiceContract::class, fn () => new ProductListComposerService());

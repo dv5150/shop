@@ -2,6 +2,7 @@
 
 namespace DV5150\Shop\Contracts\Models;
 
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 interface SellableItemContract
@@ -14,4 +15,6 @@ interface SellableItemContract
     public function getDescription(): ?string;
     public function getPriceGross(): float;
     public function isDigitalItem(): bool;
+
+    public function toShopItemCapsule(int $quantity = 1): ShopItemCapsuleContract;
 }

@@ -4,14 +4,11 @@ namespace DV5150\Shop\Services;
 
 use DV5150\Shop\Contracts\Deals\Coupons\BaseCouponContract;
 use DV5150\Shop\Contracts\Models\OrderContract;
-use DV5150\Shop\Contracts\Models\OrderItemContract;
 use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Contracts\Services\CheckoutServiceContract;
-use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use DV5150\Shop\Contracts\Transformers\OrderDataTransformerContract;
-use DV5150\Shop\Contracts\Transformers\OrderItemDataTransformerContract;
 use DV5150\Shop\Facades\Cart;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -22,7 +19,6 @@ class CheckoutService implements CheckoutServiceContract
 {
     public function __construct(
         protected OrderDataTransformerContract $orderDataTransformer,
-        protected OrderItemDataTransformerContract $orderItemDataTransformer
     ){}
 
     public function saveOrder(array $orderData): OrderContract
@@ -57,12 +53,11 @@ class CheckoutService implements CheckoutServiceContract
 
         $orderItems = config('shop.models.product')::with('discounts.discount')
             ->find($IDs)
-            ->map(fn (SellableItemContract $product) => $this->makeOrderItem(
-                (new (config('shop.support.shopItemCapsule'))(
-                    sellableItem: $product,
-                    quantity: $quantities[$product->getKey()]
-                ))->applyBestDiscount()
-            ));
+            ->map(function (SellableItemContract $product) use ($quantities) {
+                return $product->toShopItemCapsule($quantities[$product->getKey()])
+                    ->applyBestDiscount()
+                    ->toOrderItem();
+            });
 
         /** @var BaseCouponContract $coupon */
         if ($coupon = Cart::getCoupon()) {
@@ -92,18 +87,6 @@ class CheckoutService implements CheckoutServiceContract
         } while (config('shop.models.order')::whereUuid($uuid)->exists());
 
         return $uuid;
-    }
-
-    protected function makeOrderItem(ShopItemCapsuleContract $capsule): OrderItemContract
-    {
-        /** @var OrderItemContract $orderItem */
-        $orderItem = new (config('shop.models.orderItem'))(
-            $this->orderItemDataTransformer->transform($capsule)
-        );
-
-        $orderItem->sellable()->associate($capsule->getSellableItem());
-
-        return $orderItem;
     }
 
     protected function resolveShippingMode(string $provider): ShippingModeContract

@@ -4,6 +4,7 @@ namespace DV5150\Shop\Models\Default;
 
 use DV5150\Shop\Concerns\Models\SellableItemTrait;
 use DV5150\Shop\Contracts\Models\SellableItemContract;
+use DV5150\Shop\Contracts\Support\ShopItemCapsuleContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -56,5 +57,13 @@ class Product extends Model implements SellableItemContract
     public function isDigitalItem(): bool
     {
         return $this->is_digital_item;
+    }
+
+    public function toShopItemCapsule(int $quantity = 1): ShopItemCapsuleContract
+    {
+        return (new (config('shop.support.shopItemCapsule'))(
+            sellableItem: $this,
+            quantity: $quantity,
+        ));
     }
 }

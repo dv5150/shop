@@ -23,15 +23,10 @@ use DV5150\Shop\Tests\Mock\Models\PaymentMode;
 use DV5150\Shop\Tests\Mock\Models\Product;
 use DV5150\Shop\Tests\Mock\Models\ShippingMode;
 use DV5150\Shop\Tests\Mock\Models\User;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithContainer;
-use Illuminate\Support\Facades\Config;
-use Orchestra\Testbench\Concerns\HandlesRoutes;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    use HandlesRoutes, InteractsWithContainer;
-
     protected string $productClass;
     protected string $categoryClass;
 
@@ -83,37 +78,6 @@ class TestCase extends Orchestra
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom('database/migrations');
-
-        /** Mock models */
-        Config::set('shop.models.user', User::class);
-
-        /** Real models or extends real models */
-        Config::set('shop.models.billingAddress', BillingAddress::class);
-        Config::set('shop.models.category', Category::class);
-        Config::set('shop.models.coupon', Coupon::class);
-        Config::set('shop.models.discount', Discount::class);
-        Config::set('shop.models.order', Order::class);
-        Config::set('shop.models.orderItem', OrderItem::class);
-        Config::set('shop.models.payment', Payment::class);
-        Config::set('shop.models.paymentMode', PaymentMode::class);
-        Config::set('shop.models.product', Product::class);
-        Config::set('shop.models.shippingMode', ShippingMode::class);
-        Config::set('shop.models.shippingAddress', ShippingAddress::class);
-
-        /** Support tools */
-        Config::set('shop.support.shopItemCapsule', ShopItemCapsule::class);
-
-        /** API Resources */
-        Config::set('shop.resources.shippingMode', ShippingModeResource::class);
-        Config::set('shop.resources.paymentMode', PaymentModeResource::class);
-        Config::set('shop.resources.product', ProductResource::class);
-        Config::set('shop.resources.shippingAddress', ShippingAddressResource::class);
-        Config::set('shop.resources.category', CategoryResource::class);
-
-        /** Currency setup */
-        Config::set('shop.currency.code', 'HUF');
-
         $this->productClass = config('shop.models.product');
         $this->categoryClass = config('shop.models.category');
         $this->shopItemCapsuleClass = config('shop.support.shopItemCapsule');
@@ -136,5 +100,42 @@ class TestCase extends Orchestra
 
         $router->get('payment/{paymentProvider}/pay/{order:uuid}', [app(PaymentControllerContract::class), 'pay'])
             ->name('shop.pay');
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        /** Mock models */
+        $app['config']->set('shop.models.user', User::class);
+
+        /** Real models or extends real models */
+        $app['config']->set('shop.models.billingAddress', BillingAddress::class);
+        $app['config']->set('shop.models.category', Category::class);
+        $app['config']->set('shop.models.coupon', Coupon::class);
+        $app['config']->set('shop.models.discount', Discount::class);
+        $app['config']->set('shop.models.order', Order::class);
+        $app['config']->set('shop.models.orderItem', OrderItem::class);
+        $app['config']->set('shop.models.payment', Payment::class);
+        $app['config']->set('shop.models.paymentMode', PaymentMode::class);
+        $app['config']->set('shop.models.product', Product::class);
+        $app['config']->set('shop.models.shippingMode', ShippingMode::class);
+        $app['config']->set('shop.models.shippingAddress', ShippingAddress::class);
+
+        /** Support tools */
+        $app['config']->set('shop.support.shopItemCapsule', ShopItemCapsule::class);
+
+        /** API Resources */
+        $app['config']->set('shop.resources.shippingMode', ShippingModeResource::class);
+        $app['config']->set('shop.resources.paymentMode', PaymentModeResource::class);
+        $app['config']->set('shop.resources.product', ProductResource::class);
+        $app['config']->set('shop.resources.shippingAddress', ShippingAddressResource::class);
+        $app['config']->set('shop.resources.category', CategoryResource::class);
+
+        /** Currency setup */
+        $app['config']->set('shop.currency.code', 'HUF');
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom('database/migrations');
     }
 }
