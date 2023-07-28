@@ -11,6 +11,7 @@ interface OrderItemContract
     public function sellable(): MorphTo;
 
     public function getName(): string;
+    public function getItemName(): string;
     public function getInfo(): string;
     public function getOrder(): OrderContract;
     public function getSellable(): ?SellableItemContract;

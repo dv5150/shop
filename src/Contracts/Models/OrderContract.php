@@ -15,8 +15,8 @@ interface OrderContract
     public function payment(): HasOne;
 
     public function getUuid(): string;
-    public function getUser(): ShopUserContract;
-    public function getShipingMode(): ShippingModeContract;
+    public function getUser(): ?ShopUserContract;
+    public function getShippingMode(): ShippingModeContract;
     public function getPaymentMode(): PaymentModeContract;
 
     public function getEmail(): string;

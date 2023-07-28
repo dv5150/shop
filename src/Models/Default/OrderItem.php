@@ -46,6 +46,16 @@ class OrderItem extends Model implements OrderItemContract
         return $this->name;
     }
 
+    public function getItemName(): string
+    {
+        return [
+            'product' => $this->getName(),
+            'shipping-mode' => "[Shipping Mode] {$this->getName()}",
+            'payment-mode' => "[Payment Mode] {$this->getName()}",
+            'coupon' => "[Coupon] {$this->getName()}",
+        ][$this->getType()];
+    }
+
     public function getInfo(): string
     {
         return $this->info;

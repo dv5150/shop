@@ -7,9 +7,9 @@ use Illuminate\Console\Command;
 class InstallCommand extends Command
 {
     protected array $todos = [
-        'Update your migrations if necessary and run `php artisan migrate` to prepare the database.',
         'Update your `config/shop.php` config file if necessary.',
         'Update your `resources/lang/vendor/shop/en/validation.php` config file if necessary.',
+        'Update your migrations if necessary and run `php artisan migrate` to prepare the database.',
     ];
 
     protected $signature = 'shop:install:api';

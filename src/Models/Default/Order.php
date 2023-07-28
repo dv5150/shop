@@ -58,12 +58,12 @@ class Order extends Model implements OrderContract
         return $this->uuid;
     }
 
-    public function getUser(): ShopUserContract
+    public function getUser(): ?ShopUserContract
     {
         return $this->user;
     }
 
-    public function getShipingMode(): ShippingModeContract
+    public function getShippingMode(): ShippingModeContract
     {
         return $this->shippingMode;
     }
