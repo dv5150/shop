@@ -121,3 +121,21 @@ Shop facade - available methods
 | `Shop::getPaymentProvider(string $key): ?string`                | Retrieve a payment provider                          |
 | `Shop::getAllPaymentProviders(): array`                         | Retrieve all payment providers                       |
 | `Shop::isFrontendInstalled(): bool`                             | Determines whether the frontend package is installed |
+
+## Filament support
+
+Using [Filament](https://filamentphp.com/)? We've got you covered. Take a look at the Laravel Webshop Filament support [package](https://github.com/dv5150/shop-filament).
+
+---
+
+## Frontend
+
+If you need an out-of-the-box frontend scaffolding, check out this [package](https://github.com/dv5150/shop-frontend).
+
+---
+
+## Stripe support
+
+Looking to implement [Stripe](https://stripe.com) payment gateway? Click [here](https://github.com/dv5150/shop-stripe).
+
+---
