@@ -25,7 +25,7 @@ class TestPaymentProvider implements PaymentProviderContract
 
     public function pay(OrderContract $order)
     {
-        //
+        return redirect()->away('https://google.com');
     }
 
     public function webhook(Request $request)

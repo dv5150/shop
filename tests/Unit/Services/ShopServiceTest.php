@@ -14,5 +14,4 @@ it('can register a payment provider', function () {
         ->toBe(['test' => TestPaymentProvider::class])
         ->and(Shop::getPaymentProvider('test'))
         ->toBe(TestPaymentProvider::class);
-
 });

@@ -23,6 +23,7 @@ use DV5150\Shop\Tests\Mock\Models\PaymentMode;
 use DV5150\Shop\Tests\Mock\Models\Product;
 use DV5150\Shop\Tests\Mock\Models\ShippingMode;
 use DV5150\Shop\Tests\Mock\Models\User;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -98,7 +99,9 @@ class TestCase extends Orchestra
         $router->get('order/{order:uuid}/thank-you', fn (OrderContract $order) => $order->getUuid())
             ->name('shop.order.thankYou');
 
-        $router->get('payment/{paymentProvider}/pay/{order:uuid}', [app(PaymentControllerContract::class), 'pay'])
+        $router->get('payment/{paymentProvider}/pay/{order:uuid}', [
+            app(PaymentControllerContract::class), 'pay'
+        ])->middleware(SubstituteBindings::class)
             ->name('shop.pay');
     }
 

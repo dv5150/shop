@@ -41,4 +41,5 @@ interface OrderContract
     public function getOnlinePaymentUrl(): string;
 
     public function requiresOnlinePayment(): bool;
+    public function isPaid(): bool;
 }

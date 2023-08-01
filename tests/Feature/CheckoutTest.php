@@ -7,7 +7,9 @@ use DV5150\Shop\Contracts\Models\PaymentModeContract;
 use DV5150\Shop\Contracts\Models\ShippingModeContract;
 use DV5150\Shop\Facades\Shop;
 use DV5150\Shop\Tests\Mock\PaymentProviders\TestPaymentProvider;
+use Illuminate\Support\Str;
 use function Pest\Laravel\be;
+use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
 it('can store one item in an order as a guest', function (array $orderData) {
@@ -517,4 +519,58 @@ it('returns the correct redirect url on saving an order with an online payment p
             'paymentProvider' => 'test',
             'order' => $order->getUuid(),
         ]));
+});
+
+it('prevents an order being paid twice', function () {
+    list($productA, $productB) = $this->productClass::factory()->count(2)->create()->all();
+
+    Shop::registerPaymentProviders([
+        TestPaymentProvider::class,
+    ]);
+
+    /** @var ShippingModeContract $shippingMode */
+    $shippingMode = config('shop.models.shippingMode')::factory()
+        ->create();
+
+    $shippingMode
+        ->paymentModes()
+        ->sync(config('shop.models.paymentMode')::factory()->online()->create([
+            'provider' => 'test',
+        ]));
+
+    post(route('api.shop.checkout.store'), array_merge($this->testOrderDataRequired, [
+        'cartData' => [
+            [
+                'item' => ['id' => $productA->getKey()],
+                'quantity' => 2,
+            ],
+            [
+                'item' => ['id' => $productB->getKey()],
+                'quantity' => 4,
+            ],
+        ],
+        'shippingMode' => [
+            'provider' => $shippingMode->getProvider(),
+        ],
+        'paymentMode' => [
+            'provider' => $shippingMode->paymentModes()->first()->getProvider(),
+        ],
+    ]));
+
+    /** @var OrderContract $order */
+    $order = config('shop.models.order')::first();
+
+    $order->payment()->create([
+        'provider' => 'test',
+        'intent_id' => Str::random(),
+    ]);
+
+    get(route('shop.pay', [
+        'paymentProvider' => 'test',
+        'order' => $order->getUuid(),
+    ]))
+        ->assertRedirect(route('home'))
+        ->assertSessionHasErrors([
+            'paymentError' => 'This order has been already paid.'
+        ]);
 });

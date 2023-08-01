@@ -13,6 +13,12 @@ class PaymentController extends Controller implements PaymentControllerContract
 {
     public function pay(string $paymentProvider, OrderContract $order)
     {
+        if ($order->isPaid()) {
+            return redirect()->home()->withErrors([
+                'paymentError' => __("This order has been already paid.")
+            ]);
+        }
+
         if (! $this->providerExists($paymentProvider)) {
             return redirect()->home()->withErrors([
                 'paymentError' => __("Payment provider does not exist.")

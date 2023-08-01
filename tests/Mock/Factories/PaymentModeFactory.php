@@ -4,6 +4,7 @@ namespace DV5150\Shop\Tests\Mock\Factories;
 
 use DV5150\Shop\Tests\Mock\Models\PaymentMode;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class PaymentModeFactory extends Factory
 {
@@ -17,8 +18,8 @@ class PaymentModeFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'test',
-            'provider' => 'test',
+            'name' => Str::random(),
+            'provider' => Str::random(),
             'price_gross' => 190.0,
             'is_online_payment' => false,
         ];
