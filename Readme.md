@@ -13,7 +13,7 @@ To provide a set of easily customizable webshop API endpoints.
 ---
 
 ## Setup
-1. `$ composer require "dv5150/shop:^1.0"`
+1. `$ composer require dv5150/shop`
 2. `$ php artisan shop:install:api` 
 3. (Optional) Update the `resources/lang/vendor/shop/en/validation.php` localization file if needed
 4. (Optional) Update the newly published migration files if needed
